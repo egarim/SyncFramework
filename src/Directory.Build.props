@@ -1,0 +1,6 @@
+﻿<Project>
+	<PropertyGroup Label="BIT.Data.Sync">
+		<BitDataSyncNetStandardVersion>netstandard2.0</BitDataSyncNetStandardVersion>
+		<BitDataSyncNugetVersion>1.0.0</BitDataSyncNugetVersion>
+	</PropertyGroup>
+</Project>

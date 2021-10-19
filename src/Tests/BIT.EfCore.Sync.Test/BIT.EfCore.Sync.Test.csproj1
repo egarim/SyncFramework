@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="appsettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.10" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+    <PackageReference Include="NUnit" Version="3.13.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
+    <PackageReference Include="coverlet.collector" Version="3.0.3" />
+	<PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
+	<PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
+    <ProjectReference Include="..\..\Implementations\efcore\BIT.EfCore.Sync.Npgsql\BIT.EfCore.Sync.Npgsql.csproj" />
+    <ProjectReference Include="..\..\Implementations\efcore\BIT.EfCore.Sync.Sqlite\BIT.EfCore.Sync.Sqlite.csproj" />
+    <ProjectReference Include="..\..\Implementations\efcore\BIT.EfCore.Sync.SqlServer\BIT.EfCore.Sync.SqlServer.csproj" />
+    <ProjectReference Include="..\..\Implementations\efcore\BIT.EfCore.Sync\BIT.EfCore.Sync.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>$(BitDataSyncNetStandardVersion)</TargetFramework>
+		<Configurations>Debug;Release</Configurations>
+		<PackageTags>DevExpress XPO XAF Xamarin AspNetCore</PackageTags>
+		<Description>Common base classes and interfaces to implement synchronization</Description>
+		<DebugType>Full</DebugType>
+		<DebugSymbols>True</DebugSymbols>
+		<!--<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>-->
+	</PropertyGroup>
+	<!--Nuget Generation Section Start-->
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<AssemblyName>BIT.Data.Sync.v$(BitDataSyncNugetVersion)</AssemblyName>
+		<Version>$(BitDataSyncNugetVersion)</Version>
+		<PackageId>BIT.Data.Sync</PackageId>
+	</PropertyGroup>                                         
+	<!--Nuget Generation Section End-->
+	<!--Nuget Reference Section Start-->
+	<!--NugetProject ReferencesSection End-->
+	<Target Name="CopyPackage" AfterTargets="Pack">
+		<Copy SourceFiles="bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" />
+	</Target>
+</Project>

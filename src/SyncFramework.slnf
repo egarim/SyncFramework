@@ -1,0 +1,9 @@
+{
+  "solution": {
+    "path": "All.sln",
+    "projects": [
+      "BIT.Data.Sync\\BIT.Data.Sync.csproj",
+      "Tests\\BIT.Data.Sync.Tests\\BIT.Data.Sync.Tests.csproj"
+    ]
+  }
+}
