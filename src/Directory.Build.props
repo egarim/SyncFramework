@@ -3,4 +3,12 @@
 		<BitDataSyncNetStandardVersion>netstandard2.0</BitDataSyncNetStandardVersion>
 		<BitDataSyncNugetVersion>1.0.0</BitDataSyncNugetVersion>
 	</PropertyGroup>
+
+
+
+	<PropertyGroup Label="BIT.Data.Sync.EfCore">
+		<EfCoreNetStandardVersion>netstandard2.1</EfCoreNetStandardVersion>
+		<EfCoreNugetVersion>1.0.0</EfCoreNugetVersion>
+		<EfCoreVersion>5.0.10</EfCoreVersion>
+	</PropertyGroup>
 </Project>

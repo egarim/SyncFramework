@@ -15,14 +15,14 @@ namespace BIT.Data.Sync.Client
     public class SyncFrameworkHttpClient : ISyncFrameworkClient
     {
         HttpClient _httpClient;
-        public string DeltaStoreId { get; }
-        public SyncFrameworkHttpClient(HttpClient httpClient,string NodeId)
+        public string ServerNodeId { get; }
+        public SyncFrameworkHttpClient(HttpClient httpClient,string serverNodeId)
         {
-            this.DeltaStoreId = NodeId;
+           
             _httpClient = httpClient;
-            _httpClient.DefaultRequestHeaders.Add("NodeId", NodeId);
+            _httpClient.DefaultRequestHeaders.Add("NodeId", serverNodeId);
           
-            this.DeltaStoreId = NodeId;
+            this.ServerNodeId = serverNodeId;
         }
         public SyncFrameworkHttpClient(string BaseAddress, string NodeId):this(new HttpClient() { BaseAddress=new Uri(BaseAddress)},NodeId)
         {

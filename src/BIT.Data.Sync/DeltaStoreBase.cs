@@ -15,12 +15,6 @@ namespace BIT.Data.Sync
         }
    
 
-        //public string Identity { get; private set; }
-        //public DeltaStoreBase(string Identity)
-        //{
-        //    this.Identity= Identity;
-        //}
-       
         public abstract Task SaveDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken = default);
 
         public abstract Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(Guid startindex, string identity, CancellationToken cancellationToken = default);

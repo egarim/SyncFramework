@@ -18,6 +18,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.11" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
@@ -28,10 +30,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
-    <ProjectReference Include="..\..\Implementations\efcore\BIT.EfCore.Sync.Npgsql\BIT.EfCore.Sync.Npgsql.csproj" />
-    <ProjectReference Include="..\..\Implementations\efcore\BIT.EfCore.Sync.Sqlite\BIT.EfCore.Sync.Sqlite.csproj" />
-    <ProjectReference Include="..\..\Implementations\efcore\BIT.EfCore.Sync.SqlServer\BIT.EfCore.Sync.SqlServer.csproj" />
-    <ProjectReference Include="..\..\Implementations\efcore\BIT.EfCore.Sync\BIT.EfCore.Sync.csproj" />
+    <ProjectReference Include="..\..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Sqlite\BIT.Data.Sync.EfCore.Sqlite.csproj" />
+    <ProjectReference Include="..\..\EntityFrameworkCore\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
   </ItemGroup>
 
 </Project>

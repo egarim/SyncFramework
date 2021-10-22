@@ -1,6 +1,5 @@
 ﻿using BIT.Data.Sync.Client;
 using BIT.Data.Sync.Imp;
-using BIT.Data.Sync.Tests.Infrastructure;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;

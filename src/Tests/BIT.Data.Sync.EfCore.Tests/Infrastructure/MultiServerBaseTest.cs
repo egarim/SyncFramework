@@ -1,10 +1,12 @@
-using BIT.EfCore.Sync.Test.Startups;
+using BIT.Data.Sync.EfCore.Tests.Startups;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
 using NUnit.Framework;
 using System.IO;
 
-namespace BIT.EfCore.Sync.Test.Infrastructure
+namespace BIT.Data.Sync.EfCore.Tests.Infrastructure
 {
     public class MultiServerBaseTest
     {
@@ -31,23 +33,22 @@ namespace BIT.EfCore.Sync.Test.Infrastructure
 
 
             hostBuilder.UseConfiguration(Configuration);
-            hostBuilder.UseStartup<InMemoryStartUp>();
+            hostBuilder.UseStartup<TestStartup>();
             _testServer = new Microsoft.AspNetCore.TestHost.TestServer(hostBuilder);
+            hostBuilder.ConfigureLogging(logging =>
+            {
 
-            var testClient = _testServer.CreateClient();
-            var testServerHttpClientFactory = new TestClientFactory(testClient);
+                logging.ClearProviders();
+                //logging.AddConsole();
+                logging.AddDebug();
+
+            });
+          
+            var testServerHttpClientFactory = new TestClientFactory(_testServer);
             return testServerHttpClientFactory;
         }
 
 
-        protected TestClientFactory TestServerClientFactory
-        {
-            get
-            {
-                return GetTestClientFactory();
-
-            }
-
-        }
+      
     }
 }
