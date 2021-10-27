@@ -56,7 +56,7 @@ namespace BIT.Data.Sync.EfCore
         private async Task<List<ModificationCommandData>> SaveDeltasAsync(IEnumerable<ModificationCommandBatch> commandBatches,int AffectedRows, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var EFSyncFrameworkService = this.CurrentContext.Context.GetService<IEfCommandDataGeneratorService>();
+            var EFSyncFrameworkService = this.CurrentContext.Context.GetService<IModificationCommandToCommandData>();
             //var CurrentUpdater = this.CurrentContext.Context.GetService<IUpdateSqlGenerator>();
 
             //HACK to get the command in a different provider you need to execute the same code as in ReaderModificationCommandBatch.CreateStoreCommand

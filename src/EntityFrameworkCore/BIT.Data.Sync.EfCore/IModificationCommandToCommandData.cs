@@ -5,12 +5,12 @@ using System.Collections.Generic;
 
 namespace BIT.EfCore.Sync
 {
-    public interface IEfCommandDataGeneratorService
+    public interface IModificationCommandToCommandData
     {
         IEnumerable<EfSqlCommandData> AppendDeleteOperation(ModificationCommand command);
         IEnumerable<EfSqlCommandData> AppendInsertOperation(ModificationCommand command);
         IEnumerable<EfSqlCommandData> AppendUpdateOperation(ModificationCommand command);
-        Dictionary<string, IUpdateSqlGenerator> UpdateGenerators { get; }
+        Dictionary<string, IUpdateSqlGenerator> UpdateSqlGenerators { get; }
         void RegisterDeltaGenerators(IServiceProvider serviceProvider);
     }
 }
