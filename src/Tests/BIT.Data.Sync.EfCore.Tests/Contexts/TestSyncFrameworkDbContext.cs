@@ -27,7 +27,7 @@ namespace BIT.Data.Sync.EfCore.Tests.Contexts.SyncFramework
         /// </para>
         /// </summary>
         /// <param name="options">The options for this context.</param>
-        public TestSyncFrameworkDbContext(DbContextOptions options, IServiceCollection ServiceCollection, string Identity) : base(options, ServiceCollection, Identity)
+        public TestSyncFrameworkDbContext(DbContextOptions options, IServiceCollection SyncFrameworkServiceCollection, string Identity) : base(options, SyncFrameworkServiceCollection, Identity)
         {
             //ServiceCollection.AddSingleton<ISyncIdentityService>(new SyncIdentityService(Identity));
         }

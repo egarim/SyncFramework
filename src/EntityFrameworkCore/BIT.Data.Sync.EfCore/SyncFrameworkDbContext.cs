@@ -28,10 +28,10 @@ namespace BIT.EfCore.Sync
         protected IServiceProvider serviceProvider;
         protected IServiceCollection _ServiceCollection;
         public string Identity { get; private set; }
-        protected SyncFrameworkDbContext(DbContextOptions options, IServiceCollection ServiceCollection, string Identity) : base(options)
+        protected SyncFrameworkDbContext(DbContextOptions options, IServiceCollection SyncFrameworkServiceCollection, string Identity) : base(options)
         {
             this.Identity = Identity;
-            _ServiceCollection = ServiceCollection;
+            _ServiceCollection = SyncFrameworkServiceCollection;
             _ServiceCollection.AddSingleton<IDeltaProcessor>(new EFDeltaProcessor(this));
             this.serviceProvider = _ServiceCollection.BuildServiceProvider();
 

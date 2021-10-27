@@ -26,13 +26,21 @@ namespace BIT.Data.Sync.EfCore.Tests
         {
             base.Setup();
             cf = this.GetTestClientFactory();
+            masterContextOptionBuilder.UseSqlite("Data Source=TestM.db;");
+            node_AContextOptionbuilder.UseSqlite("Data Source=TestNA.db;");
+            node_BContextOptionbuilder.UseSqlite("Data Source=TestNB.db;");
+            node_CContextOptionbuilder.UseSqlite("Data Source=TestNB.db;");
+            //masterContextOptionBuilder.UseSqlite(GetSqliteMemoryConnection("Master"));
+            //node_AContextOptionbuilder.UseSqlite(GetSqliteMemoryConnection("A"));
         }
         private const string InMemoryConnectionString = "DataSource=:memory:";
-
-       
-        SqliteConnection GetSqliteMemoryConnection()
+        DbContextOptionsBuilder masterContextOptionBuilder = new DbContextOptionsBuilder();
+        DbContextOptionsBuilder node_AContextOptionbuilder = new DbContextOptionsBuilder();
+        DbContextOptionsBuilder node_BContextOptionbuilder = new DbContextOptionsBuilder();
+        DbContextOptionsBuilder node_CContextOptionbuilder = new DbContextOptionsBuilder();
+        SqliteConnection GetSqliteMemoryConnection(string Name)
         {
-            var connection = new SqliteConnection(InMemoryConnectionString);
+            var connection = new SqliteConnection($"Data Source={Name};Mode=Memory;");
             connection.Open();
             return connection;
         }
@@ -40,112 +48,118 @@ namespace BIT.Data.Sync.EfCore.Tests
         public async Task SqlServerToSqliteTest()
         {
 
-            var MasterHttpCLient = cf.CreateClient("TestClient");
-            var Client_AHttpClient = cf.CreateClient("TestClient");
+            var MasterHttpCLient = cf.CreateClient("Master");
+            var Node_A_HttpClient = cf.CreateClient("Node A");
+            var Node_B_HttpClient = cf.CreateClient("Node B");
+            var Node_C_HttpClient = cf.CreateClient("Node C");
 
-
-
-            ServiceCollection Master = new ServiceCollection();
-            ServiceCollection Client_A = new ServiceCollection();
+            ServiceCollection ServiceCollectionMaster = new ServiceCollection();
+            ServiceCollection ServiceCollectionNode_A = new ServiceCollection();
+            ServiceCollection ServiceCollectionNode_B = new ServiceCollection();
+            ServiceCollection ServiceCollectionNode_C = new ServiceCollection();
 
             List<DeltaGeneratorBase> DeltaGenerators = new List<DeltaGeneratorBase>();
             DeltaGenerators.Add(new SqliteDeltaGenerator());
-            
-
-            Master.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb1"); }, MasterHttpCLient, "MemoryDeltaStore1");
-            Master.AddEntityFrameworkSqlite();
-            Master.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Master"));
-
-            Client_A.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb2"); }, Client_AHttpClient, "MemoryDeltaStore1");
-            Client_A.AddEntityFrameworkSqlite();
-            Client_A.AddSingleton<ISyncIdentityService>(new SyncIdentityService("A"));
 
 
+            ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb1"); }, MasterHttpCLient, "MemoryDeltaStore1");
+            ServiceCollectionMaster.AddEntityFrameworkSqlite();
+            ServiceCollectionMaster.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Master"));
 
-            DbContextOptionsBuilder SqlServerOptionsBuilder = new DbContextOptionsBuilder();
-            SqlServerOptionsBuilder.UseSqlite("Data Source=Test.db;");
+            ServiceCollectionNode_A.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb2"); }, Node_A_HttpClient, "MemoryDeltaStore1");
+            ServiceCollectionNode_A.AddEntityFrameworkSqlite();
+            ServiceCollectionNode_A.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Node A"));
 
-            DbContextOptionsBuilder SqliteOptionsBuilder = new DbContextOptionsBuilder();
-            SqliteOptionsBuilder.UseSqlite("Data Source=Test.db;");
+            ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb3"); }, Node_B_HttpClient, "MemoryDeltaStore1");
+            ServiceCollectionNode_B.AddEntityFrameworkSqlite();
+            ServiceCollectionNode_B.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Node B"));
 
 
-            using (var SqliteContext = new TestSyncFrameworkDbContext(SqliteOptionsBuilder.Options, Client_A, "Client A"))
-            using (var SqlServerContext = new TestSyncFrameworkDbContext(SqlServerOptionsBuilder.Options, Master, "Master"))
+            ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb4"); }, Node_C_HttpClient, "MemoryDeltaStore1");
+            ServiceCollectionNode_B.AddEntityFrameworkSqlite();
+            ServiceCollectionNode_B.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Node c"));
+
+
+
+            using (var MasterContext = new TestSyncFrameworkDbContext(masterContextOptionBuilder.Options, ServiceCollectionMaster, "Master"))
+            using (var Node_A_Context = new TestSyncFrameworkDbContext(node_AContextOptionbuilder.Options, ServiceCollectionNode_A, "Node A"))
+            using (var Node_B_Context = new TestSyncFrameworkDbContext(node_BContextOptionbuilder.Options, ServiceCollectionNode_B, "Node B"))
+            using (var Node_C_Context = new TestSyncFrameworkDbContext(node_CContextOptionbuilder.Options, ServiceCollectionNode_C, "Node C"))
             {
 
-                await SqlServerContext.Database.EnsureDeletedAsync();
-                await SqlServerContext.Database.EnsureCreatedAsync();
+                await MasterContext.Database.EnsureDeletedAsync();
+                await MasterContext.Database.EnsureCreatedAsync();
 
-                await SqliteContext.Database.EnsureDeletedAsync();
-                await SqliteContext.Database.EnsureCreatedAsync();
+                await Node_A_Context.Database.EnsureDeletedAsync();
+                await Node_A_Context.Database.EnsureCreatedAsync();
 
 
                 Blog entity = GetBlog("Blog 1", "EF Core 3.1!", "EF Core 5.0!");
 
-                SqlServerContext.Add(entity);
-                await SqlServerContext.SaveChangesAsync();
+                MasterContext.Add(entity);
+                await MasterContext.SaveChangesAsync();
 
                 entity.Name = "Blog 1 Updated";
 
-                await SqlServerContext.SaveChangesAsync();
+                await MasterContext.SaveChangesAsync();
 
-                SqlServerContext.Remove(entity);
+                MasterContext.Remove(entity);
 
 
-                await SqlServerContext.SaveChangesAsync();
+                await MasterContext.SaveChangesAsync();
 
                 Blog TestBlog = GetBlog("Blog 2", "Post 1", "Post 2");
-                SqlServerContext.Add(TestBlog);
-                await SqlServerContext.SaveChangesAsync();
+                MasterContext.Add(TestBlog);
+                await MasterContext.SaveChangesAsync();
 
-                await SqlServerContext.PushAsync();
-
-
-
-
-                await SqliteContext.PullAsync();
+                await MasterContext.PushAsync();
 
 
 
 
-                var blogs = SqliteContext.Blogs
+                await Node_A_Context.PullAsync();
+
+
+
+
+                var blogs = Node_A_Context.Blogs
                        .Include(blog => blog.Posts)
                        .ToList();
 
                 var count = blogs.Count;
                 Blog SqliteBlog = GetBlog("Blog 3", "SQLite post 1", "SQLite post 2");
-                SqliteContext.Add(SqliteBlog);
+                Node_A_Context.Add(SqliteBlog);
 
-                await SqliteContext.SaveChangesAsync();
+                await Node_A_Context.SaveChangesAsync();
 
-                await SqliteContext.PushAsync();
+                await Node_A_Context.PushAsync();
 
 
-                var Deltas = await SqlServerContext.FetchAsync();
-                await SqlServerContext.PullAsync();
+                var Deltas = await MasterContext.FetchAsync();
+                await MasterContext.PullAsync();
 
 
 
 
                 Blog NewBlog = GetBlog("Blog 4", "NewBlog post 1", "NewBlog post 2");
-                SqliteContext.Add(NewBlog);
+                Node_A_Context.Add(NewBlog);
 
 
-                await SqliteContext.SaveChangesAsync();
-                await SqliteContext.PushAsync();
+                await Node_A_Context.SaveChangesAsync();
+                await Node_A_Context.PushAsync();
 
-                Deltas = await SqlServerContext.FetchAsync();
+                Deltas = await MasterContext.FetchAsync();
 
-                await SqlServerContext.PullAsync();
+                await MasterContext.PullAsync();
 
-                var SqlServerBlogs = SqlServerContext.Blogs
+                var SqlServerBlogs = MasterContext.Blogs
                        .Include((Blog blog) => blog.Posts)
                        .ToList();
 
                 Assert.AreEqual(3, SqlServerBlogs.Count);
             }
 
-        
+
 
         }
         private static Blog GetBlog(string Name, string Title1, string Title2)
