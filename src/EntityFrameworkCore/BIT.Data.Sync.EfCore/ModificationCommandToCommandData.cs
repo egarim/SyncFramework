@@ -64,7 +64,15 @@ namespace BIT.Data.Sync.EfCore
             {
                 var updateSqlGenerator = deltaGeneratorBase.CreateInstance(serviceProvider);
                 string key = UpdaterAliasService.GetAlias(updateSqlGenerator.GetType().FullName);
-                UpdateSqlGenerators.Add(key, updateSqlGenerator);
+                
+                if (UpdateSqlGenerators.ContainsKey(key))
+                {
+                    UpdateSqlGenerators[key] = updateSqlGenerator;
+                }
+                else
+                {
+                    UpdateSqlGenerators.Add(key, updateSqlGenerator);
+                }
             }
         }
 
@@ -72,7 +80,15 @@ namespace BIT.Data.Sync.EfCore
         {
             IUpdateSqlGenerator CurrentUpdateSqlGenerator = serviceProvider.GetService(typeof(IUpdateSqlGenerator)) as IUpdateSqlGenerator;
             string key = updaterAliasService.GetAlias(CurrentUpdateSqlGenerator.GetType().FullName);
-            UpdateSqlGenerators.Add(key, CurrentUpdateSqlGenerator);
+            if(UpdateSqlGenerators.ContainsKey(key))
+            {
+                UpdateSqlGenerators[key] = CurrentUpdateSqlGenerator;
+            }
+            else
+            {
+                UpdateSqlGenerators.Add(key, CurrentUpdateSqlGenerator);
+            }
+            
         }
     }
 }

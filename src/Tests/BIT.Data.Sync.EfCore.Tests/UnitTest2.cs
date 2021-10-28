@@ -1,6 +1,8 @@
 using BIT.Data.Sync;
 using BIT.Data.Sync.Client;
+using BIT.Data.Sync.EfCore.Npgsql;
 using BIT.Data.Sync.EfCore.Sqlite;
+using BIT.Data.Sync.EfCore.SqlServer;
 using BIT.Data.Sync.EfCore.Tests.Contexts.SyncFramework;
 using BIT.Data.Sync.EfCore.Tests.Infrastructure;
 using BIT.Data.Sync.EfCore.Tests.Model;
@@ -24,12 +26,13 @@ namespace BIT.Data.Sync.EfCore.Tests
         [SetUp()]
         public override void Setup()
         {
+            var serverVersion = new MySqlServerVersion(new Version(8, 0, 26));
             base.Setup();
             cf = this.GetTestClientFactory();
-            masterContextOptionBuilder.UseSqlite("Data Source=TestM.db;");
-            node_AContextOptionbuilder.UseSqlite("Data Source=TestNA.db;");
-            node_BContextOptionbuilder.UseSqlite("Data Source=TestNB.db;");
-            node_CContextOptionbuilder.UseSqlite("Data Source=TestNB.db;");
+            masterContextOptionBuilder.UseSqlServer("Server=MSI;Database=EfMaster;Trusted_Connection=True;");
+            node_AContextOptionbuilder.UseSqlite("Data Source=EfNode_A.db;");
+            node_BContextOptionbuilder.UseNpgsql("Server=127.0.0.1;User Id=postgres;Password=1234567890;Port=5432;Database=EfNode_B;");
+            node_CContextOptionbuilder.UseMySql("Server=127.0.0.1;Uid=root;Pwd=1234567890;Database=EfNode_C;SslMode=Preferred;", serverVersion);
             //masterContextOptionBuilder.UseSqlite(GetSqliteMemoryConnection("Master"));
             //node_AContextOptionbuilder.UseSqlite(GetSqliteMemoryConnection("A"));
         }
@@ -61,22 +64,28 @@ namespace BIT.Data.Sync.EfCore.Tests
             List<DeltaGeneratorBase> DeltaGenerators = new List<DeltaGeneratorBase>();
             DeltaGenerators.Add(new SqliteDeltaGenerator());
 
+            List<DeltaGeneratorBase> deltaGeneratorBases = new List<DeltaGeneratorBase>();
+            deltaGeneratorBases.Add(new NpgsqlDeltaGenerator());
+            deltaGeneratorBases.Add(new PomeloMySqlDeltaGenerator());
+            deltaGeneratorBases.Add(new SqliteDeltaGenerator());
+            deltaGeneratorBases.Add(new SqlServerDeltaGenerator());
+            DeltaGeneratorBase[] additionalDeltaGenerators = deltaGeneratorBases.ToArray();
 
-            ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb1"); }, MasterHttpCLient, "MemoryDeltaStore1");
-            ServiceCollectionMaster.AddEntityFrameworkSqlite();
+            ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb1"); }, MasterHttpCLient, "MemoryDeltaStore1", additionalDeltaGenerators);
+            ServiceCollectionMaster.AddEntityFrameworkSqlServer();
             ServiceCollectionMaster.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Master"));
 
-            ServiceCollectionNode_A.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb2"); }, Node_A_HttpClient, "MemoryDeltaStore1");
+            ServiceCollectionNode_A.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb2"); }, Node_A_HttpClient, "MemoryDeltaStore1", additionalDeltaGenerators);
             ServiceCollectionNode_A.AddEntityFrameworkSqlite();
             ServiceCollectionNode_A.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Node A"));
 
-            ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb3"); }, Node_B_HttpClient, "MemoryDeltaStore1");
-            ServiceCollectionNode_B.AddEntityFrameworkSqlite();
+            ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb3"); }, Node_B_HttpClient, "MemoryDeltaStore1", additionalDeltaGenerators);
+            ServiceCollectionNode_B.AddEntityFrameworkNpgsql();
             ServiceCollectionNode_B.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Node B"));
 
 
-            ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb4"); }, Node_C_HttpClient, "MemoryDeltaStore1");
-            ServiceCollectionNode_B.AddEntityFrameworkSqlite();
+            ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb4"); }, Node_C_HttpClient, "MemoryDeltaStore1", additionalDeltaGenerators);
+            ServiceCollectionNode_B.AddEntityFrameworkMySql();
             ServiceCollectionNode_B.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Node c"));
 
 

@@ -22,7 +22,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EfCore", "EfCore", "{46C1A4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIT.Data.Sync.EfCore.Sqlite", "EntityFrameworkCore\BIT.Data.Sync.EfCore.Sqlite\BIT.Data.Sync.EfCore.Sqlite.csproj", "{24A957CE-DE20-42CE-BF77-8A169F07B233}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BIT.Data.Sync.EfCore.SqlServer", "EntityFrameworkCore\BIT.Data.Sync.EfCore.SqlServer\BIT.Data.Sync.EfCore.SqlServer.csproj", "{39BDD72F-625D-4124-AF3A-A765FC2CFA14}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIT.Data.Sync.EfCore.SqlServer", "EntityFrameworkCore\BIT.Data.Sync.EfCore.SqlServer\BIT.Data.Sync.EfCore.SqlServer.csproj", "{39BDD72F-625D-4124-AF3A-A765FC2CFA14}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIT.Data.Sync.EfCore.Npgsql", "EntityFrameworkCore\NBIT.Data.Sync.EfCore.Npgsql\BIT.Data.Sync.EfCore.Npgsql.csproj", "{11072152-DC60-44DD-B1F8-59155A4DD76A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BIT.Data.Sync.EfCore.Pomelo.MySql", "EntityFrameworkCore\BIT.Data.Sync.EfCore.Pomelo.MySql\BIT.Data.Sync.EfCore.Pomelo.MySql.csproj", "{D9FB98D7-BDCC-48AB-B04A-0836DB180674}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +71,18 @@ Global
 		{39BDD72F-625D-4124-AF3A-A765FC2CFA14}.Release|Any CPU.Build.0 = Release|Any CPU
 		{39BDD72F-625D-4124-AF3A-A765FC2CFA14}.ReleaseProduction|Any CPU.ActiveCfg = Release|Any CPU
 		{39BDD72F-625D-4124-AF3A-A765FC2CFA14}.ReleaseProduction|Any CPU.Build.0 = Release|Any CPU
+		{11072152-DC60-44DD-B1F8-59155A4DD76A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11072152-DC60-44DD-B1F8-59155A4DD76A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11072152-DC60-44DD-B1F8-59155A4DD76A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11072152-DC60-44DD-B1F8-59155A4DD76A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11072152-DC60-44DD-B1F8-59155A4DD76A}.ReleaseProduction|Any CPU.ActiveCfg = ReleaseProduction|Any CPU
+		{11072152-DC60-44DD-B1F8-59155A4DD76A}.ReleaseProduction|Any CPU.Build.0 = ReleaseProduction|Any CPU
+		{D9FB98D7-BDCC-48AB-B04A-0836DB180674}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9FB98D7-BDCC-48AB-B04A-0836DB180674}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9FB98D7-BDCC-48AB-B04A-0836DB180674}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9FB98D7-BDCC-48AB-B04A-0836DB180674}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9FB98D7-BDCC-48AB-B04A-0836DB180674}.ReleaseProduction|Any CPU.ActiveCfg = Release|Any CPU
+		{D9FB98D7-BDCC-48AB-B04A-0836DB180674}.ReleaseProduction|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -77,6 +93,8 @@ Global
 		{038DE97D-D019-4B91-8067-F631B41801F4} = {F659BA38-A2DD-41E9-83E1-2F9658400833}
 		{24A957CE-DE20-42CE-BF77-8A169F07B233} = {46C1A426-26A2-4DDB-9EC2-E4611CCDFA93}
 		{39BDD72F-625D-4124-AF3A-A765FC2CFA14} = {46C1A426-26A2-4DDB-9EC2-E4611CCDFA93}
+		{11072152-DC60-44DD-B1F8-59155A4DD76A} = {46C1A426-26A2-4DDB-9EC2-E4611CCDFA93}
+		{D9FB98D7-BDCC-48AB-B04A-0836DB180674} = {46C1A426-26A2-4DDB-9EC2-E4611CCDFA93}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DE69D0C-01EA-425A-B43E-10A131088EFC}

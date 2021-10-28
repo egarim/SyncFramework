@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>$(EfCoreNetStandardVersion)</TargetFramework>
+		<Configurations>Debug;Release;ReleaseProduction</Configurations>
+		<PackageTags>Entity Framework Core entity-framework-core EF Data O/RM EntityFramework EntityFrameworkCore EFCore Npgsql Postgresql Postgres Sql Data-Synchronization</PackageTags>
+		<Description>Common base classes and interfaces to implement database synchronization</Description>
+		<DebugType>Full</DebugType>
+		<DebugSymbols>True</DebugSymbols>
+		<!--<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>-->
+	</PropertyGroup>
+	<!--Nuget Generation Section Start-->
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<AssemblyName>BIT.Data.Sync.EfCore.Npgsql.v$(NugetVersion)</AssemblyName>
+		<Version>$(NugetVersion)</Version>
+		<PackageId>BIT.Data.Sync.EfCore.Npgsql</PackageId>
+	</PropertyGroup>
+	<!--Nuget Generation Section End-->
+	<!--Nuget Reference Section Start-->
+	<ItemGroup>
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.10" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
+	  <ProjectReference Include="..\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
+	</ItemGroup>
+	<!--NugetProject ReferencesSection End-->
+	<Target Name="CopyPackage" AfterTargets="Pack">
+		<Copy SourceFiles="bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" />
+	</Target>
+</Project>
