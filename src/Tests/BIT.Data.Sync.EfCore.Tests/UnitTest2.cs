@@ -31,10 +31,10 @@ namespace BIT.Data.Sync.EfCore.Tests
             cf = this.GetTestClientFactory();
             masterContextOptionBuilder.UseSqlServer("Server=MSI;Database=EfMaster;Trusted_Connection=True;");
             node_AContextOptionbuilder.UseSqlite("Data Source=EfNode_A.db;");
-            node_BContextOptionbuilder.UseNpgsql("Server=127.0.0.1;User Id=postgres;Password=1234567890;Port=5432;Database=EfNode_B;");
+            node_BContextOptionbuilder.UseSqlServer("Server=MSI;Database=EfNode_B;Trusted_Connection=True;");
+            //node_BContextOptionbuilder.UseNpgsql("Server=127.0.0.1;User Id=postgres;Password=1234567890;Port=5432;Database=EfNode_B;");
             node_CContextOptionbuilder.UseMySql("Server=127.0.0.1;Uid=root;Pwd=1234567890;Database=EfNode_C;SslMode=Preferred;", serverVersion);
-            //masterContextOptionBuilder.UseSqlite(GetSqliteMemoryConnection("Master"));
-            //node_AContextOptionbuilder.UseSqlite(GetSqliteMemoryConnection("A"));
+            
         }
         private const string InMemoryConnectionString = "DataSource=:memory:";
         DbContextOptionsBuilder masterContextOptionBuilder = new DbContextOptionsBuilder();
@@ -61,8 +61,7 @@ namespace BIT.Data.Sync.EfCore.Tests
             ServiceCollection ServiceCollectionNode_B = new ServiceCollection();
             ServiceCollection ServiceCollectionNode_C = new ServiceCollection();
 
-            List<DeltaGeneratorBase> DeltaGenerators = new List<DeltaGeneratorBase>();
-            DeltaGenerators.Add(new SqliteDeltaGenerator());
+           
 
             List<DeltaGeneratorBase> deltaGeneratorBases = new List<DeltaGeneratorBase>();
             deltaGeneratorBases.Add(new NpgsqlDeltaGenerator());
@@ -80,13 +79,14 @@ namespace BIT.Data.Sync.EfCore.Tests
             ServiceCollectionNode_A.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Node A"));
 
             ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb3"); }, Node_B_HttpClient, "MemoryDeltaStore1", additionalDeltaGenerators);
-            ServiceCollectionNode_B.AddEntityFrameworkNpgsql();
+            //ServiceCollectionNode_B.AddEntityFrameworkNpgsql();
+            ServiceCollectionNode_B.AddEntityFrameworkSqlServer();
             ServiceCollectionNode_B.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Node B"));
 
 
-            ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb4"); }, Node_C_HttpClient, "MemoryDeltaStore1", additionalDeltaGenerators);
-            ServiceCollectionNode_B.AddEntityFrameworkMySql();
-            ServiceCollectionNode_B.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Node c"));
+            ServiceCollectionNode_C.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb4"); }, Node_C_HttpClient, "MemoryDeltaStore1", additionalDeltaGenerators);
+            ServiceCollectionNode_C.AddEntityFrameworkMySql();
+            ServiceCollectionNode_C.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Node c"));
 
 
 
@@ -102,70 +102,112 @@ namespace BIT.Data.Sync.EfCore.Tests
                 await Node_A_Context.Database.EnsureDeletedAsync();
                 await Node_A_Context.Database.EnsureCreatedAsync();
 
+                await Node_B_Context.Database.EnsureDeletedAsync();
+                await Node_B_Context.Database.EnsureCreatedAsync();
 
-                Blog entity = GetBlog("Blog 1", "EF Core 3.1!", "EF Core 5.0!");
+                await Node_C_Context.Database.EnsureDeletedAsync();
+                await Node_C_Context.Database.EnsureCreatedAsync();
 
-                MasterContext.Add(entity);
+                Blog SqlServerBlog = GetBlog("SqlServer blog", "EF Core 3.1!", "EF Core 5.0!");
+                Blog SqliteBlog = GetBlog("Sqlite blog", "EF Core 3.1!", "EF Core 5.0!");
+                Blog NpgsqlBlog = GetBlog("Npgsql blog", "EF Core 3.1!", "EF Core 5.0!");
+                Blog PomeloMySqlBlog = GetBlog("Pomelo MySql blog", "EF Core 3.1!", "EF Core 5.0!");
+
+                MasterContext.Add(SqlServerBlog);
+                MasterContext.Add(SqliteBlog);
+                MasterContext.Add(NpgsqlBlog);
+                MasterContext.Add(PomeloMySqlBlog);
                 await MasterContext.SaveChangesAsync();
-
-                entity.Name = "Blog 1 Updated";
-
-                await MasterContext.SaveChangesAsync();
-
-                MasterContext.Remove(entity);
-
-
-                await MasterContext.SaveChangesAsync();
-
-                Blog TestBlog = GetBlog("Blog 2", "Post 1", "Post 2");
-                MasterContext.Add(TestBlog);
-                await MasterContext.SaveChangesAsync();
-
                 await MasterContext.PushAsync();
 
+                //Node_B_Context.Add(SqlServerBlog);
+                //Node_B_Context.Add(SqliteBlog);
+                //Node_B_Context.Add(NpgsqlBlog);
+                //Node_B_Context.Add(PomeloMySqlBlog);
+                //await Node_B_Context.SaveChangesAsync();
+                //await Node_B_Context.PushAsync();
+
+                //Node_C_Context.Add(SqlServerBlog);
+                //Node_C_Context.Add(SqliteBlog);
+                //Node_C_Context.Add(NpgsqlBlog);
+                //Node_C_Context.Add(PomeloMySqlBlog);
+                //await Node_C_Context.SaveChangesAsync();
+                //await Node_C_Context.PushAsync();
 
 
-
+                //await MasterContext.PullAsync();
                 await Node_A_Context.PullAsync();
+                await Node_B_Context.PullAsync();
+                await Node_C_Context.PullAsync();
+
+                Node_A_Context.Add(GetBlog("Node A Blog","Post 1","Post 2"));
+                Node_B_Context.Add(GetBlog("Node B Blog", "Post 1", "Post 2"));
+                Node_C_Context.Add(GetBlog("Node C Blog", "Post 1", "Post 2"));
 
 
+                await Node_A_Context.SaveChangesAsync();
+                await Node_A_Context.PushAsync();
+
+                await Node_B_Context.SaveChangesAsync();
+                await Node_B_Context.PushAsync();
+
+                await Node_C_Context.SaveChangesAsync();
+                await Node_C_Context.PushAsync();
 
 
-                var blogs = Node_A_Context.Blogs
-                       .Include(blog => blog.Posts)
-                       .ToList();
+                await MasterContext.PullAsync();
 
+                var blogs = MasterContext.Blogs.ToList();
                 var count = blogs.Count;
-                Blog SqliteBlog = GetBlog("Blog 3", "SQLite post 1", "SQLite post 2");
-                Node_A_Context.Add(SqliteBlog);
+                //Blog TestBlog = GetBlog("Blog 2", "Post 1", "Post 2");
+                //MasterContext.Add(TestBlog);
+                //await MasterContext.SaveChangesAsync();
 
-                await Node_A_Context.SaveChangesAsync();
-
-                await Node_A_Context.PushAsync();
-
-
-                var Deltas = await MasterContext.FetchAsync();
-                await MasterContext.PullAsync();
+                //await MasterContext.PushAsync();
 
 
 
 
-                Blog NewBlog = GetBlog("Blog 4", "NewBlog post 1", "NewBlog post 2");
-                Node_A_Context.Add(NewBlog);
+                //await Node_A_Context.PullAsync();
 
 
-                await Node_A_Context.SaveChangesAsync();
-                await Node_A_Context.PushAsync();
 
-                Deltas = await MasterContext.FetchAsync();
 
-                await MasterContext.PullAsync();
+                //var blogs = Node_A_Context.Blogs
+                //       .Include(blog => blog.Posts)
+                //       .ToList();
 
-                var SqlServerBlogs = MasterContext.Blogs
-                       .Include((Blog blog) => blog.Posts)
-                       .ToList();
+                //var count = blogs.Count;
+                //Blog SqliteBlog = GetBlog("Blog 3", "SQLite post 1", "SQLite post 2");
+                //Node_A_Context.Add(SqliteBlog);
 
-                Assert.AreEqual(3, SqlServerBlogs.Count);
+                //await Node_A_Context.SaveChangesAsync();
+
+                //await Node_A_Context.PushAsync();
+
+
+                //var Deltas = await MasterContext.FetchAsync();
+                //await MasterContext.PullAsync();
+
+
+
+
+                //Blog NewBlog = GetBlog("Blog 4", "NewBlog post 1", "NewBlog post 2");
+                //Node_A_Context.Add(NewBlog);
+
+
+                //await Node_A_Context.SaveChangesAsync();
+                //await Node_A_Context.PushAsync();
+
+                //Deltas = await MasterContext.FetchAsync();
+
+                //await MasterContext.PullAsync();
+
+                //var SqlServerBlogs = MasterContext.Blogs
+                //       .Include((Blog blog) => blog.Posts)
+                //       .ToList();
+
+                //Assert.AreEqual(3, SqlServerBlogs.Count);
             }
 
 

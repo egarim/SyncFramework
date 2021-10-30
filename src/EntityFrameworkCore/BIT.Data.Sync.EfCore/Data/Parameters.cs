@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 
 namespace BIT.Data.Sync.EfCore.Data
 {
@@ -10,6 +11,7 @@ namespace BIT.Data.Sync.EfCore.Data
         {
 
         }
+        public DbType? DbType { get; set; }
         public string Name { get; set; }
         public object Value { get; set; }
 

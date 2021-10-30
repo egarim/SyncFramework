@@ -45,7 +45,7 @@ namespace BIT.Data.Sync.EfCore
         }
         public async override Task<int> ExecuteAsync(IEnumerable<ModificationCommandBatch> commandBatches, IRelationalConnection connection, CancellationToken cancellationToken = default)
         {
-            var test = connection.DbConnection.GetType();
+            
             cancellationToken.ThrowIfCancellationRequested();
           
             int AffectedRows = await base.ExecuteAsync(commandBatches, connection, cancellationToken).ConfigureAwait(false);
@@ -95,12 +95,12 @@ namespace BIT.Data.Sync.EfCore
                         if (columnModification.UseCurrentValueParameter)
                         {
 
-                            parameters.Add(new Parameters() { Name = columnModification.ParameterName, Value = columnModification.Value });
+                            parameters.Add(new Parameters() { Name = columnModification.ParameterName, Value = columnModification.Value,DbType=columnModification.TypeMapping.DbType });
                         }
 
                         if (columnModification.UseOriginalValueParameter)
                         {
-                            parameters.Add(new Parameters() { Name = columnModification.OriginalParameterName, Value = columnModification.OriginalValue });
+                            parameters.Add(new Parameters() { Name = columnModification.OriginalParameterName, Value = columnModification.OriginalValue, DbType = columnModification.TypeMapping.DbType });
                         }
                     }
 
