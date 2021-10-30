@@ -47,7 +47,7 @@ namespace BIT.Data.Sync.EfCore.Tests
             return connection;
         }
         [Test]
-        public async Task SqlServerToSqliteTest()
+        public async Task MainTest()
         {
 
             var MasterHttpCLient = HttpClientFactory.CreateClient("Master");
@@ -69,29 +69,29 @@ namespace BIT.Data.Sync.EfCore.Tests
             DeltaGenerators.Add(new SqlServerDeltaGenerator());
             DeltaGeneratorBase[] additionalDeltaGenerators = DeltaGenerators.ToArray();
 
-            ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb1"); }, MasterHttpCLient, "MemoryDeltaStore1", additionalDeltaGenerators);
+            ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb1"); }, MasterHttpCLient, "MemoryDeltaStore1", "Master", additionalDeltaGenerators);
             ServiceCollectionMaster.AddEntityFrameworkSqlServer();
-            ServiceCollectionMaster.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Master"));
 
-            ServiceCollectionNode_A.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb2"); }, Node_A_HttpClient, "MemoryDeltaStore1", additionalDeltaGenerators);
+
+            ServiceCollectionNode_A.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb2"); }, Node_A_HttpClient, "MemoryDeltaStore1", "Node A", additionalDeltaGenerators);
             ServiceCollectionNode_A.AddEntityFrameworkSqlite();
-            ServiceCollectionNode_A.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Node A"));
+         
 
-            ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb3"); }, Node_B_HttpClient, "MemoryDeltaStore1", additionalDeltaGenerators);
+            ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb3"); }, Node_B_HttpClient, "MemoryDeltaStore1", "Node B", additionalDeltaGenerators);
             ServiceCollectionNode_B.AddEntityFrameworkNpgsql();
-            ServiceCollectionNode_B.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Node B"));
+          
 
 
-            ServiceCollectionNode_C.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb4"); }, Node_C_HttpClient, "MemoryDeltaStore1", additionalDeltaGenerators);
+            ServiceCollectionNode_C.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb4"); }, Node_C_HttpClient, "MemoryDeltaStore1", "Node C", additionalDeltaGenerators);
             ServiceCollectionNode_C.AddEntityFrameworkMySql();
-            ServiceCollectionNode_C.AddSingleton<ISyncIdentityService>(new SyncIdentityService("Node C"));
+            
 
 
 
-            using (var MasterContext = new TestSyncFrameworkDbContext(masterContextOptionBuilder.Options, ServiceCollectionMaster, "Master"))
-            using (var Node_A_Context = new TestSyncFrameworkDbContext(node_AContextOptionbuilder.Options, ServiceCollectionNode_A, "Node A"))
-            using (var Node_B_Context = new TestSyncFrameworkDbContext(node_BContextOptionbuilder.Options, ServiceCollectionNode_B, "Node B"))
-            using (var Node_C_Context = new TestSyncFrameworkDbContext(node_CContextOptionbuilder.Options, ServiceCollectionNode_C, "Node C"))
+            using (var MasterContext = new TestSyncFrameworkDbContext(masterContextOptionBuilder.Options, ServiceCollectionMaster))
+            using (var Node_A_Context = new TestSyncFrameworkDbContext(node_AContextOptionbuilder.Options, ServiceCollectionNode_A))
+            using (var Node_B_Context = new TestSyncFrameworkDbContext(node_BContextOptionbuilder.Options, ServiceCollectionNode_B))
+            using (var Node_C_Context = new TestSyncFrameworkDbContext(node_CContextOptionbuilder.Options, ServiceCollectionNode_C))
             {
 
                 await MasterContext.Database.EnsureDeletedAsync();
@@ -118,15 +118,7 @@ namespace BIT.Data.Sync.EfCore.Tests
                 await MasterContext.SaveChangesAsync();
                 await MasterContext.PushAsync();
 
-                //Node_B_Context.Add(SqlServerBlog);
-                //Node_B_Context.Add(SqliteBlog);
-                //Node_B_Context.Add(NpgsqlBlog);
-                //Node_B_Context.Add(PomeloMySqlBlog);
-                //await Node_B_Context.SaveChangesAsync();
-                //await Node_B_Context.PushAsync();
-
-
-                //await MasterContext.PullAsync();
+             
                 await Node_A_Context.PullAsync();
                 await Node_B_Context.PullAsync();
                 await Node_C_Context.PullAsync();
@@ -153,20 +145,12 @@ namespace BIT.Data.Sync.EfCore.Tests
 
                 Assert.AreEqual(7, count);
 
-                
-                try
-                {
-                    await Node_A_Context.PullAsync();
-                    await Node_B_Context.PullAsync();
-                    await Node_C_Context.PullAsync();
-                }
-                catch (Exception ex)
-                {
-                    var message = ex.Message;
-                    throw;
-                }
-               
-                
+
+                await Node_A_Context.PullAsync();
+                await Node_B_Context.PullAsync();
+                await Node_C_Context.PullAsync();
+
+
                 Assert.AreEqual(7, Node_A_Context.Blogs.Count());
                 Assert.AreEqual(7, Node_A_Context.Blogs.Count());
                 Assert.AreEqual(7, Node_A_Context.Blogs.Count());

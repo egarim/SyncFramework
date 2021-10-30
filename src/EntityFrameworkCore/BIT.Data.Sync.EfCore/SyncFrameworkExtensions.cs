@@ -22,17 +22,17 @@ namespace BIT.EfCore.Sync
         /// <param name="ServerNodeId">The id of the node wh</param>
         /// <param name="AdditionalDeltaGenerators"></param>
         /// <returns></returns>
-        public static IServiceCollection AddEfSynchronization(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> DeltaStoreDbContextOptions, HttpClient httpClient, string ServerNodeId, params DeltaGeneratorBase[] AdditionalDeltaGenerators)
+        public static IServiceCollection AddEfSynchronization(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> DeltaStoreDbContextOptions, HttpClient httpClient, string ServerNodeId, string Idenity, params DeltaGeneratorBase[] AdditionalDeltaGenerators)
         {
             SyncFrameworkHttpClient syncFrameworkClient = new SyncFrameworkHttpClient(httpClient, ServerNodeId);
-            return serviceCollection.AddEfSynchronization(DeltaStoreDbContextOptions, syncFrameworkClient, AdditionalDeltaGenerators);
+            return serviceCollection.AddEfSynchronization(DeltaStoreDbContextOptions, syncFrameworkClient, Idenity, AdditionalDeltaGenerators);
         }
-        public static IServiceCollection AddEfSynchronization(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> DeltaStoreDbContextOptions, string ServerNodeId, string ServerUrl, params DeltaGeneratorBase[] AdditionalDeltaGenerators)
+        public static IServiceCollection AddEfSynchronization(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> DeltaStoreDbContextOptions, string ServerNodeId, string ServerUrl,string Idenity ,params DeltaGeneratorBase[] AdditionalDeltaGenerators)
         {
             SyncFrameworkHttpClient syncFrameworkClient = new SyncFrameworkHttpClient(ServerUrl,ServerNodeId);
-            return serviceCollection.AddEfSynchronization(DeltaStoreDbContextOptions, syncFrameworkClient, AdditionalDeltaGenerators);
+            return serviceCollection.AddEfSynchronization(DeltaStoreDbContextOptions, syncFrameworkClient, Idenity, AdditionalDeltaGenerators);
         }
-        public static IServiceCollection AddEfSynchronization(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> DeltaStoreDbContextOptions, ISyncFrameworkClient SyncFrameworkClient, params DeltaGeneratorBase[] AdditionalDeltaGenerators)
+        public static IServiceCollection AddEfSynchronization(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> DeltaStoreDbContextOptions, ISyncFrameworkClient SyncFrameworkClient, string Identity, params DeltaGeneratorBase[] AdditionalDeltaGenerators)
         {
 
             serviceCollection.AddSingleton(typeof(ISyncFrameworkClient), SyncFrameworkClient);
@@ -40,7 +40,7 @@ namespace BIT.EfCore.Sync
             serviceCollection.AddDbContext<DeltaDbContext>(DeltaStoreDbContextOptions);
             serviceCollection.AddSingleton<IDeltaStore, EFDeltaStore>();
             serviceCollection.AddSingleton<IModificationCommandToCommandDataService>(new ModificationCommandToCommandDataService(AdditionalDeltaGenerators));
-
+            serviceCollection.AddSingleton<ISyncIdentityService>(new SyncIdentityService(Identity));
             Dictionary<string, string> KnownUpdaters = new Dictionary<string, string>();
             KnownUpdaters.Add("Microsoft.EntityFrameworkCore.Sqlite.Update.Internal.SqliteUpdateSqlGenerator", "Sqlite");
             KnownUpdaters.Add("Microsoft.EntityFrameworkCore.SqlServer.Update.Internal.SqlServerUpdateSqlGenerator", "SqlServer");
