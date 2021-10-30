@@ -7,11 +7,11 @@ using BIT.EfCore.Sync;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 namespace BIT.Data.Sync.EfCore
 {
-    public class ModificationCommandToCommandData : IModificationCommandToCommandData
+    public class ModificationCommandToCommandDataService : IModificationCommandToCommandDataService
     {
         protected Dictionary<string, IUpdateSqlGenerator> _UpdateSqlGenerators;
         protected IEnumerable<DeltaGeneratorBase> _deltaGenerators;
-        public ModificationCommandToCommandData(IEnumerable<DeltaGeneratorBase> deltaGenerators)
+        public ModificationCommandToCommandDataService(IEnumerable<DeltaGeneratorBase> deltaGenerators)
         {
             _UpdateSqlGenerators = new Dictionary<string, IUpdateSqlGenerator>();
             _deltaGenerators = new List<DeltaGeneratorBase>(deltaGenerators);

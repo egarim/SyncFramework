@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace BIT.EfCore.Sync
 {
-    public interface IModificationCommandToCommandData
+    public interface IModificationCommandToCommandDataService
     {
         IEnumerable<EfSqlCommandData> AppendDeleteOperation(ModificationCommand command);
         IEnumerable<EfSqlCommandData> AppendInsertOperation(ModificationCommand command);

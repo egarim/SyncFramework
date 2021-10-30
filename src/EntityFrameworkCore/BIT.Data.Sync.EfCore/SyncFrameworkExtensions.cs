@@ -39,7 +39,7 @@ namespace BIT.EfCore.Sync
             serviceCollection.AddScoped<IBatchExecutor, SyncFrameworkBatchExecutor>();
             serviceCollection.AddDbContext<DeltaDbContext>(DeltaStoreDbContextOptions);
             serviceCollection.AddSingleton<IDeltaStore, EFDeltaStore>();
-            serviceCollection.AddSingleton<IModificationCommandToCommandData>(new ModificationCommandToCommandData(AdditionalDeltaGenerators));
+            serviceCollection.AddSingleton<IModificationCommandToCommandDataService>(new ModificationCommandToCommandDataService(AdditionalDeltaGenerators));
 
             Dictionary<string, string> KnownUpdaters = new Dictionary<string, string>();
             KnownUpdaters.Add("Microsoft.EntityFrameworkCore.Sqlite.Update.Internal.SqliteUpdateSqlGenerator", "Sqlite");

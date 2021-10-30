@@ -49,18 +49,25 @@ namespace BIT.Data.Sync.EfCore
         protected virtual IDbCommand CreateDbCommand(string CommandDbEngine, IDelta delta, IDbConnection dbConnection, ModificationCommandData modificationCommandData)
         {
             IDbCommand dbCommand = dbConnection.CreateCommand();
-            //TODO pass the command that is type of the target Database
+          
             var CurrentCommand = modificationCommandData.SqlCommandTexts.FirstOrDefault(c => c.DbEngine == CommandDbEngine);
             if (CurrentCommand == null)
             {
                 throw new Exception($"the delta({delta.Index}-{delta.Identity}-{delta.Epoch}) does not contain information for current database  using the updater type:{CommandDbEngine}");
             }
             dbCommand.CommandText = CurrentCommand.Command;
+            SetParameters(modificationCommandData, dbCommand);
+
+            return dbCommand;
+        }
+
+        protected virtual void SetParameters(ModificationCommandData modificationCommandData, IDbCommand dbCommand)
+        {
             foreach (Parameters ModificationCommandParameter in modificationCommandData.parameters)
             {
 
                 IDbDataParameter DbCommandParameter = dbCommand.CreateParameter();
-                
+
                 DbCommandParameter.ParameterName = ModificationCommandParameter.Name;
                 if (ModificationCommandParameter.Value == null)
                 {
@@ -71,7 +78,7 @@ namespace BIT.Data.Sync.EfCore
                 {
                     Debug.WriteLine("Before casting");
                     Debug.WriteLine($"ParameterName:{DbCommandParameter.ParameterName}--Value:{ModificationCommandParameter.Value}--GetType:{ModificationCommandParameter.Value.GetType()}--DbType:{ModificationCommandParameter.DbType}");
-                    if(ModificationCommandParameter.DbType== DbType.Guid)
+                    if ((ModificationCommandParameter.DbType == DbType.Guid) || (ModificationCommandParameter.CrlType == "System.Guid"))
                     {
                         DbCommandParameter.Value = Guid.Parse(ModificationCommandParameter.Value.ToString());
                     }
@@ -86,9 +93,8 @@ namespace BIT.Data.Sync.EfCore
 
                 dbCommand.Parameters.Add(DbCommandParameter);
             }
-
-            return dbCommand;
         }
+
         protected virtual IDbConnection GetConnection(string ConnectionString)
         {
             //HACK https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/obtaining-a-dbproviderfactory

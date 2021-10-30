@@ -56,20 +56,20 @@ namespace BIT.Data.Sync.EfCore
         private async Task<List<ModificationCommandData>> SaveDeltasAsync(IEnumerable<ModificationCommandBatch> commandBatches,int AffectedRows, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var EFSyncFrameworkService = this.CurrentContext.Context.GetService<IModificationCommandToCommandData>();
-            //var CurrentUpdater = this.CurrentContext.Context.GetService<IUpdateSqlGenerator>();
+            var EFSyncFrameworkService = this.CurrentContext.Context.GetService<IModificationCommandToCommandDataService>();
+            var CurrentUpdater = this.CurrentContext.Context.GetService<IUpdateSqlGenerator>();
+            var IUpdaterAliasService = this.CurrentContext.Context.GetService<IUpdaterAliasService>();
 
-            //HACK to get the command in a different provider you need to execute the same code as in ReaderModificationCommandBatch.CreateStoreCommand
-            //StringBuilder commandStringBuilder = new StringBuilder();
-            //StringBuilder originalSqlBuilder = new StringBuilder();
+            var alias=IUpdaterAliasService.GetAlias(CurrentUpdater.GetType().FullName);
+
+
             List<ModificationCommandData> modifications = new List<ModificationCommandData>();
             foreach (ModificationCommandBatch modificationCommandBatch in commandBatches)
             {
 
-                StringBuilder originalSqlBuilder = new StringBuilder();
-                for (int i = 0; i < modificationCommandBatch.ModificationCommands.Count; i++)
+                foreach (ModificationCommand modificationCommandItem in modificationCommandBatch.ModificationCommands)
                 {
-                    ModificationCommand modificationCommand = modificationCommandBatch.ModificationCommands[i];
+                    ModificationCommand modificationCommand = modificationCommandItem;
                     IEnumerable<EfSqlCommandData> commands = null;
 
                     switch (modificationCommand.EntityState)
@@ -88,23 +88,9 @@ namespace BIT.Data.Sync.EfCore
                             commands = EFSyncFrameworkService.AppendInsertOperation(modificationCommand);
                             break;
                     }
-                    List<Parameters> parameters = new List<Parameters>();
-                    for (int j = 0; j < modificationCommand.ColumnModifications.Count; j++)
-                    {
-                        ColumnModification columnModification = modificationCommand.ColumnModifications[j];
-                        if (columnModification.UseCurrentValueParameter)
-                        {
+                    List<Parameters> parameters = GetParameters(modificationCommand);
 
-                            parameters.Add(new Parameters() { Name = columnModification.ParameterName, Value = columnModification.Value,DbType=columnModification.TypeMapping.DbType });
-                        }
-
-                        if (columnModification.UseOriginalValueParameter)
-                        {
-                            parameters.Add(new Parameters() { Name = columnModification.OriginalParameterName, Value = columnModification.OriginalValue, DbType = columnModification.TypeMapping.DbType });
-                        }
-                    }
-
-                    ModificationCommandData modificationCommandData = new ModificationCommandData(parameters, commands, AffectedRows);
+                    ModificationCommandData modificationCommandData = new ModificationCommandData(parameters, commands, AffectedRows, alias);
                     modifications.Add(modificationCommandData);
                 }
             }
@@ -115,6 +101,33 @@ namespace BIT.Data.Sync.EfCore
 
 
             return modifications;
+        }
+
+        protected virtual List<Parameters> GetParameters(ModificationCommand modificationCommand)
+        {
+            List<Parameters> parameters = new List<Parameters>();
+            foreach (ColumnModification columnModificationItem in modificationCommand.ColumnModifications)
+            {
+                ColumnModification columnModification = columnModificationItem;
+
+                Parameters item = new Parameters()
+                {
+                    Name = columnModification.ParameterName,
+                    DbType = columnModification.TypeMapping.DbType,
+                    CrlType = columnModification.TypeMapping.ClrType.FullName
+                };
+                if (columnModification.UseCurrentValueParameter)
+                {
+                    item.Value = columnModification.Value;
+                }
+                if (columnModification.UseOriginalValueParameter)
+                {
+                    item.Value = columnModification.OriginalValue;
+                }
+                parameters.Add(item);
+            }
+
+            return parameters;
         }
     }
   

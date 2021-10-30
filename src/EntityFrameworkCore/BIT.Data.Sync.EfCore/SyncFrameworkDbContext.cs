@@ -45,7 +45,7 @@ namespace BIT.EfCore.Sync
             this.DeltaStore = serviceProvider.GetService<IDeltaStore>();
             this.DeltaProcessor = serviceProvider.GetService<IDeltaProcessor>();
             this.SyncFrameworkClient = serviceProvider.GetService<ISyncFrameworkClient>();
-            var IEFSyncFrameworkService = serviceProvider.GetService<IModificationCommandToCommandData>();
+            var IEFSyncFrameworkService = serviceProvider.GetService<IModificationCommandToCommandDataService>();
             IEFSyncFrameworkService.RegisterDeltaGenerators(serviceProvider);
             optionsBuilder.UseInternalServiceProvider(serviceProvider);
         }
