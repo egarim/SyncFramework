@@ -1,9 +1,23 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>$(EfCoreNetStandardVersion)</TargetFramework>
+    <TargetFramework>$(EfCoreTargetFramework)</TargetFramework>
+    <Configurations>Debug;Release</Configurations>
+    <PackageTags>Entity Framework Core entity-framework-core EF Data O/RM EntityFramework EntityFrameworkCore EFCore Data-Synchronization SqlServer</PackageTags>
+    <Description>SyncFramework delta generator and delta processor for MSSqlServer</Description>
+    <DebugType>Full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
+    <!--<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>-->
   </PropertyGroup>
-
+  <!--Nuget Generation Section Start-->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyName>BIT.Data.Sync.EfCore.SqlServer.v$(NugetVersion)</AssemblyName>
+    <Version>$(NugetVersion)</Version>
+    <PackageId>BIT.Data.Sync.EfCore.SqlServer</PackageId>
+  </PropertyGroup>
+  <!--Nuget Generation Section End-->
+  <!--Nuget Reference Section Start-->
   <ItemGroup>
     <ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
     <ProjectReference Include="..\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
@@ -13,4 +27,8 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfCoreVersion)" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EfCoreVersion)" />
 	</ItemGroup>
+  <!--NugetProject ReferencesSection End-->
+  <Target Name="CopyPackage" AfterTargets="Pack">
+    <Copy SourceFiles="bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" />
+  </Target>
 </Project>

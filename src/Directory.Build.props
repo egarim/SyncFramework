@@ -7,7 +7,7 @@
 
 
 	<PropertyGroup Label="BIT.Data.Sync.EfCore">
-		<EfCoreNetStandardVersion>netstandard2.1</EfCoreNetStandardVersion>
+		<EfCoreTargetFramework>netstandard2.1</EfCoreTargetFramework>
 		<EfCoreNugetVersion>1.0.0</EfCoreNugetVersion>
 		<EfCoreVersion>5.0.10</EfCoreVersion>
 	</PropertyGroup>

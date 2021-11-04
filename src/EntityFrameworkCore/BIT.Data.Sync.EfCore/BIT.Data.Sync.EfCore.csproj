@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>$(EfCoreNetStandardVersion)</TargetFramework>
-		<Configurations>Debug;Release;ReleaseProduction</Configurations>
+		<TargetFramework>$(EfCoreTargetFramework)</TargetFramework>
+		<Configurations>Debug;Release</Configurations>
 		<PackageTags>Entity Framework Core entity-framework-core EF Data O/RM EntityFramework EntityFrameworkCore EFCore Data-Synchronization</PackageTags>
 		<Description>Common base classes and interfaces to implement database synchronization</Description>
 		<DebugType>Full</DebugType>
 		<DebugSymbols>True</DebugSymbols>
-		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<!--<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>-->
 	</PropertyGroup>
 	<!--Nuget Generation Section Start-->
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">

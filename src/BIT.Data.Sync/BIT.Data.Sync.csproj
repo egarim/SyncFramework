@@ -2,12 +2,10 @@
 	<PropertyGroup>
 		<TargetFramework>$(BitDataSyncNetStandardVersion)</TargetFramework>
 		<Configurations>Debug;Release</Configurations>
-		<PackageTags>DevExpress XPO XAF Xamarin AspNetCore</PackageTags>
-		<Description>Common base classes and interfaces to implement synchronization</Description>
+		<PackageTags>DevExpress XPO XAF Xamarin AspNetCore MAUI</PackageTags>
+		<Description>Common base classes and interfaces to implement delta synchronization</Description>
 		<DebugType>Full</DebugType>
 		<DebugSymbols>True</DebugSymbols>
-		<!--<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>-->
 	</PropertyGroup>
 	<!--Nuget Generation Section Start-->
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
