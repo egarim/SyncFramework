@@ -26,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIT.Data.Sync.EfCore.SqlSer
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIT.Data.Sync.EfCore.Npgsql", "EntityFrameworkCore\NBIT.Data.Sync.EfCore.Npgsql\BIT.Data.Sync.EfCore.Npgsql.csproj", "{11072152-DC60-44DD-B1F8-59155A4DD76A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BIT.Data.Sync.EfCore.Pomelo.MySql", "EntityFrameworkCore\BIT.Data.Sync.EfCore.Pomelo.MySql\BIT.Data.Sync.EfCore.Pomelo.MySql.csproj", "{D9FB98D7-BDCC-48AB-B04A-0836DB180674}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIT.Data.Sync.EfCore.Pomelo.MySql", "EntityFrameworkCore\BIT.Data.Sync.EfCore.Pomelo.MySql\BIT.Data.Sync.EfCore.Pomelo.MySql.csproj", "{D9FB98D7-BDCC-48AB-B04A-0836DB180674}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,8 +39,8 @@ Global
 		{74EBFFB4-10E8-419E-9956-E4FDAD9385D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74EBFFB4-10E8-419E-9956-E4FDAD9385D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74EBFFB4-10E8-419E-9956-E4FDAD9385D3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{74EBFFB4-10E8-419E-9956-E4FDAD9385D3}.ReleaseProduction|Any CPU.ActiveCfg = ReleaseProduction|Any CPU
-		{74EBFFB4-10E8-419E-9956-E4FDAD9385D3}.ReleaseProduction|Any CPU.Build.0 = ReleaseProduction|Any CPU
+		{74EBFFB4-10E8-419E-9956-E4FDAD9385D3}.ReleaseProduction|Any CPU.ActiveCfg = Release|Any CPU
+		{74EBFFB4-10E8-419E-9956-E4FDAD9385D3}.ReleaseProduction|Any CPU.Build.0 = Release|Any CPU
 		{F5301998-7372-47E0-81DE-4ADD421A2D50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F5301998-7372-47E0-81DE-4ADD421A2D50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5301998-7372-47E0-81DE-4ADD421A2D50}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -75,8 +75,8 @@ Global
 		{11072152-DC60-44DD-B1F8-59155A4DD76A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11072152-DC60-44DD-B1F8-59155A4DD76A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11072152-DC60-44DD-B1F8-59155A4DD76A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{11072152-DC60-44DD-B1F8-59155A4DD76A}.ReleaseProduction|Any CPU.ActiveCfg = ReleaseProduction|Any CPU
-		{11072152-DC60-44DD-B1F8-59155A4DD76A}.ReleaseProduction|Any CPU.Build.0 = ReleaseProduction|Any CPU
+		{11072152-DC60-44DD-B1F8-59155A4DD76A}.ReleaseProduction|Any CPU.ActiveCfg = Release|Any CPU
+		{11072152-DC60-44DD-B1F8-59155A4DD76A}.ReleaseProduction|Any CPU.Build.0 = Release|Any CPU
 		{D9FB98D7-BDCC-48AB-B04A-0836DB180674}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D9FB98D7-BDCC-48AB-B04A-0836DB180674}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9FB98D7-BDCC-48AB-B04A-0836DB180674}.Release|Any CPU.ActiveCfg = Release|Any CPU
