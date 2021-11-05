@@ -1,14 +1,21 @@
 ﻿<Project>
-	<PropertyGroup Label="BIT.Data.Sync">
+
+  <PropertyGroup Label="All">
+    <PackageProjectUrl>https://github.com/egarim/SyncFramework</PackageProjectUrl>
+  </PropertyGroup>
+
+
+  <PropertyGroup Label="BIT.Data.Sync">
 		<BitDataSyncNetStandardVersion>netstandard2.0</BitDataSyncNetStandardVersion>
-		<BitDataSyncNugetVersion>1.0.0</BitDataSyncNugetVersion>
+		<BitDataSyncNugetVersion>1.0.0-alpha</BitDataSyncNugetVersion>
+    <PackageProjectUrl>https://github.com/egarim/SyncFramework</PackageProjectUrl>
 	</PropertyGroup>
 
 
 
 	<PropertyGroup Label="BIT.Data.Sync.EfCore">
 		<EfCoreTargetFramework>netstandard2.1</EfCoreTargetFramework>
-		<EfCoreNugetVersion>1.0.0</EfCoreNugetVersion>
+		<EfCoreNugetVersion>1.0.0-alpha</EfCoreNugetVersion>
 		<EfCoreVersion>5.0.10</EfCoreVersion>
 	</PropertyGroup>
 </Project>
