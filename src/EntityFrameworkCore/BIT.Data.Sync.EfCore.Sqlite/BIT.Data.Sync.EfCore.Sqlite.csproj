@@ -23,8 +23,6 @@
 		<ProjectReference Include="..\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="$(EfCoreVersion)" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfCoreVersion)" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EfCoreVersion)" />
 	</ItemGroup>
   <!--NugetProject ReferencesSection End-->
