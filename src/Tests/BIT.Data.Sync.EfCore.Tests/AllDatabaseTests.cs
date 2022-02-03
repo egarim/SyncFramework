@@ -29,11 +29,10 @@ namespace BIT.Data.Sync.EfCore.Tests
             var serverVersion = new MySqlServerVersion(new Version(8, 0, 26));
             base.Setup();
             HttpClientFactory = this.GetTestClientFactory();
-            masterContextOptionBuilder.UseSqlServer("Server=MSI;Database=EfMaster;Trusted_Connection=True;");
+            masterContextOptionBuilder.UseSqlServer(@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;");
             node_AContextOptionbuilder.UseSqlite("Data Source=EfNode_A.db;");
-            node_BContextOptionbuilder.UseNpgsql("Server=127.0.0.1;User Id=postgres;Password=1234567890;Port=5432;Database=EfNode_B;");
-            node_CContextOptionbuilder.UseMySql("Server=127.0.0.1;Uid=root;Pwd=1234567890;Database=EfNode_C;SslMode=Preferred;", serverVersion);
-            
+            node_BContextOptionbuilder.UseNpgsql("Server=127.0.0.1;User Id=postgres;Password=pgadmin;Port=5432;Database=EfNode_B;");
+            node_CContextOptionbuilder.UseMySql("Server=127.0.0.1;Uid=root;Pwd=mysqlAdmin@123;Database=EfNode_C;SslMode=Preferred;", serverVersion);
         }
         private const string InMemoryConnectionString = "DataSource=:memory:";
         DbContextOptionsBuilder masterContextOptionBuilder = new DbContextOptionsBuilder();
@@ -60,7 +59,7 @@ namespace BIT.Data.Sync.EfCore.Tests
             ServiceCollection ServiceCollectionNode_B = new ServiceCollection();
             ServiceCollection ServiceCollectionNode_C = new ServiceCollection();
 
-           
+
 
             List<DeltaGeneratorBase> DeltaGenerators = new List<DeltaGeneratorBase>();
             DeltaGenerators.Add(new NpgsqlDeltaGenerator());
@@ -69,29 +68,34 @@ namespace BIT.Data.Sync.EfCore.Tests
             DeltaGenerators.Add(new SqlServerDeltaGenerator());
             DeltaGeneratorBase[] additionalDeltaGenerators = DeltaGenerators.ToArray();
 
-            ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb1"); }, MasterHttpCLient, "MemoryDeltaStore1", "Master", additionalDeltaGenerators);
+            ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseNpgsql("Server=localhost;User Id=postgres;Password=pgadmin;Port=5432;Database=TestdeltaStore;"); }, MasterHttpCLient, "MemoryDeltaStore1", "Master", additionalDeltaGenerators);
             ServiceCollectionMaster.AddEntityFrameworkSqlServer();
 
 
             ServiceCollectionNode_A.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb2"); }, Node_A_HttpClient, "MemoryDeltaStore1", "Node A", additionalDeltaGenerators);
             ServiceCollectionNode_A.AddEntityFrameworkSqlite();
-         
+
 
             ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb3"); }, Node_B_HttpClient, "MemoryDeltaStore1", "Node B", additionalDeltaGenerators);
             ServiceCollectionNode_B.AddEntityFrameworkNpgsql();
-          
+
 
 
             ServiceCollectionNode_C.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb4"); }, Node_C_HttpClient, "MemoryDeltaStore1", "Node C", additionalDeltaGenerators);
             ServiceCollectionNode_C.AddEntityFrameworkMySql();
-            
+
+            var _providerMaster = ServiceCollectionMaster.BuildServiceProvider();
+            var _providerNode_A = ServiceCollectionNode_A.BuildServiceProvider();
+            var _providerNode_B = ServiceCollectionNode_B.BuildServiceProvider();
+            var _providerNode_C = ServiceCollectionNode_C.BuildServiceProvider();
 
 
 
-            using (var MasterContext = new TestSyncFrameworkDbContext(masterContextOptionBuilder.Options, ServiceCollectionMaster))
-            using (var Node_A_Context = new TestSyncFrameworkDbContext(node_AContextOptionbuilder.Options, ServiceCollectionNode_A))
-            using (var Node_B_Context = new TestSyncFrameworkDbContext(node_BContextOptionbuilder.Options, ServiceCollectionNode_B))
-            using (var Node_C_Context = new TestSyncFrameworkDbContext(node_CContextOptionbuilder.Options, ServiceCollectionNode_C))
+
+            using (var MasterContext = new TestSyncFrameworkDbContext(masterContextOptionBuilder.Options, _providerMaster))
+            using (var Node_A_Context = new TestSyncFrameworkDbContext(node_AContextOptionbuilder.Options, _providerNode_A))
+            using (var Node_B_Context = new TestSyncFrameworkDbContext(node_BContextOptionbuilder.Options, _providerNode_B))
+            using (var Node_C_Context = new TestSyncFrameworkDbContext(node_CContextOptionbuilder.Options, _providerNode_C))
             {
 
                 await MasterContext.Database.EnsureDeletedAsync();
@@ -118,12 +122,12 @@ namespace BIT.Data.Sync.EfCore.Tests
                 await MasterContext.SaveChangesAsync();
                 await MasterContext.PushAsync();
 
-             
+
                 await Node_A_Context.PullAsync();
                 await Node_B_Context.PullAsync();
                 await Node_C_Context.PullAsync();
 
-                Node_A_Context.Add(GetBlog("Node A Blog","Post 1","Post 2"));
+                Node_A_Context.Add(GetBlog("Node A Blog", "Post 1", "Post 2"));
                 Node_B_Context.Add(GetBlog("Node B Blog", "Post 1", "Post 2"));
                 Node_C_Context.Add(GetBlog("Node C Blog", "Post 1", "Post 2"));
 

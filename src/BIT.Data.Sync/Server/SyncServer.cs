@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BIT.Data.Sync.Server
 {
-    public class SyncServer: ISyncServer
+    public class SyncServer : ISyncServer
     {
 
 
@@ -22,15 +22,27 @@ namespace BIT.Data.Sync.Server
 
        
 
-        public async Task<IEnumerable<IDelta>> GetDeltasAsync(string NodeId, Guid startindex, string identity, CancellationToken cancellationToken)
+        public async Task<IEnumerable<IDelta>> GetDeltasAsync(string NodeId, Guid startindex, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ISyncServerNode Node = GetNode(NodeId);
             if (Node != null)
             {
-                return await Node.GetDeltasAsync(startindex, identity, cancellationToken).ConfigureAwait(false);
+                return await Node.GetDeltasAsync(startindex,null, cancellationToken).ConfigureAwait(false);
             }
 
+            IEnumerable<IDelta> result = new List<IDelta>();
+            return result;
+        }
+        public async Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string nodeId, Guid startindex, string identity, CancellationToken cancellationToken)
+        {
+
+            cancellationToken.ThrowIfCancellationRequested();
+            ISyncServerNode Node = GetNode(nodeId);
+            if (Node != null)
+            {
+                return await Node.GetDeltasAsync(startindex, identity, cancellationToken).ConfigureAwait(false);
+            }
             IEnumerable<IDelta> result = new List<IDelta>();
             return result;
         }
@@ -51,11 +63,11 @@ namespace BIT.Data.Sync.Server
             return Nodes.FirstOrDefault(node => node.NodeId == NodeId);
         }
 
-        public Task SaveDeltasAsync(string NodeId, IEnumerable<IDelta> deltas, CancellationToken cancellationToken)
+        public Task SaveDeltasAsync(string nodeId, IEnumerable<IDelta> deltas, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            ISyncServerNode Node = GetNode(NodeId);
+            ISyncServerNode Node = GetNode(nodeId);
 
             if (Node != null)
             {

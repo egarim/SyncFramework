@@ -62,17 +62,18 @@ namespace BIT.Data.Sync.EfCore.Tests.Controllers
         public async Task<string> Fetch(Guid startindex, string identity)
         {
 
-            
-
             string NodeId = GetHeader("NodeId");
 
 
             var Message = $"Fetch from node:{NodeId}{Environment.NewLine}Start delta index:{startindex}{Environment.NewLine}Client identity:{identity}";
             _logger.LogInformation(Message);
             Debug.WriteLine(Message);
+            IEnumerable<IDelta> enumerable;
+            if (string.IsNullOrEmpty(identity))
+                enumerable = await _SyncServer.GetDeltasAsync(NodeId, startindex, new CancellationToken());
+            else
+                enumerable = await _SyncServer.GetDeltasFromOtherNodes(NodeId, startindex, identity, new CancellationToken());
 
-
-            IEnumerable<IDelta> enumerable = await _SyncServer.GetDeltasAsync(NodeId, startindex, identity, new CancellationToken());
             List<Delta> toserialzie = new List<Delta>();
             foreach (IDelta delta in enumerable)
             {

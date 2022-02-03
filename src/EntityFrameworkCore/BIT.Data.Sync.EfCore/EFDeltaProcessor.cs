@@ -25,7 +25,6 @@ namespace BIT.Data.Sync.EfCore
         public EFDeltaProcessor(DbContext dBContext) 
         {
             _dBContext = dBContext;
-          
         }
         public EFDeltaProcessor(string connectionstring, string DbEngineAlias, string ProviderInvariantName)
         {
@@ -144,16 +143,11 @@ namespace BIT.Data.Sync.EfCore
             Debug.WriteLine($"CurrentDbEngine:{CurrentDbEngine}");
             foreach (IDelta delta in Deltas)
             {
-               
-               
-
                 List<ModificationCommandData> ModificationsData = this.GetDeltaOperations<List<ModificationCommandData>>(delta);
                 if (System.Diagnostics.Debugger.IsAttached)
                 {
                     WriteModificationsDataToDebugConsole(ModificationsData);
                 }
-
-
                 foreach (ModificationCommandData modificationCommandData in ModificationsData)
                 {
                     
