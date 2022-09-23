@@ -112,7 +112,8 @@ namespace BIT.Data.Sync.EfCore
 
                 Parameters item = new Parameters()
                 {
-                    Name = columnModification.ParameterName,
+                    /*columnModification.OriginalParameterName should be used in case of columnModification.ParameterName is null. Due to this it will throw unknown parametter error.*/
+                    Name = !string.IsNullOrEmpty(columnModification.ParameterName)? columnModification.ParameterName: columnModification.OriginalParameterName,
                     DbType = columnModification.TypeMapping.DbType,
                     CrlType = columnModification.TypeMapping.ClrType.FullName
                 };

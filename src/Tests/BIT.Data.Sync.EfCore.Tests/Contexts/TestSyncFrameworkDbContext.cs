@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using BIT.EfCore.Sync;
+using System;
 
 namespace BIT.Data.Sync.EfCore.Tests.Contexts.SyncFramework
 {
@@ -27,7 +28,7 @@ namespace BIT.Data.Sync.EfCore.Tests.Contexts.SyncFramework
         /// </para>
         /// </summary>
         /// <param name="options">The options for this context.</param>
-        public TestSyncFrameworkDbContext(DbContextOptions options, IServiceCollection SyncFrameworkServiceCollection) : base(options, SyncFrameworkServiceCollection)
+        public TestSyncFrameworkDbContext(DbContextOptions options, IServiceProvider SyncFrameworkServiceCollection) : base(options, SyncFrameworkServiceCollection)
         {
             //ServiceCollection.AddSingleton<ISyncIdentityService>(new SyncIdentityService(Identity));
         }

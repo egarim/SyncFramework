@@ -8,6 +8,8 @@ namespace BIT.EfCore.Sync
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key, Column(Order = 0)]
         public Guid Id { get; set; }
+        [Required]
+        public string Identity { get; set; }
         public int LastTransactionLogProcessed { get; set; }
         public Guid LastProcessedDelta { get; set; }
         public Guid LastPushedDelta { get; set; }

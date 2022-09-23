@@ -22,11 +22,6 @@
     <ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
     <ProjectReference Include="..\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
   </ItemGroup>
-	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="$(EfCoreVersion)" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfCoreVersion)" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EfCoreVersion)" />
-	</ItemGroup>
   <!--NugetProject ReferencesSection End-->
   <Target Name="CopyPackage" AfterTargets="Pack">
     <Copy SourceFiles="bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" />

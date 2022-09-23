@@ -19,7 +19,7 @@ namespace BIT.Data.Sync.EfCore.Data
 
         public EFDelta(IDelta Delta) : base(Delta)
         {
-
+            Date = ((Delta)Delta).Date;
         }
 
         public EFDelta(string identity, Guid index, byte[] operation) : base(identity, index, operation)

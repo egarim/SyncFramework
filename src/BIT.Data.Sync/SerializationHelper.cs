@@ -32,9 +32,12 @@ namespace BIT.Data.Sync
 
         public static byte[] SerializeCore(object Instance)
         {
-          
 
-            DataContractJsonSerializer js = new DataContractJsonSerializer(Instance.GetType());
+            var knownTypes = new[] { typeof(DateTimeOffset) };
+            DataContractJsonSerializer js = new DataContractJsonSerializer(Instance.GetType(), new DataContractJsonSerializerSettings
+            {
+                KnownTypes = knownTypes
+            }) ;
             MemoryStream msObj = new MemoryStream();
             js.WriteObject(msObj, Instance);
             msObj.Position = 0;
@@ -50,8 +53,9 @@ namespace BIT.Data.Sync
             string str = Encoding.UTF8.GetString(Data);
             using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(str)))
             {
+                var knowTypes = new Type[]{ typeof(DateTimeOffset) };
 
-                DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(T));
+                DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(T), knowTypes);
                 T Instance = (T)deserializer.ReadObject(ms);
                 return Instance;
 
