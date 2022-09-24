@@ -1,7 +1,7 @@
 using BIT.Data.Sync;
 using BIT.Data.Sync.EfCore;
 using BIT.Data.Sync.Server;
-using BIT.EfCore.Sync;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;

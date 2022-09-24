@@ -26,13 +26,18 @@ namespace BIT.Data.Sync.EfCore.Tests
         [SetUp()]
         public override void Setup()
         {
-            var serverVersion = new MySqlServerVersion(new Version(8, 0, 26));
+            var serverVersion = new MySqlServerVersion(new Version(8, 0, 30));
             base.Setup();
             HttpClientFactory = this.GetTestClientFactory();
-            masterContextOptionBuilder.UseSqlServer(@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;");
-            node_AContextOptionbuilder.UseSqlite("Data Source=EfNode_A.db;");
-            node_BContextOptionbuilder.UseNpgsql("Server=127.0.0.1;User Id=postgres;Password=pgadmin;Port=5432;Database=EfNode_B;");
-            node_CContextOptionbuilder.UseMySql("Server=127.0.0.1;Uid=root;Pwd=mysqlAdmin@123;Database=EfNode_C;SslMode=Preferred;", serverVersion);
+            string SqlServerSycnFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSycnFrameworkTestCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
+            string PostgresSynFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(PostgresSynFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;User Id=postgres;Password=pgadmin;Port=5432;Database=EfNode_B;"
+            const string ConnectionString = "Data Source=EfNode_A.db;";
+            string MysqlSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MysqlSyncFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;Uid=root;Pwd=mysqlAdmin@123;Database=EfNode_C;SslMode=Preferred;";
+
+            masterContextOptionBuilder.UseSqlServer(SqlServerSycnFrameworkTestCnx);
+            node_AContextOptionbuilder.UseSqlite(ConnectionString);
+            node_BContextOptionbuilder.UseNpgsql(PostgresSynFrameworkTestCnx);            
+            node_CContextOptionbuilder.UseMySql(MysqlSyncFrameworkTestCnx, serverVersion);
         }
         private const string InMemoryConnectionString = "DataSource=:memory:";
         DbContextOptionsBuilder masterContextOptionBuilder = new DbContextOptionsBuilder();
@@ -68,7 +73,11 @@ namespace BIT.Data.Sync.EfCore.Tests
             DeltaGenerators.Add(new SqlServerDeltaGenerator());
             DeltaGeneratorBase[] additionalDeltaGenerators = DeltaGenerators.ToArray();
 
-            ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseNpgsql("Server=localhost;User Id=postgres;Password=pgadmin;Port=5432;Database=TestdeltaStore;"); }, MasterHttpCLient, "MemoryDeltaStore1", "Master", additionalDeltaGenerators);
+
+
+
+
+            ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb2"); }, MasterHttpCLient, "MemoryDeltaStore1", "Master", additionalDeltaGenerators);
             ServiceCollectionMaster.AddEntityFrameworkSqlServer();
 
 
