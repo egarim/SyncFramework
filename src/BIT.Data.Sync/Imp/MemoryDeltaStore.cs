@@ -64,6 +64,7 @@ namespace BIT.Data.Sync.Imp
         public override async Task SetLastProcessedDeltaAsync(Guid Index, string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            _syncStatus.Add(identity, new SyncStatus() { LastProcessedDelta=Index,LastPushedDelta=Index });
             LastProcessedDelta = Index;
 
 

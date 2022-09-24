@@ -70,16 +70,16 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
             //9 - Write in the console the current state of each database
             Debug.WriteLine("Data in master");
             Master.Data.ForEach(r => Debug.WriteLine(r.ToString()));
-            Debug.WriteLine("Data in master Last Processed Delta Index:" + await Master.DeltaStore.GetLastProcessedDeltaAsync(default));
+            Debug.WriteLine("Data in master Last Processed Delta Index:" + await Master.DeltaStore.GetLastProcessedDeltaAsync(nameof(Master),default));
 
             Debug.WriteLine("Data in A_Database");
             A_Database.Data.ForEach(r => Debug.WriteLine(r.ToString()));
-            Guid A_LastIndexProccesded = await A_Database.DeltaStore.GetLastProcessedDeltaAsync(default);
+            Guid A_LastIndexProccesded = await A_Database.DeltaStore.GetLastProcessedDeltaAsync(nameof(A_Database), default);
             Debug.WriteLine("Data in A_Database Last Processed Delta Index:" + A_LastIndexProccesded);
 
             Debug.WriteLine("Data in B_Database");
             B_Database.Data.ForEach(r => Debug.WriteLine(r.ToString()));
-            Guid B_LastIndexProccesded = await B_Database.DeltaStore.GetLastProcessedDeltaAsync(default);
+            Guid B_LastIndexProccesded = await B_Database.DeltaStore.GetLastProcessedDeltaAsync(nameof(B_Database), default);
             Debug.WriteLine("Data in B_Database Last Processed Delta Index:" + B_LastIndexProccesded);
 
 

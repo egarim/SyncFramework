@@ -74,35 +74,35 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
 
             //12 - Process deltas in the master and save the index of last delta processed
             await Master_DeltaProcessor.ProcessDeltasAsync(DeltasFromDatabaseA, default);
-            await Master.DeltaStore.SetLastProcessedDeltaAsync(DeltasFromDatabaseA.Max(d => d.Index), default);
+            await Master.DeltaStore.SetLastProcessedDeltaAsync(DeltasFromDatabaseA.Max(d => d.Index),nameof(Master), default);
             await Master_DeltaProcessor.ProcessDeltasAsync(DeltasFromDatabaseB, default);
-            await Master.DeltaStore.SetLastProcessedDeltaAsync(DeltasFromDatabaseB.Max(d => d.Index), default);
+            await Master.DeltaStore.SetLastProcessedDeltaAsync(DeltasFromDatabaseB.Max(d => d.Index), nameof(Master), default);
 
             //13 - Process deltas in database A and save the index of last delta processed
             await A_DeltaProcessor.ProcessDeltasAsync(DeltasFromDatabaseB, default);
-            await A_Database.DeltaStore.SetLastProcessedDeltaAsync(DeltasFromDatabaseB.Max(d => d.Index), default);
+            await A_Database.DeltaStore.SetLastProcessedDeltaAsync(DeltasFromDatabaseB.Max(d => d.Index), nameof(A_Database), default);
             await A_DeltaProcessor.ProcessDeltasAsync(DeltasFromMaster, default);
-            await A_Database.DeltaStore.SetLastProcessedDeltaAsync(DeltasFromMaster.Max(d => d.Index), default);
+            await A_Database.DeltaStore.SetLastProcessedDeltaAsync(DeltasFromMaster.Max(d => d.Index), nameof(A_Database), default);
 
             //14 - Process deltas in database B and save the index of last delta processed
             await B_DeltaProcessor.ProcessDeltasAsync(DeltasFromDatabaseA, default);
-            await B_Database.DeltaStore.SetLastProcessedDeltaAsync(DeltasFromDatabaseA.Max(d => d.Index), default);
+            await B_Database.DeltaStore.SetLastProcessedDeltaAsync(DeltasFromDatabaseA.Max(d => d.Index), nameof(B_Database), default);
             await B_DeltaProcessor.ProcessDeltasAsync(DeltasFromMaster, default);
-            await B_Database.DeltaStore.SetLastProcessedDeltaAsync(DeltasFromMaster.Max(d => d.Index), default);
+            await B_Database.DeltaStore.SetLastProcessedDeltaAsync(DeltasFromMaster.Max(d => d.Index), nameof(B_Database), default);
 
             //15 - Write in the console the current state of each database
             Debug.WriteLine("Data in master");
             Master.Data.ForEach(r => Debug.WriteLine(r.ToString()));
-            Debug.WriteLine("Data in master Last Processed Delta Index:" + await Master.DeltaStore.GetLastProcessedDeltaAsync(default));
+            Debug.WriteLine("Data in master Last Processed Delta Index:" + await Master.DeltaStore.GetLastProcessedDeltaAsync(nameof(Master), default));
 
             Debug.WriteLine("Data in A_Database");
             A_Database.Data.ForEach(r => Debug.WriteLine(r.ToString()));
-            Guid A_LastIndexProccesded = await A_Database.DeltaStore.GetLastProcessedDeltaAsync(default);
+            Guid A_LastIndexProccesded = await A_Database.DeltaStore.GetLastProcessedDeltaAsync(nameof(A_Database), default);
             Debug.WriteLine("Data in A_Database Last Processed Delta Index:" + A_LastIndexProccesded);
 
             Debug.WriteLine("Data in B_Database");
             B_Database.Data.ForEach(r => Debug.WriteLine(r.ToString()));
-            Guid B_LastIndexProccesded = await B_Database.DeltaStore.GetLastProcessedDeltaAsync(default);
+            Guid B_LastIndexProccesded = await B_Database.DeltaStore.GetLastProcessedDeltaAsync(nameof(B_Database), default);
             Debug.WriteLine("Data in B_Database Last Processed Delta Index:" + B_LastIndexProccesded);
 
 
