@@ -1,21 +1,27 @@
 ﻿<Project>
 
-  <PropertyGroup Label="All">
-    <PackageProjectUrl>https://github.com/egarim/SyncFramework</PackageProjectUrl>
-  </PropertyGroup>
+	<PropertyGroup Label="All">
+		<PackageProjectUrl>https://github.com/egarim/SyncFramework</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/egarim/SyncFramework</RepositoryUrl>
+	</PropertyGroup>
 
 
-  <PropertyGroup Label="BIT.Data.Sync">
-		<BitDataSyncNetStandardVersion>netstandard2.0</BitDataSyncNetStandardVersion>
-		<BitDataSyncNugetVersion>1.0.0-alpha</BitDataSyncNugetVersion>
-    <PackageProjectUrl>https://github.com/egarim/SyncFramework</PackageProjectUrl>
+	<PropertyGroup Label="BIT.Data.Sync">
+		<BitDataSyncNetStandardVersion>net6.0</BitDataSyncNetStandardVersion>
+		<BitDataSyncNugetVersion>1.0.0</BitDataSyncNugetVersion>
+		<PackageProjectUrl>https://github.com/egarim/SyncFramework</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/egarim/SyncFramework</RepositoryUrl>
 	</PropertyGroup>
 
 
 
 	<PropertyGroup Label="BIT.Data.Sync.EfCore">
-		<EfCoreTargetFramework>netstandard2.1</EfCoreTargetFramework>
-		<EfCoreNugetVersion>1.0.0-alpha</EfCoreNugetVersion>
-		<EfCoreVersion>5.0.10</EfCoreVersion>
+		<EfCoreTargetFramework>net6.0</EfCoreTargetFramework>
+		<EfCoreNugetVersion>6.0.2</EfCoreNugetVersion>
+		<EfCoreVersion>6.0.2</EfCoreVersion>
+		<EfCorePostgresVersion>6.0.2</EfCorePostgresVersion>
+		<EfCorePomeloMysqlVersion>6.0.2</EfCorePomeloMysqlVersion>
+		<EfCoreSqliteVersion>6.0.2</EfCoreSqliteVersion>
+		<EfCoreSqlServerVersion>6.0.2</EfCoreSqlServerVersion>
 	</PropertyGroup>
 </Project>

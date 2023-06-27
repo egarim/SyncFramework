@@ -6,8 +6,8 @@
 		<Description>SyncFramework delta generator and delta processor for Npgsql</Description>
 		<DebugType>Full</DebugType>
 		<DebugSymbols>True</DebugSymbols>
-		<!--<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>-->
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 	<!--Nuget Generation Section Start-->
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
@@ -19,11 +19,17 @@
 	<!--Nuget Generation Section End-->
 	<!--Nuget Reference Section Start-->
 	<ItemGroup>
-		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.10" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="$(EfCorePostgresVersion)" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
 	  <ProjectReference Include="..\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="LICENSE.txt">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 	<!--NugetProject ReferencesSection End-->
 	<Target Name="CopyPackage" AfterTargets="Pack">

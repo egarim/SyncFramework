@@ -23,16 +23,12 @@ namespace BIT.Data.Sync.EfCore.Sqlite
             TypeMappingSourceDependencies TypeMappingSourceDependencies = serviceProvider.GetService(typeof(TypeMappingSourceDependencies)) as TypeMappingSourceDependencies;
             RelationalTypeMappingSourceDependencies RelationalTypeMappingSourceDependencies = serviceProvider.GetService(typeof(RelationalTypeMappingSourceDependencies)) as RelationalTypeMappingSourceDependencies;
 
-            var options = new MySqlOptions();
-            var mySqlUpdateSqlGenerator = new MySqlUpdateSqlGenerator(
-                            new UpdateSqlGeneratorDependencies(
-                                new MySqlSqlGenerationHelper(
-                                    new RelationalSqlGenerationHelperDependencies(),
-                                    options),
-                                new MySqlTypeMappingSource(
-                                   TypeMappingSourceDependencies,
-                                   RelationalTypeMappingSourceDependencies,
-                                    options)));
+            var optionsTypeMapping = new MySqlOptions();
+            RelationalSqlGenerationHelperDependencies dependencies = new RelationalSqlGenerationHelperDependencies();
+            MySqlSqlGenerationHelper sqlGenerationHelper = new MySqlSqlGenerationHelper(dependencies, optionsTypeMapping);
+            MySqlTypeMappingSource typeMappingSource = new MySqlTypeMappingSource(TypeMappingSourceDependencies, RelationalTypeMappingSourceDependencies, optionsTypeMapping);
+           
+            var mySqlUpdateSqlGenerator = new MySqlUpdateSqlGenerator(new UpdateSqlGeneratorDependencies(sqlGenerationHelper, typeMappingSource));
 
 
 

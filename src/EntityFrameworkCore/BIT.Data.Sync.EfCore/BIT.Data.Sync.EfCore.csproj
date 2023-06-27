@@ -6,8 +6,8 @@
 		<Description>Common base classes and interfaces to implement database synchronization</Description>
 		<DebugType>Full</DebugType>
 		<DebugSymbols>True</DebugSymbols>
-		<!--<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>-->
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 	<!--Nuget Generation Section Start-->
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
@@ -16,17 +16,25 @@
 		<Version>$(EfCoreNugetVersion)</Version>
 		<PackageId>BIT.Data.Sync.EfCore</PackageId>
 	</PropertyGroup>
+	<ItemGroup>
+	  <EmbeddedResource Include="LICENSE.txt" />
+	</ItemGroup>
 	<!--Nuget Generation Section End-->
 	<!--Nuget Reference Section Start-->
 	<ItemGroup>
 		<PackageReference Include="JetBrains.Annotations" Version="2021.2.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.13" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.13" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.13" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.13" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="$(EfCoreVersion)" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfCoreVersion)" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EfCoreVersion)" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="LICENSE.txt">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 	<!--NugetProject ReferencesSection End-->
 	<Target Name="CopyPackage" AfterTargets="Pack">

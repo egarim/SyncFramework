@@ -1,32 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>$(EfCoreTargetFramework)</TargetFramework>
-    <Configurations>Debug;Release</Configurations>
-    <PackageTags>Entity Framework Core entity-framework-core EF Data O/RM EntityFramework EntityFrameworkCore EFCore Data-Synchronization Sqlite</PackageTags>
-    <Description>SyncFramework delta generator and delta processor for Sqlite</Description>
-    <DebugType>Full</DebugType>
-    <DebugSymbols>True</DebugSymbols>
-    <!--<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>-->
-  </PropertyGroup>
-  <!--Nuget Generation Section Start-->
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyName>BIT.Data.Sync.EfCore.Sqlite.v$(EfCoreNugetVersion)</AssemblyName>
-    <Version>$(EfCoreNugetVersion)</Version>
-    <PackageId>BIT.Data.Sync.EfCore.Sqlite</PackageId>
-  </PropertyGroup>
-  <!--Nuget Generation Section End-->
-  <!--Nuget Reference Section Start-->
+	<PropertyGroup>
+		<TargetFramework>$(EfCoreTargetFramework)</TargetFramework>
+		<Configurations>Debug;Release</Configurations>
+		<PackageTags>Entity Framework Core entity-framework-core EF Data O/RM EntityFramework EntityFrameworkCore EFCore Data-Synchronization Sqlite</PackageTags>
+		<Description>SyncFramework delta generator and delta processor for Sqlite</Description>
+		<DebugType>Full</DebugType>
+		<DebugSymbols>True</DebugSymbols>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	</PropertyGroup>
+	<!--Nuget Generation Section Start-->
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<AssemblyName>BIT.Data.Sync.EfCore.Sqlite.v$(EfCoreNugetVersion)</AssemblyName>
+		<Version>$(EfCoreNugetVersion)</Version>
+		<PackageId>BIT.Data.Sync.EfCore.Sqlite</PackageId>
+	</PropertyGroup>
+	<!--Nuget Generation Section End
+	Nuget Reference Section Start-->
 	<ItemGroup>
 		<ProjectReference Include="..\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EfCoreVersion)" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EfCoreSqliteVersion)" />
 	</ItemGroup>
-  <!--NugetProject ReferencesSection End-->
-  <Target Name="CopyPackage" AfterTargets="Pack">
-    <Copy SourceFiles="bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" />
-  </Target>
+	<ItemGroup>
+	  <None Update="LICENSE.txt">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+	<!--NugetProject ReferencesSection End-->
+	<Target Name="CopyPackage" AfterTargets="Pack">
+		<Copy SourceFiles="bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" />
+	</Target>
 </Project>
