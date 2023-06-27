@@ -20,15 +20,15 @@ blog posts:
 7. Adding network support - https://www.jocheojeda.com/2021/10/17/syncframework-adding-network-support/
 
 
-## Current version 6.0.2
+## Current version 7.0.X
 
 Target Framework net6.0
 
-- EfCore Version        6.0.2
-- Postgres Version      6.0.2
-- Pomelo Mysql Version  6.0.2
-- Sqlite Version		6.0.2
-- Sql Server Version    6.0.2
+- EfCore Version        7.0.3
+- Postgres Version      7.0.3
+- Pomelo Mysql Version  7.0.0
+- Sqlite Version		7.0.3
+- Sql Server Version    7.0.3
 
 ## Nugets
 

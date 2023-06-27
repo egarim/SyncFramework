@@ -3,6 +3,7 @@ using BIT.EfCore.Sync;
 
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Update;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure.Internal;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Internal;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Update.Internal;
@@ -30,7 +31,7 @@ namespace BIT.Data.Sync.EfCore.Npgsql
                                     new RelationalSqlGenerationHelperDependencies());
             var typeMapper = new NpgsqlTypeMappingSource(TypeMappingSourceDependencies, 
                                  RelationalTypeMappingSourceDependencies,
-                                 npgsqlSqlGenerationHelper);
+                                 npgsqlSqlGenerationHelper, new NpgsqlSingletonOptions());
 
             var sqliteUpdateSqlGenerator = new NpgsqlUpdateSqlGenerator(
                         new UpdateSqlGeneratorDependencies(

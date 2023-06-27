@@ -24,19 +24,30 @@ namespace BIT.Data.Sync.EfCore.Tests
     {
         TestClientFactory HttpClientFactory;
         [SetUp()]
+        MySqlServerVersion serverVersion;
         public override void Setup()
         {
-            var  serverVersion = new MySqlServerVersion(new Version(8, 0, 30));
+
+            serverVersion = new MySqlServerVersion(new Version(8, 0, 31));
+
+          
+
             base.Setup();
             HttpClientFactory = this.GetTestClientFactory();
-            string SqlServerSycnFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSycnFrameworkTestCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
-            string PostgresSynFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(PostgresSynFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;User Id=postgres;Password=pgadmin;Port=5432;Database=EfNode_B;"
+            //string SqlServerSycnFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSycnFrameworkTestCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
+            //string PostgresSynFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(PostgresSynFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;User Id=postgres;Password=pgadmin;Port=5432;Database=EfNode_B;"
+            //const string ConnectionString = "Data Source=EfNode_A.db;";
+            //string MysqlSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MysqlSyncFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;Uid=root;Pwd=mysqlAdmin@123;Database=EfNode_C;SslMode=Preferred;";
+
+            string SqlServerSycnFrameworkTestCnx = @"Server=(localdb)\mssqllocaldb;Database=EfMaster;Trusted_Connection=True;";
+            string PostgresSynFrameworkTestCnx = "Server=127.0.0.1;User Id=postgres;Password=1234567890;Port=5432;Database=EfNode_B;";
             const string ConnectionString = "Data Source=EfNode_A.db;";
-            string MysqlSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MysqlSyncFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;Uid=root;Pwd=mysqlAdmin@123;Database=EfNode_C;SslMode=Preferred;";
+            string MysqlSyncFrameworkTestCnx = "Server=127.0.0.1;Uid=root;Pwd=;Database=EfNode_C;SslMode=Preferred;";
+
 
             masterContextOptionBuilder.UseSqlServer(SqlServerSycnFrameworkTestCnx);
             node_AContextOptionbuilder.UseSqlite(ConnectionString);
-            node_BContextOptionbuilder.UseNpgsql(PostgresSynFrameworkTestCnx);            
+            node_BContextOptionbuilder.UseNpgsql(PostgresSynFrameworkTestCnx);
             node_CContextOptionbuilder.UseMySql(MysqlSyncFrameworkTestCnx, serverVersion);
         }
         private const string InMemoryConnectionString = "DataSource=:memory:";
@@ -44,6 +55,7 @@ namespace BIT.Data.Sync.EfCore.Tests
         DbContextOptionsBuilder node_AContextOptionbuilder = new DbContextOptionsBuilder();
         DbContextOptionsBuilder node_BContextOptionbuilder = new DbContextOptionsBuilder();
         DbContextOptionsBuilder node_CContextOptionbuilder = new DbContextOptionsBuilder();
+        MySqlServerVersion serverVersion;
         SqliteConnection GetSqliteMemoryConnection(string Name)
         {
             var connection = new SqliteConnection($"Data Source={Name};Mode=Memory;");
@@ -68,7 +80,7 @@ namespace BIT.Data.Sync.EfCore.Tests
 
             List<DeltaGeneratorBase> DeltaGenerators = new List<DeltaGeneratorBase>();
             DeltaGenerators.Add(new NpgsqlDeltaGenerator());
-            DeltaGenerators.Add(new PomeloMySqlDeltaGenerator());
+            DeltaGenerators.Add(new PomeloMySqlDeltaGenerator(serverVersion));
             DeltaGenerators.Add(new SqliteDeltaGenerator());
             DeltaGenerators.Add(new SqlServerDeltaGenerator());
             DeltaGeneratorBase[] additionalDeltaGenerators = DeltaGenerators.ToArray();
