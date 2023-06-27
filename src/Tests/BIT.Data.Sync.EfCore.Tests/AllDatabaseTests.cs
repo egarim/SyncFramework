@@ -24,9 +24,14 @@ namespace BIT.Data.Sync.EfCore.Tests
     {
         TestClientFactory HttpClientFactory;
         [SetUp()]
+        MySqlServerVersion serverVersion;
         public override void Setup()
         {
+
             serverVersion = new MySqlServerVersion(new Version(8, 0, 31));
+
+          
+
             base.Setup();
             HttpClientFactory = this.GetTestClientFactory();
             //string SqlServerSycnFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSycnFrameworkTestCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
