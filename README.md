@@ -29,11 +29,13 @@ Sqlite Version		  6.0.2
 Sql Server Version    6.0.2
 
 ## Nugets
+
 https://www.nuget.org/packages/BIT.Data.Sync/
 https://www.nuget.org/packages/BIT.Data.Sync.EfCore/
 https://www.nuget.org/packages/BIT.Data.Sync.EfCore.Npgsql/
 https://www.nuget.org/packages/BIT.Data.Sync.EfCore.Pomelo.MySql/
 https://www.nuget.org/packages/BIT.Data.Sync.EfCore.Sqlite/
+https://www.nuget.org/packages/BIT.Data.Sync.EfCore.SqlServer/
 
 
 
