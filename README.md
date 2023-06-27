@@ -21,12 +21,14 @@ blog posts:
 
 
 ## Current version 6.0.2
+
 Target Framework net6.0
-EfCore Version        6.0.2
-Postgres Version      6.0.2
-Pomelo Mysql Version  6.0.2
-Sqlite Version		  6.0.2
-Sql Server Version    6.0.2
+
+- EfCore Version        6.0.2
+- Postgres Version      6.0.2
+- Pomelo Mysql Version  6.0.2
+- Sqlite Version		  6.0.2
+- Sql Server Version    6.0.2
 
 ## Nugets
 
