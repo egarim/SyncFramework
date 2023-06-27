@@ -1,38 +1,41 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>$(EfCoreTargetFramework)</TargetFramework>
-    <Configurations>Debug;Release</Configurations>
-    <PackageTags>Entity Framework Core entity-framework-core EF Data O/RM EntityFramework EntityFrameworkCore EFCore Data-Synchronization SqlServer</PackageTags>
-    <Description>SyncFramework delta generator and delta processor for MSSqlServer</Description>
-    <DebugType>Full</DebugType>
-    <DebugSymbols>True</DebugSymbols>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-  </PropertyGroup>
-  <!--Nuget Generation Section Start-->
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <AssemblyName>BIT.Data.Sync.EfCore.SqlServer.v$(EfCoreNugetVersion)</AssemblyName>
-    <Version>$(EfCoreNugetVersion)</Version>
-    <PackageId>BIT.Data.Sync.EfCore.SqlServer</PackageId>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>$(EfCoreTargetFramework)</TargetFramework>
+		<Configurations>Debug;Release</Configurations>
+		<PackageTags>Entity Framework Core entity-framework-core EF Data O/RM EntityFramework EntityFrameworkCore EFCore Data-Synchronization SqlServer</PackageTags>
+		<Description>SyncFramework delta generator and delta processor for MSSqlServer</Description>
+		<DebugType>Full</DebugType>
+		<DebugSymbols>True</DebugSymbols>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\..\..\README.md" Link="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+	<!--Nuget Generation Section Start-->
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<AssemblyName>BIT.Data.Sync.EfCore.SqlServer.v$(EfCoreNugetVersion)</AssemblyName>
+		<Version>$(EfCoreNugetVersion)</Version>
+		<PackageId>BIT.Data.Sync.EfCore.SqlServer</PackageId>
+	</PropertyGroup>
 	<!--Nuget Reference Section Start-->
 	<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(EfCoreSqlServerVersion)" />
 	</ItemGroup>
 	<!--NugetProject ReferencesSection End-->
-  <ItemGroup>
-    <ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
-    <ProjectReference Include="..\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="LICENSE.txt">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
-  <!--NugetProject ReferencesSection End-->
-  <Target Name="CopyPackage" AfterTargets="Pack">
-    <Copy SourceFiles="bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" />
-  </Target>
+	<ItemGroup>
+		<ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
+		<ProjectReference Include="..\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="LICENSE.txt">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+	<!--NugetProject ReferencesSection End-->
+	<Target Name="CopyPackage" AfterTargets="Pack">
+		<Copy SourceFiles="bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" />
+	</Target>
 </Project>

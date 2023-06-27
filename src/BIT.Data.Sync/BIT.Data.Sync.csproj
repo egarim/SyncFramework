@@ -23,6 +23,9 @@
 		<Copy SourceFiles="bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" />
 	</Target>
 	<ItemGroup>
+	  <None Include="..\..\README.md" Link="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+	<ItemGroup>
 	  <None Update="LICENSE.txt">
 	    <PackagePath>\</PackagePath>
 	    <Pack>True</Pack>

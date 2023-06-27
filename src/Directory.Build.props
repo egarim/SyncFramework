@@ -3,6 +3,7 @@
 	<PropertyGroup Label="All">
 		<PackageProjectUrl>https://github.com/egarim/SyncFramework</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/egarim/SyncFramework</RepositoryUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 
