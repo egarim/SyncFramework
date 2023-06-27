@@ -332,3 +332,4 @@ ASALocalRun/
 
 # Local History for Visual Studio
 .localhistory/
+/src/EntityFrameworkCore/BIT.Data.Sync.EfCore.Pomelo.MySql/PomeloMySqlDeltaGenerator.cs

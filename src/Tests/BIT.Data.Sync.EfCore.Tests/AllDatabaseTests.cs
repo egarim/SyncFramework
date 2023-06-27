@@ -24,7 +24,7 @@ namespace BIT.Data.Sync.EfCore.Tests
     {
         TestClientFactory HttpClientFactory;
         [SetUp()]
-        MySqlServerVersion serverVersion;
+  
         public override void Setup()
         {
 
@@ -34,15 +34,10 @@ namespace BIT.Data.Sync.EfCore.Tests
 
             base.Setup();
             HttpClientFactory = this.GetTestClientFactory();
-            //string SqlServerSycnFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSycnFrameworkTestCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
-            //string PostgresSynFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(PostgresSynFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;User Id=postgres;Password=pgadmin;Port=5432;Database=EfNode_B;"
-            //const string ConnectionString = "Data Source=EfNode_A.db;";
-            //string MysqlSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MysqlSyncFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;Uid=root;Pwd=mysqlAdmin@123;Database=EfNode_C;SslMode=Preferred;";
-
-            string SqlServerSycnFrameworkTestCnx = @"Server=(localdb)\mssqllocaldb;Database=EfMaster;Trusted_Connection=True;";
-            string PostgresSynFrameworkTestCnx = "Server=127.0.0.1;User Id=postgres;Password=1234567890;Port=5432;Database=EfNode_B;";
+            string SqlServerSycnFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSycnFrameworkTestCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
+            string PostgresSynFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(PostgresSynFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;User Id=postgres;Password=pgadmin;Port=5432;Database=EfNode_B;"
             const string ConnectionString = "Data Source=EfNode_A.db;";
-            string MysqlSyncFrameworkTestCnx = "Server=127.0.0.1;Uid=root;Pwd=;Database=EfNode_C;SslMode=Preferred;";
+            string MysqlSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MysqlSyncFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;Uid=root;Pwd=mysqlAdmin@123;Database=EfNode_C;SslMode=Preferred;";
 
 
             masterContextOptionBuilder.UseSqlServer(SqlServerSycnFrameworkTestCnx);
