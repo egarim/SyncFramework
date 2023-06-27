@@ -32,12 +32,12 @@ Target Framework net6.0
 
 ## Nugets
 
-https://www.nuget.org/packages/BIT.Data.Sync/
-https://www.nuget.org/packages/BIT.Data.Sync.EfCore/
-https://www.nuget.org/packages/BIT.Data.Sync.EfCore.Npgsql/
-https://www.nuget.org/packages/BIT.Data.Sync.EfCore.Pomelo.MySql/
-https://www.nuget.org/packages/BIT.Data.Sync.EfCore.Sqlite/
-https://www.nuget.org/packages/BIT.Data.Sync.EfCore.SqlServer/
+- Common base classes and interfaces to implement delta synchronization https://www.nuget.org/packages/BIT.Data.Sync/
+- EfCore Implementation https://www.nuget.org/packages/BIT.Data.Sync.EfCore/
+- EfCore Implementation for postgres https://www.nuget.org/packages/BIT.Data.Sync.EfCore.Npgsql/
+- EfCore Implementation for Mysql/MariaDB using Pomelo provider https://www.nuget.org/packages/BIT.Data.Sync.EfCore.Pomelo.MySql/
+- EfCore Implementation for Sqlite https://www.nuget.org/packages/BIT.Data.Sync.EfCore.Sqlite/
+- EfCore Implementation for MsSqlServer https://www.nuget.org/packages/BIT.Data.Sync.EfCore.SqlServer/
 
 
 
