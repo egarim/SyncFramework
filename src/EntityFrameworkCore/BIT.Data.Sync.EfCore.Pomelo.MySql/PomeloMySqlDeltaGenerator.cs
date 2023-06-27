@@ -25,8 +25,7 @@ namespace BIT.Data.Sync.EfCore.Sqlite
 
             var optionsTypeMapping = new MySqlOptions();
             RelationalSqlGenerationHelperDependencies dependencies = new RelationalSqlGenerationHelperDependencies();
-            MySqlSqlGenerationHelper sqlGenerationHelper = new MySqlSqlGenerationHelper(dependencies, optionsTypeMapping);
-            MySqlTypeMappingSource typeMappingSource = new MySqlTypeMappingSource(TypeMappingSourceDependencies, RelationalTypeMappingSourceDependencies, optionsTypeMapping);
+            MySqlSqlGenerationHelper sqlGenerationHelper = new MySqlSqlGenerationHelper(dependencies, optionsTypeMappserverVersion      MySqlTypeMappingSource typeMappingSource = new MySqlTypeMappingSource(TypeMappingSourceDependencies, RelationalTypeMappingSourceDependencies, optionsTypeMapping);
            
             var mySqlUpdateSqlGenerator = new MySqlUpdateSqlGenerator(new UpdateSqlGeneratorDependencies(sqlGenerationHelper, typeMappingSource));
 
