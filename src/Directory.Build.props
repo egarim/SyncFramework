@@ -9,7 +9,7 @@
 
 	<PropertyGroup Label="BIT.Data.Sync">
 		<BitDataSyncNetStandardVersion>net6.0</BitDataSyncNetStandardVersion>
-		<BitDataSyncNugetVersion>1.0.0</BitDataSyncNugetVersion>
+		<BitDataSyncNugetVersion>1.0.1</BitDataSyncNugetVersion>
 		<PackageProjectUrl>https://github.com/egarim/SyncFramework</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/egarim/SyncFramework</RepositoryUrl>
 	</PropertyGroup>
@@ -18,7 +18,7 @@
 
 	<PropertyGroup Label="BIT.Data.Sync.EfCore">
 		<EfCoreTargetFramework>net6.0</EfCoreTargetFramework>
-		<EfCoreNugetVersion>7.0.3</EfCoreNugetVersion>
+		<EfCoreNugetVersion>7.0.3.1</EfCoreNugetVersion>
 		<EfCoreVersion>7.0.3</EfCoreVersion>
 		<EfCorePostgresVersion>7.0.3</EfCorePostgresVersion>
 		<EfCorePomeloMysqlVersion>7.0.0</EfCorePomeloMysqlVersion>

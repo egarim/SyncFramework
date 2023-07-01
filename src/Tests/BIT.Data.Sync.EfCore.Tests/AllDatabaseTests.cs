@@ -34,11 +34,15 @@ namespace BIT.Data.Sync.EfCore.Tests
 
             base.Setup();
             HttpClientFactory = this.GetTestClientFactory();
-            string SqlServerSycnFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSycnFrameworkTestCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
-            string PostgresSynFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(PostgresSynFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;User Id=postgres;Password=pgadmin;Port=5432;Database=EfNode_B;"
-            const string ConnectionString = "Data Source=EfNode_A.db;";
-            string MysqlSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MysqlSyncFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;Uid=root;Pwd=mysqlAdmin@123;Database=EfNode_C;SslMode=Preferred;";
+            //string SqlServerSycnFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSycnFrameworkTestCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
+            //string PostgresSynFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(PostgresSynFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;User Id=postgres;Password=pgadmin;Port=5432;Database=EfNode_B;"
+            //const string ConnectionString = "Data Source=EfNode_A.db;";
+            //string MysqlSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MysqlSyncFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;Uid=root;Pwd=mysqlAdmin@123;Database=EfNode_C;SslMode=Preferred;";
 
+                string SqlServerSycnFrameworkTestCnx = @"Server=(localdb)\mssqllocaldb;Database=EfMaster;Trusted_Connection=True;";
+            string PostgresSynFrameworkTestCnx = "Server=127.0.0.1;User Id=postgres;Password=1234567890;Port=5432;Database=EfNode_B;";
+            const string ConnectionString = "Data Source=EfNode_A.db;";
+            string MysqlSyncFrameworkTestCnx = "Server=127.0.0.1;Uid=root;Pwd=;Database=EfNode_C;SslMode=Preferred;";
 
             masterContextOptionBuilder.UseSqlServer(SqlServerSycnFrameworkTestCnx);
             node_AContextOptionbuilder.UseSqlite(ConnectionString);
@@ -143,6 +147,11 @@ namespace BIT.Data.Sync.EfCore.Tests
                 await Node_B_Context.PullAsync();
                 await Node_C_Context.PullAsync();
 
+                //Expected 4 for each node
+                int A_Actual = Node_A_Context.Blogs.Count();
+                int B_Actual = Node_B_Context.Blogs.Count();
+                int C_Actual = Node_C_Context.Blogs.Count();
+
                 Node_A_Context.Add(GetBlog("Node A Blog", "Post 1", "Post 2"));
                 Node_B_Context.Add(GetBlog("Node B Blog", "Post 1", "Post 2"));
                 Node_C_Context.Add(GetBlog("Node C Blog", "Post 1", "Post 2"));
@@ -157,6 +166,10 @@ namespace BIT.Data.Sync.EfCore.Tests
                 await Node_C_Context.SaveChangesAsync();
                 await Node_C_Context.PushAsync();
 
+                //Expected 5 for each node
+                A_Actual = Node_A_Context.Blogs.Count();
+                B_Actual = Node_B_Context.Blogs.Count();
+                C_Actual = Node_C_Context.Blogs.Count();
 
                 await MasterContext.PullAsync();
 
@@ -166,14 +179,50 @@ namespace BIT.Data.Sync.EfCore.Tests
                 Assert.AreEqual(7, count);
 
 
+                var NodeAFetchedDeltas= await Node_A_Context.FetchAsync();
+                var NodeBFetchedDeltas = await Node_B_Context.FetchAsync();
+                var NodeCFetchedDeltas = await Node_C_Context.FetchAsync();
+
                 await Node_A_Context.PullAsync();
                 await Node_B_Context.PullAsync();
                 await Node_C_Context.PullAsync();
 
+                var NodeABlogs = Node_A_Context.Blogs.ToList();
+                var NodeBBlogs = Node_B_Context.Blogs.ToList();
+                var NodeCBlogs = Node_C_Context.Blogs.ToList();
 
-                Assert.AreEqual(7, Node_A_Context.Blogs.Count());
-                Assert.AreEqual(7, Node_A_Context.Blogs.Count());
-                Assert.AreEqual(7, Node_A_Context.Blogs.Count());
+                A_Actual = Node_A_Context.Blogs.Count();
+                B_Actual = Node_B_Context.Blogs.Count();
+                C_Actual = Node_C_Context.Blogs.Count();
+
+                Assert.AreEqual(7, A_Actual);
+                Assert.AreEqual(7, B_Actual);
+                Assert.AreEqual(7, C_Actual);
+
+                Node_A_Context.Add(GetBlog("Node A Blog", "Post 2", "Post 3"));
+                Node_B_Context.Add(GetBlog("Node B Blog", "Post 2", "Post 3"));
+                Node_C_Context.Add(GetBlog("Node C Blog", "Post 2", "Post 3"));
+
+                await Node_A_Context.SaveChangesAsync();
+                await Node_A_Context.PushAsync();
+
+                await Node_B_Context.SaveChangesAsync();
+                await Node_B_Context.PushAsync();
+
+                await Node_C_Context.SaveChangesAsync();
+                await Node_C_Context.PushAsync();
+
+                //Expected 8 for each node
+                A_Actual = Node_A_Context.Blogs.Count();
+                B_Actual = Node_B_Context.Blogs.Count();
+                C_Actual = Node_C_Context.Blogs.Count();
+
+                await MasterContext.PullAsync();
+
+                blogs = MasterContext.Blogs.ToList();
+                count = blogs.Count;
+
+                Assert.AreEqual(10, count);
             }
 
 

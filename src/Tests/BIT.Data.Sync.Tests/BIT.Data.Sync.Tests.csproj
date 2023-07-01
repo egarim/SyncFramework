@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ClientServerTests\**" />
+    <EmbeddedResource Remove="ClientServerTests\**" />
+    <None Remove="ClientServerTests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="appsettings.json" />
   </ItemGroup>
 
@@ -26,9 +32,6 @@
   </ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="ClientServerTests\" />
 	</ItemGroup>
 
 </Project>

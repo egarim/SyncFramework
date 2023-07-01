@@ -23,20 +23,7 @@ namespace BIT.Data.Sync
         {
             return CreateDeltaCore(Identity, Operations);
         }
-        //public static IDelta CreateDeltaCore(this IDeltaStore instance, object Operations)
-        //{
-        //    DateTime now = DateTime.Now;
-        //    var delta = new Delta()
-        //    {
-        //        Date = now,
-        //        Identity = instance.Identity,
-               
-        //        Operation = SerializationHelper.CompressCore(SerializationHelper.SerializeCore(Operations)),
-        //        Index = Delta.GetGuid()
-        //    };
-        //    delta.Epoch = now.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
-        //    return delta;
-        //}
+      
         public static IDelta CreateDeltaCore(string Identity, object Operations)
         {
             DateTime now = DateTime.Now;

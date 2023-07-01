@@ -267,3 +267,7 @@ public class SyncController : ControllerBase
 ```
 
 Now we are ready to sync your data between your clients and your server.
+
+## Changelog
+
+You can see the current list of changes [here](Changes.md)

@@ -21,27 +21,7 @@ namespace BIT.Data.Sync
         }
 
     
-        //[SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
-        //protected virtual void GetObjectData(SerializationInfo info, StreamingContext context)
-        //{
-        //    if (info == null)
-        //        throw new ArgumentNullException("info");
-
-        //    info.AddValue(nameof(IDelta.Epoch), this.Epoch);
-        //    info.AddValue(nameof(IDelta.Identity), this.Index);
-        //    info.AddValue(nameof(IDelta.Operation), this.Index);
-        //    info.AddValue(nameof(this.Date), this.Date);
-
-        //}
-
-        //[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
-        //void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
-        //{
-        //    if (info == null)
-        //        throw new ArgumentNullException("info");
-
-        //    GetObjectData(info, context);
-        //}
+       
         public Delta(string identity, byte[] operation)
         {
 

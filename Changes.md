@@ -1,4 +1,10 @@
-﻿### BIT.Data.Sync
+﻿## version BIT.Data.Sync 1.0.1
+### GuidService
+- The Guid generation algorithm was rewritten; the old version was not sortable.
+- A test class was created in the BIT.Data.Sync.Tests project to test the Guid generation.
+
+## version BIT.Data.Sync 1.0.0
+### BIT.Data.Sync
 - Set default date to Delta.cs due to exception raised in some situation
 - Added new functions to IDeltaStore. Similarlay updated DeltaStoreBase, EFDeltaStore and MemoryDeltaStore
 - Updated functions to allow the use of a single deltastore by multiple client nodes. 
