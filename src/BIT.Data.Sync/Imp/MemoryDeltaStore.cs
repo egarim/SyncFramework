@@ -7,14 +7,7 @@ using System.Threading.Tasks;
 
 namespace BIT.Data.Sync.Imp
 {
-    public class SequenceService
-    {
-        public int DeltaIndex = 0;
-        public SequenceService()
-        {
-            
-        }
-    }
+
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     public class MemoryDeltaStore : DeltaStoreBase
     {
@@ -23,7 +16,8 @@ namespace BIT.Data.Sync.Imp
         readonly IDictionary<string, SyncStatus> _syncStatus;
         string LastPushedDelta;
         string LastProcessedDelta;
-        SequenceService sequenceService = new SequenceService();
+        //TODO pass this in the constructor or add dependency injection
+        MemorySequenceService sequenceService = new MemorySequenceService(new YearSequencePrefixStrategy());
         public MemoryDeltaStore(IEnumerable<IDelta> Deltas) : base()
         {
             this._Deltas = new List<IDelta>(Deltas);
@@ -39,12 +33,13 @@ namespace BIT.Data.Sync.Imp
         public async override Task SaveDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken = default)
 
         {
+            //TODO Review string index new functionality
             cancellationToken.ThrowIfCancellationRequested();
             foreach (IDelta delta in deltas)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 Delta item = new Delta(delta);
-                item.Index = sequenceService.DeltaIndex++.ToString();
+                item.Index = await sequenceService.GenerateNextSequenceAsync();
                 Deltas.Add(item);
             }
         }

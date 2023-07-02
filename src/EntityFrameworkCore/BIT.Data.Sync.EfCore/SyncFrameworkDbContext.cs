@@ -2,7 +2,6 @@
 using BIT.Data.Sync.Client;
 using BIT.Data.Sync.EfCore;
 using Microsoft.EntityFrameworkCore;
-//using Microsoft.EntityFrameworkCore.SqlServer.Infrastructure.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -37,24 +36,7 @@ namespace BIT.EfCore.Sync
 
         protected IServiceProvider serviceProvider;
         public string Identity { get; private set; }
-        public IModificationCommandToCommandDataService IEFSyncFrameworkService { get; private set; }
-
-        #region Helper Methods
-        //protected static DbContextOptions<T> ChangeOptionsType<T>(DbContextOptions options) where T : DbContext
-        //{
-        //    var sqlExt = options.Extensions.FirstOrDefault(e => e is SqlServerOptionsExtension);
-
-        //    if (sqlExt == null)
-        //        throw (new Exception("Failed to retrieve SQL connection string for base Context"));
-        //    return new DbContextOptionsBuilder<T>()
-        //                .UseSqlServer(((SqlServerOptionsExtension)sqlExt).ConnectionString)
-        //                .Options;
-        //}
-        //private SqlServerOptionsExtension GetSqlServerExtension(DbContextOptions options)
-        //{
-        //    return (SqlServerOptionsExtension)options.Extensions.FirstOrDefault(e => e is SqlServerOptionsExtension);
-        //}
-        #endregion
+  
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -62,7 +44,7 @@ namespace BIT.EfCore.Sync
             this.Identity = serviceProvider.GetService<ISyncIdentityService>()?.Identity;
             this.DeltaStore = serviceProvider.GetService<IDeltaStore>();
             this.SyncFrameworkClient = serviceProvider.GetService<ISyncFrameworkClient>();
-            IEFSyncFrameworkService = serviceProvider.GetService<IModificationCommandToCommandDataService>();
+            var IEFSyncFrameworkService = serviceProvider.GetService<IModificationCommandToCommandDataService>();
             IEFSyncFrameworkService.RegisterDeltaGenerators(serviceProvider);
             optionsBuilder.UseInternalServiceProvider(serviceProvider);
         }

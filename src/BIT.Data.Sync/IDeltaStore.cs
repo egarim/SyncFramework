@@ -8,7 +8,7 @@ namespace BIT.Data.Sync
     public interface IDeltaStore
     {
         //string Identity { get; }
-        
+
         /// <summary>
         /// Saves the IEnumerable<IDelta> of deltas in the current store
         /// </summary>
@@ -92,5 +92,7 @@ namespace BIT.Data.Sync
         /// <returns>An empty task</returns>
         Task PurgeDeltasAsync(string identity, CancellationToken cancellationToken = default);
         Task ResetDeltasStatusAsync(string identity, CancellationToken cancellationToken = default);
+
+        ISequenceService SequenceService { get; }
     }
 }

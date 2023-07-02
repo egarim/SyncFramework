@@ -1,7 +1,7 @@
 ﻿using BIT.Data.Sync;
 using BIT.Data.Sync.EfCore.Data;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,7 +11,33 @@ using System.Threading.Tasks;
 
 namespace BIT.EfCore.Sync
 {
+    public class EfSequenceService: SequenceServiceBase, ISequenceService
+    {
+        DeltaDbContext DeltaDbContext;
 
+        public EfSequenceService(ISequencePrefixStrategy sequencePrefixStrategy, DeltaDbContext deltaDbContext) : base(sequencePrefixStrategy)
+        {
+            DeltaDbContext = deltaDbContext;
+        }
+
+        public override async Task<string> GenerateNextSequenceAsync(string prefix)
+        {
+            var sequence = await DeltaDbContext.EfSequence.FindAsync(prefix);
+            if (sequence == null)
+            {
+                sequence = new EfSequence { Prefix = prefix, LastNumber = 0 };
+                DeltaDbContext.EfSequence.Add(sequence);
+            }
+
+            sequence.LastNumber++;
+
+            await DeltaDbContext.SaveChangesAsync();
+
+            return $"{prefix}{sequence.LastNumber:D4}";
+        }
+
+     
+    }
     public class EFDeltaStore : DeltaStoreBase
     {
         DeltaDbContext DeltaDbContext;
@@ -19,6 +45,7 @@ namespace BIT.EfCore.Sync
         {
             this.DeltaDbContext = DeltaDbContext;
             this.DeltaDbContext.Database.EnsureCreated();
+            this.sequenceService=  DeltaDbContext.GetService<ISequenceService>();
         }
 
         protected EFDeltaStore()
@@ -28,14 +55,14 @@ namespace BIT.EfCore.Sync
             this.DeltaDbContext = new DeltaDbContext(dbContextOptionsBuilder.Options);
             this.DeltaDbContext.Database.EnsureCreated();
         }
-        static int DeltaIndex = 0;
+     
         public async override Task SaveDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             foreach (IDelta delta in deltas)
             {
                 EFDelta entity = new EFDelta(delta);
-                entity.Index= DeltaIndex++.ToString();
+                entity.Index= await sequenceService.GenerateNextSequenceAsync();
                 DeltaDbContext.Deltas.Add(entity);
             }
             await DeltaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -77,11 +104,9 @@ namespace BIT.EfCore.Sync
         }
         public override Task<IEnumerable<IDelta>> GetDeltasByIdentityAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
+          
             cancellationToken.ThrowIfCancellationRequested();
-            var deltas = DeltaDbContext.Deltas.ToList();
-            IEnumerable<EFDelta> DeltasToReturn = deltas.Where(d => string.Compare(d.Index,startIndex)>0 && d.Identity == identity);
-            return Task.FromResult(DeltasToReturn.ToList().Cast<IDelta>());
-            //return Task.FromResult(DeltaDbContext.Deltas.Where(d => d.Index.CompareTo(startIndex) > 0 && d.Identity == identity).ToList().Cast<IDelta>());
+            return Task.FromResult(DeltaDbContext.Deltas.Where(d => string.Compare(d.Index, startIndex) > 0 && d.Identity == identity).ToList().Cast<IDelta>());
         }
 
         public async override Task<string> GetLastPushedDeltaAsync(string identity, CancellationToken cancellationToken = default)

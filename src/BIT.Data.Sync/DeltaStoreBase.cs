@@ -8,6 +8,8 @@ namespace BIT.Data.Sync
 {
     public abstract class DeltaStoreBase : IDeltaStore
     {
+        protected ISequenceService sequenceService;
+        public ISequenceService SequenceService => sequenceService;
 
         protected DeltaStoreBase()
         {

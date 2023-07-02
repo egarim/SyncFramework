@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BIT.Data.Sync.EfCore.Data
 {
-
     public class EFDelta : Delta, IDelta
     {
         public EFDelta()

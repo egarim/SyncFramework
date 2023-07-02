@@ -10,15 +10,12 @@ namespace BIT.Data.Sync
     /// <summary>
     /// An implementation of the IDelta interface, this class is primary used for serialization and transportation purpose 
     /// </summary>
-    public class Delta : IDelta//, ISerializable
+    public class Delta : IDelta
     {
         public Delta()
         {
         }
-        public static Guid GetGuid()
-        {
-            return GuidService.Create();
-        }
+        
 
     
        

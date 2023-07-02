@@ -6,6 +6,7 @@ using BIT.Data.Sync.EfCore.SqlServer;
 using BIT.Data.Sync.EfCore.Tests.Contexts.SyncFramework;
 using BIT.Data.Sync.EfCore.Tests.Infrastructure;
 using BIT.Data.Sync.EfCore.Tests.Model;
+using BIT.Data.Sync.Imp;
 using BIT.EfCore.Sync;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -34,26 +35,34 @@ namespace BIT.Data.Sync.EfCore.Tests
 
             base.Setup();
             HttpClientFactory = this.GetTestClientFactory();
-            //string SqlServerSycnFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSycnFrameworkTestCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
-            //string PostgresSynFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(PostgresSynFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;User Id=postgres;Password=pgadmin;Port=5432;Database=EfNode_B;"
-            //const string ConnectionString = "Data Source=EfNode_A.db;";
-            //string MysqlSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MysqlSyncFrameworkTestCnx), EnvironmentVariableTarget.User); //"Server=127.0.0.1;Uid=root;Pwd=mysqlAdmin@123;Database=EfNode_C;SslMode=Preferred;";
 
-                string SqlServerSycnFrameworkTestCnx = @"Server=(localdb)\mssqllocaldb;Database=EfMaster;Trusted_Connection=True;";
-            string PostgresSynFrameworkTestCnx = "Server=127.0.0.1;User Id=postgres;Password=1234567890;Port=5432;Database=EfNode_B;";
-            const string ConnectionString = "Data Source=EfNode_A.db;";
-            string MysqlSyncFrameworkTestCnx = "Server=127.0.0.1;Uid=root;Pwd=;Database=EfNode_C;SslMode=Preferred;";
+            string SqlServerSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSyncFrameworkTestCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
+            string SqlServerSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
+            
+            
+            string PostgresSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(PostgresSyncFrameworkTestCnx), EnvironmentVariableTarget.User); 
+            string PostgresSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(PostgresSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
 
-            masterContextOptionBuilder.UseSqlServer(SqlServerSycnFrameworkTestCnx);
-            node_AContextOptionbuilder.UseSqlite(ConnectionString);
-            node_BContextOptionbuilder.UseNpgsql(PostgresSynFrameworkTestCnx);
-            node_CContextOptionbuilder.UseMySql(MysqlSyncFrameworkTestCnx, serverVersion);
+            string SQLiteSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SQLiteSyncFrameworkTestCnx), EnvironmentVariableTarget.User);
+            string SQLiteSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(SQLiteSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
+
+            string MySQLSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestCnx), EnvironmentVariableTarget.User);
+            string MySQLSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
+
+
+
+            //string MySQLSyncFrameworkTestCnx = "Server=127.0.0.1;Uid=root;Pwd=;Database=EfNode_C;SslMode=Preferred;";
+
+            masterContextOptionBuilder.UseSqlServer(SqlServerSyncFrameworkTestCnx);
+            node_AContextOptionBuilder.UseSqlite(SQLiteSyncFrameworkTestCnx);
+            node_BContextOptionBuilder.UseNpgsql(PostgresSyncFrameworkTestCnx);
+            node_CContextOptionBuilder.UseMySql(MySQLSyncFrameworkTestCnx, serverVersion);
         }
         private const string InMemoryConnectionString = "DataSource=:memory:";
         DbContextOptionsBuilder masterContextOptionBuilder = new DbContextOptionsBuilder();
-        DbContextOptionsBuilder node_AContextOptionbuilder = new DbContextOptionsBuilder();
-        DbContextOptionsBuilder node_BContextOptionbuilder = new DbContextOptionsBuilder();
-        DbContextOptionsBuilder node_CContextOptionbuilder = new DbContextOptionsBuilder();
+        DbContextOptionsBuilder node_AContextOptionBuilder = new DbContextOptionsBuilder();
+        DbContextOptionsBuilder node_BContextOptionBuilder = new DbContextOptionsBuilder();
+        DbContextOptionsBuilder node_CContextOptionBuilder = new DbContextOptionsBuilder();
         MySqlServerVersion serverVersion;
         SqliteConnection GetSQLiteMemoryConnection(string Name)
         {
@@ -104,18 +113,30 @@ namespace BIT.Data.Sync.EfCore.Tests
             ServiceCollectionNode_C.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb4"); }, Node_C_HttpClient, "MemoryDeltaStore1", "Node C", additionalDeltaGenerators);
             ServiceCollectionNode_C.AddEntityFrameworkMySql();
 
+            YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
+            ServiceCollectionMaster.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
+            ServiceCollectionNode_A.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
+            ServiceCollectionNode_B.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
+            ServiceCollectionNode_C.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
+
+            ServiceCollectionMaster.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
+            ServiceCollectionNode_A.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
+            ServiceCollectionNode_B.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
+            ServiceCollectionNode_C.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
+
             var _providerMaster = ServiceCollectionMaster.BuildServiceProvider();
             var _providerNode_A = ServiceCollectionNode_A.BuildServiceProvider();
             var _providerNode_B = ServiceCollectionNode_B.BuildServiceProvider();
             var _providerNode_C = ServiceCollectionNode_C.BuildServiceProvider();
 
+         
 
 
 
             using (var MasterContext = new TestSyncFrameworkDbContext(masterContextOptionBuilder.Options, _providerMaster))
-            using (var Node_A_Context = new TestSyncFrameworkDbContext(node_AContextOptionbuilder.Options, _providerNode_A))
-            using (var Node_B_Context = new TestSyncFrameworkDbContext(node_BContextOptionbuilder.Options, _providerNode_B))
-            using (var Node_C_Context = new TestSyncFrameworkDbContext(node_CContextOptionbuilder.Options, _providerNode_C))
+            using (var Node_A_Context = new TestSyncFrameworkDbContext(node_AContextOptionBuilder.Options, _providerNode_A))
+            using (var Node_B_Context = new TestSyncFrameworkDbContext(node_BContextOptionBuilder.Options, _providerNode_B))
+            using (var Node_C_Context = new TestSyncFrameworkDbContext(node_CContextOptionBuilder.Options, _providerNode_C))
             {
 
                 await MasterContext.Database.EnsureDeletedAsync();

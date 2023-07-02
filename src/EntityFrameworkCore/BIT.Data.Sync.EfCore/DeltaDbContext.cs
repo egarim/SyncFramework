@@ -31,7 +31,7 @@ namespace BIT.EfCore.Sync
 
         public DbSet<EFDelta> Deltas { get; set; }
         public DbSet<EFSyncStatus> EFSyncStatus { get; set; }
-
+        public DbSet<EfSequence> EfSequence { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
