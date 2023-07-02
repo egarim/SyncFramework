@@ -14,9 +14,9 @@ namespace BIT.Data.Sync.Client
             cancellationToken.ThrowIfCancellationRequested();
             var statusExists = await instance.DeltaStore.CanRestoreDatabaseAsync(instance.Identity, cancellationToken);
             var LastDeltaIndex = await instance.DeltaStore.GetLastProcessedDeltaAsync(instance.Identity, cancellationToken).ConfigureAwait(false);
-            //TODO this might not be needed 
-            //if (!statusExists)
-            //    return await instance.SyncFrameworkClient.FetchAsync(LastDeltaIndex, string.Empty, cancellationToken).ConfigureAwait(false);
+            //TODO review functionality CanRestoreDatabaseAsync
+            if (!statusExists)
+                return await instance.SyncFrameworkClient.FetchAsync(LastDeltaIndex, string.Empty, cancellationToken).ConfigureAwait(false);
 
             return await instance.SyncFrameworkClient.FetchAsync(LastDeltaIndex, instance.Identity, cancellationToken).ConfigureAwait(false);
         }
