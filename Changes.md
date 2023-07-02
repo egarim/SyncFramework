@@ -1,7 +1,9 @@
 ﻿## version BIT.Data.Sync 1.0.1
-### GuidService
-- The Guid generation algorithm was rewritten; the old version was not sortable.
-- A test class was created in the BIT.Data.Sync.Tests project to test the Guid generation.
+### ISequenceService
+    - Added new interface ISequenceService that is on charge or generating sequence numbers for delta entities
+    - Added new EfSquenceService  (ISequenceService implementation)
+    - Added new MemorySquenceService  (ISequenceService implementation)
+    - Updated delta index comparison query to use strings instead of guids
 
 ## version BIT.Data.Sync 1.0.0
 ### BIT.Data.Sync
