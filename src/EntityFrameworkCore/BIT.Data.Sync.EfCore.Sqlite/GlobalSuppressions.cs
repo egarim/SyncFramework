@@ -5,4 +5,4 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Usage", "EF1001:Internal EF Core API usage.", Justification = "<Pending>", Scope = "member", Target = "~M:BIT.Data.Sync.EfCore.Sqlite.SqliteDeltaGenerator.CreateInstance(System.IServiceProvider)~Microsoft.EntityFrameworkCore.Update.IUpdateSqlGenerator")]
+[assembly: SuppressMessage("Usage", "EF1001:Internal EF Core API usage.", Justification = "<Pending>", Scope = "member", Target = "~M:BIT.Data.Sync.EfCore.SQLite.SqliteDeltaGenerator.CreateInstance(System.IServiceProvider)~Microsoft.EntityFrameworkCore.Update.IUpdateSqlGenerator")]

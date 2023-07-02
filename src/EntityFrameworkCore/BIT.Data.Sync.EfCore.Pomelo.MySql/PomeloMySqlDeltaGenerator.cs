@@ -11,7 +11,7 @@ using Pomelo.EntityFrameworkCore.MySql.Internal;
 using Pomelo.EntityFrameworkCore.MySql.Storage.Internal;
 using Pomelo.EntityFrameworkCore.MySql.Update.Internal;
 using System;
-namespace BIT.Data.Sync.EfCore.Sqlite
+namespace BIT.Data.Sync.EfCore.Pomelo.MySql
 {
     public class PomeloMySqlDeltaGenerator : DeltaGeneratorBase
     {

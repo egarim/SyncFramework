@@ -1,7 +1,7 @@
 using BIT.Data.Sync;
 using BIT.Data.Sync.Client;
 using BIT.Data.Sync.EfCore.Npgsql;
-using BIT.Data.Sync.EfCore.Sqlite;
+using BIT.Data.Sync.EfCore.SQLite;
 using BIT.Data.Sync.EfCore.SqlServer;
 using BIT.Data.Sync.EfCore.Tests.Contexts.SyncFramework;
 using BIT.Data.Sync.EfCore.Tests.Infrastructure;
@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using BIT.Data.Sync.EfCore.Pomelo.MySql;
 
 namespace BIT.Data.Sync.EfCore.Tests
 {
@@ -101,30 +102,55 @@ namespace BIT.Data.Sync.EfCore.Tests
 
 
             //ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb1"); }, MasterHttpClient, "MemoryDeltaStore1", "Master", additionalDeltaGenerators);
-            ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseSqlServer(SqlServerSyncFrameworkTestDeltaCnx); }, MasterHttpClient, "MemoryDeltaStore1", "Master", additionalDeltaGenerators);
-            ServiceCollectionMaster.AddEntityFrameworkSqlServer();
+
+            ////You get register the service in any way you want, this is just an example
+            //ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseSqlServer(SqlServerSyncFrameworkTestDeltaCnx); }, MasterHttpClient, "MemoryDeltaStore1", "Master", additionalDeltaGenerators);
+            //ServiceCollectionMaster.AddEntityFrameworkSqlServer();
+
+            //you can also use the extension method for specific providers
+            ServiceCollectionMaster.AddSyncFrameworkForSqlServer(SqlServerSyncFrameworkTestDeltaCnx, MasterHttpClient, "MemoryDeltaStore1", "Master", additionalDeltaGenerators);
+
 
 
             //ServiceCollectionNode_A.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb2"); }, Node_A_HttpClient, "MemoryDeltaStore1", "Node A", additionalDeltaGenerators);
-            ServiceCollectionNode_A.AddEfSynchronization((options) => { options.UseSqlite(SQLiteSyncFrameworkTestDeltaCnx); }, Node_A_HttpClient, "MemoryDeltaStore1", "Node A", additionalDeltaGenerators);
-            ServiceCollectionNode_A.AddEntityFrameworkSqlite();
+
+            ////You get register the service in any way you want, this is just an example
+            //ServiceCollectionNode_A.AddEfSynchronization((options) => { options.UseSqlite(SQLiteSyncFrameworkTestDeltaCnx); }, Node_A_HttpClient, "MemoryDeltaStore1", "Node A", additionalDeltaGenerators);
+            //ServiceCollectionNode_A.AddEntityFrameworkSqlite();
+
+            //you can also use the extension method for specific providers
+            ServiceCollectionNode_A.AddSyncFrameworkForSQLite(SQLiteSyncFrameworkTestDeltaCnx, Node_A_HttpClient, "MemoryDeltaStore1", "Node A", additionalDeltaGenerators);
 
 
             //ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb3"); }, Node_B_HttpClient, "MemoryDeltaStore1", "Node B", additionalDeltaGenerators);
-            ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseNpgsql(PostgresSyncFrameworkTestDeltaCnx); }, Node_B_HttpClient, "MemoryDeltaStore1", "Node B", additionalDeltaGenerators);
-            ServiceCollectionNode_B.AddEntityFrameworkNpgsql();
+
+            ////You get register the service in any way you want, this is just an example            
+            //ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseNpgsql(PostgresSyncFrameworkTestDeltaCnx); }, Node_B_HttpClient, "MemoryDeltaStore1", "Node B", additionalDeltaGenerators);
+            //ServiceCollectionNode_B.AddEntityFrameworkNpgsql();
+
+            //you can also use the extension method for specific providers
+            ServiceCollectionNode_B.AddSyncFrameworkForNpgsql(PostgresSyncFrameworkTestDeltaCnx, Node_B_HttpClient, "MemoryDeltaStore1", "Node B", additionalDeltaGenerators);
 
 
-
+            ////You get register the service in any way you want, this is just an example   
             //ServiceCollectionNode_C.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb4"); }, Node_C_HttpClient, "MemoryDeltaStore1", "Node C", additionalDeltaGenerators);
-            ServiceCollectionNode_C.AddEfSynchronization((options) => { options.UseMySql(MySQLSyncFrameworkTestDeltaCnx, serverVersion); }, Node_C_HttpClient, "MemoryDeltaStore1", "Node C", additionalDeltaGenerators);
-            ServiceCollectionNode_C.AddEntityFrameworkMySql();
+
+
+            //ServiceCollectionNode_C.AddEfSynchronization((options) => { options.UseMySql(MySQLSyncFrameworkTestDeltaCnx, serverVersion); }, Node_C_HttpClient, "MemoryDeltaStore1", "Node C", additionalDeltaGenerators);
+            //ServiceCollectionNode_C.AddEntityFrameworkMySql();
+
+
+            //you can also use the extension method for specific providers
+            ServiceCollectionNode_C.AddSyncFrameworkForMysql(MySQLSyncFrameworkTestDeltaCnx,serverVersion, Node_C_HttpClient, "MemoryDeltaStore1", "Node C", additionalDeltaGenerators);
+
 
             YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
             ServiceCollectionMaster.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
             ServiceCollectionNode_A.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
             ServiceCollectionNode_B.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
             ServiceCollectionNode_C.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
+
+
 
             //ServiceCollectionMaster.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
             //ServiceCollectionNode_A.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));

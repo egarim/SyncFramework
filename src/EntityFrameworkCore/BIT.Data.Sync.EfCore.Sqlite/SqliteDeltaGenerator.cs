@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Sqlite.Update.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Update;
 using System;
-namespace BIT.Data.Sync.EfCore.Sqlite
+namespace BIT.Data.Sync.EfCore.SQLite
 {
     public class SqliteDeltaGenerator : DeltaGeneratorBase
     {
