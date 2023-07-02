@@ -11,87 +11,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Diagnostics;
+using BIT.Data.Sync.AspNetCore.Controllers;
 
 namespace BIT.Data.Sync.EfCore.Tests.Controllers
 {
     //[Authorize]
     [ApiController]
     [Route("[controller]")]
-    public class SyncController : ControllerBase
+    public class SyncController : SyncControllerBase
     {
-
-
-        private readonly ILogger<SyncController> _logger;
-        private readonly ISyncServer _SyncServer;
-        protected string GetHeader(string HeaderName)
+        public SyncController(ILogger<SyncControllerBase> logger, ISyncServer SyncServer) : base(logger, SyncServer)
         {
-            Microsoft.Extensions.Primitives.StringValues stringValues = HttpContext.Request.Headers[HeaderName];
-            return stringValues;
         }
-
-
-        public SyncController(ILogger<SyncController> logger, ISyncServer SyncServer)
+        public override Task<string> Fetch(string startIndex, string identity)
         {
-            _logger = logger;
-            _SyncServer = SyncServer;
+            return base.Fetch(startIndex, identity);
         }
-        [HttpPost(nameof(Push))]
-        public virtual async Task Push()
+        public override Task Push()
         {
-
-            string NodeId = GetHeader("NodeId");
-            var stream = new StreamReader(this.Request.Body);
-            var body = await stream.ReadToEndAsync();          
-            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(body)))
-            {
-              
-                DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(List<Delta>));
-                List<Delta> Deltas = (List<Delta>)deserialized.ReadObject(ms);
-                await _SyncServer.SaveDeltasAsync(NodeId, Deltas, new CancellationToken());
-                var Message = $"Push to node:{NodeId}{Environment.NewLine}Deltas Received:{Deltas.Count}{Environment.NewLine}Identity:{Deltas.FirstOrDefault()?.Identity}";
-                _logger.LogInformation(Message);
-                Debug.WriteLine(Message);
-              
-            }
-            
-
-
-
-        }
-        [HttpGet("Fetch")]
-        public async Task<string> Fetch(string startIndex, string identity)
-        {
-
-            string NodeId = GetHeader("NodeId");
-
-
-            var Message = $"Fetch from node:{NodeId}{Environment.NewLine}Start delta index:{startIndex}{Environment.NewLine}Client identity:{identity}";
-            _logger.LogInformation(Message);
-            Debug.WriteLine(Message);
-            IEnumerable<IDelta> enumerable;
-
-            if(startIndex == null)
-                startIndex = "";
-
-            if (string.IsNullOrEmpty(identity))
-                enumerable = await _SyncServer.GetDeltasAsync(NodeId, startIndex, new CancellationToken());
-            else
-                enumerable = await _SyncServer.GetDeltasFromOtherNodes(NodeId, startIndex, identity, new CancellationToken());
-
-            List<Delta> toSerialize = new List<Delta>();
-            foreach (IDelta delta in enumerable)
-            {
-                toSerialize.Add(new Delta(delta));
-            }
-            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(List<Delta>));
-            MemoryStream msObj = new MemoryStream();
-            js.WriteObject(msObj, toSerialize);
-            msObj.Position = 0;
-            StreamReader sr = new StreamReader(msObj);
-            string jsonDeltas = sr.ReadToEnd();
-            return jsonDeltas;
-
-        }
-
+            return base.Push();
+        }       
     }
 }

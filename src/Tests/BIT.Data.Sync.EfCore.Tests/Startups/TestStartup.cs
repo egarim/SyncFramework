@@ -24,13 +24,14 @@ namespace BIT.Data.Sync.EfCore.Tests.Startups
         {
             services.AddControllers();
 
-           
-         
-            SyncServerNode syncServerNode = new SyncServerNode(new MemoryDeltaStore(), null, "MemoryDeltaStore1");
 
-            
-            services.AddSingleton<ISyncServer>(new SyncServer(syncServerNode));
-            
+            ////HACK you can add as many nodes as you want and then add a single SyncServer to the DI container
+            //SyncServerNode syncServerNode = new SyncServerNode(new MemoryDeltaStore(), null, "MemoryDeltaStore1");
+            //services.AddSingleton<ISyncServer>(new SyncServer(syncServerNode));
+
+            ////HACK or you can use the extension method AddSyncServerWithMemoryNode
+            services.AddSyncServerWithMemoryNode("MemoryDeltaStore1");
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
