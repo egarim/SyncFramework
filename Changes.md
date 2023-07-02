@@ -4,6 +4,7 @@
     - Added new EfSquenceService  (ISequenceService implementation)
     - Added new MemorySquenceService  (ISequenceService implementation)
     - Updated delta index comparison query to use strings instead of guids
+    - Breaking change: delta indexes are now strings instead of guids
 
 ## version BIT.Data.Sync 1.0.0
 ### BIT.Data.Sync
