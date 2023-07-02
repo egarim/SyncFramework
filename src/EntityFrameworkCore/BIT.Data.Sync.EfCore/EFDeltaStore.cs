@@ -17,8 +17,8 @@ namespace BIT.EfCore.Sync
         public EFDeltaStore(DeltaDbContext DeltaDbContext)
         {
             this.DeltaDbContext = DeltaDbContext;
-            //TODO remove after test
-            this.DeltaDbContext.Database.EnsureDeleted();
+            //HACK TEST remove the comment below to ensure a clean delta database for testing
+            //this.DeltaDbContext.Database.EnsureDeleted();
             this.DeltaDbContext.Database.EnsureCreated();
             this.sequenceService=  DeltaDbContext.GetService<ISequenceService>();
         }
