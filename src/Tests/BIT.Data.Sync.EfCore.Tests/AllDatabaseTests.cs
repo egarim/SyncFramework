@@ -23,6 +23,20 @@ namespace BIT.Data.Sync.EfCore.Tests
 {
     public class AllDatabaseTests : MultiServerBaseTest
     {
+        string SqlServerSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSyncFrameworkTestCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
+        string SqlServerSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
+
+
+        string PostgresSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(PostgresSyncFrameworkTestCnx), EnvironmentVariableTarget.User);
+        string PostgresSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(PostgresSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
+
+        string SQLiteSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SQLiteSyncFrameworkTestCnx), EnvironmentVariableTarget.User);
+        string SQLiteSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(SQLiteSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
+
+        string MySQLSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestCnx), EnvironmentVariableTarget.User);
+        string MySQLSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
+
+
         TestClientFactory HttpClientFactory;
         [SetUp()]
   
@@ -36,22 +50,9 @@ namespace BIT.Data.Sync.EfCore.Tests
             base.Setup();
             HttpClientFactory = this.GetTestClientFactory();
 
-            string SqlServerSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSyncFrameworkTestCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
-            string SqlServerSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
-            
-            
-            string PostgresSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(PostgresSyncFrameworkTestCnx), EnvironmentVariableTarget.User); 
-            string PostgresSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(PostgresSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
+          
 
-            string SQLiteSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SQLiteSyncFrameworkTestCnx), EnvironmentVariableTarget.User);
-            string SQLiteSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(SQLiteSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
-
-            string MySQLSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestCnx), EnvironmentVariableTarget.User);
-            string MySQLSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
-
-
-
-            //string MySQLSyncFrameworkTestCnx = "Server=127.0.0.1;Uid=root;Pwd=;Database=EfNode_C;SslMode=Preferred;";
+          
 
             masterContextOptionBuilder.UseSqlServer(SqlServerSyncFrameworkTestCnx);
             node_AContextOptionBuilder.UseSqlite(SQLiteSyncFrameworkTestCnx);
@@ -73,6 +74,8 @@ namespace BIT.Data.Sync.EfCore.Tests
         [Test]
         public async Task MainTest()
         {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 
             var MasterHttpClient = HttpClientFactory.CreateClient("Master");
             var Node_A_HttpClient = HttpClientFactory.CreateClient("Node A");
@@ -97,20 +100,24 @@ namespace BIT.Data.Sync.EfCore.Tests
 
 
 
-            ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb1"); }, MasterHttpClient, "MemoryDeltaStore1", "Master", additionalDeltaGenerators);
+            //ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb1"); }, MasterHttpClient, "MemoryDeltaStore1", "Master", additionalDeltaGenerators);
+            ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseSqlServer(SqlServerSyncFrameworkTestDeltaCnx); }, MasterHttpClient, "MemoryDeltaStore1", "Master", additionalDeltaGenerators);
             ServiceCollectionMaster.AddEntityFrameworkSqlServer();
 
 
-            ServiceCollectionNode_A.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb2"); }, Node_A_HttpClient, "MemoryDeltaStore1", "Node A", additionalDeltaGenerators);
+            //ServiceCollectionNode_A.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb2"); }, Node_A_HttpClient, "MemoryDeltaStore1", "Node A", additionalDeltaGenerators);
+            ServiceCollectionNode_A.AddEfSynchronization((options) => { options.UseSqlite(SQLiteSyncFrameworkTestDeltaCnx); }, Node_A_HttpClient, "MemoryDeltaStore1", "Node A", additionalDeltaGenerators);
             ServiceCollectionNode_A.AddEntityFrameworkSqlite();
 
 
-            ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb3"); }, Node_B_HttpClient, "MemoryDeltaStore1", "Node B", additionalDeltaGenerators);
+            //ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb3"); }, Node_B_HttpClient, "MemoryDeltaStore1", "Node B", additionalDeltaGenerators);
+            ServiceCollectionNode_B.AddEfSynchronization((options) => { options.UseNpgsql(PostgresSyncFrameworkTestDeltaCnx); }, Node_B_HttpClient, "MemoryDeltaStore1", "Node B", additionalDeltaGenerators);
             ServiceCollectionNode_B.AddEntityFrameworkNpgsql();
 
 
 
-            ServiceCollectionNode_C.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb4"); }, Node_C_HttpClient, "MemoryDeltaStore1", "Node C", additionalDeltaGenerators);
+            //ServiceCollectionNode_C.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb4"); }, Node_C_HttpClient, "MemoryDeltaStore1", "Node C", additionalDeltaGenerators);
+            ServiceCollectionNode_C.AddEfSynchronization((options) => { options.UseMySql(MySQLSyncFrameworkTestDeltaCnx, serverVersion); }, Node_C_HttpClient, "MemoryDeltaStore1", "Node C", additionalDeltaGenerators);
             ServiceCollectionNode_C.AddEntityFrameworkMySql();
 
             YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
@@ -119,10 +126,17 @@ namespace BIT.Data.Sync.EfCore.Tests
             ServiceCollectionNode_B.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
             ServiceCollectionNode_C.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
 
-            ServiceCollectionMaster.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
-            ServiceCollectionNode_A.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
-            ServiceCollectionNode_B.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
-            ServiceCollectionNode_C.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
+            //ServiceCollectionMaster.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
+            //ServiceCollectionNode_A.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
+            //ServiceCollectionNode_B.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
+            //ServiceCollectionNode_C.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
+
+
+            ServiceCollectionMaster.AddSingleton(typeof(ISequenceService), typeof(EfSequenceService));
+            ServiceCollectionNode_A.AddSingleton(typeof(ISequenceService), typeof(EfSequenceService));
+            ServiceCollectionNode_B.AddSingleton(typeof(ISequenceService), typeof(EfSequenceService));
+            ServiceCollectionNode_C.AddSingleton(typeof(ISequenceService), typeof(EfSequenceService));
+
 
             var _providerMaster = ServiceCollectionMaster.BuildServiceProvider();
             var _providerNode_A = ServiceCollectionNode_A.BuildServiceProvider();

@@ -11,39 +11,14 @@ using System.Threading.Tasks;
 
 namespace BIT.EfCore.Sync
 {
-    public class EfSequenceService: SequenceServiceBase, ISequenceService
-    {
-        DeltaDbContext DeltaDbContext;
-
-        public EfSequenceService(ISequencePrefixStrategy sequencePrefixStrategy, DeltaDbContext deltaDbContext) : base(sequencePrefixStrategy)
-        {
-            DeltaDbContext = deltaDbContext;
-        }
-
-        public override async Task<string> GenerateNextSequenceAsync(string prefix)
-        {
-            var sequence = await DeltaDbContext.EfSequence.FindAsync(prefix);
-            if (sequence == null)
-            {
-                sequence = new EfSequence { Prefix = prefix, LastNumber = 0 };
-                DeltaDbContext.EfSequence.Add(sequence);
-            }
-
-            sequence.LastNumber++;
-
-            await DeltaDbContext.SaveChangesAsync();
-
-            return $"{prefix}{sequence.LastNumber:D4}";
-        }
-
-     
-    }
     public class EFDeltaStore : DeltaStoreBase
     {
         DeltaDbContext DeltaDbContext;
         public EFDeltaStore(DeltaDbContext DeltaDbContext)
         {
             this.DeltaDbContext = DeltaDbContext;
+            //TODO remove after test
+            this.DeltaDbContext.Database.EnsureDeleted();
             this.DeltaDbContext.Database.EnsureCreated();
             this.sequenceService=  DeltaDbContext.GetService<ISequenceService>();
         }
@@ -99,14 +74,28 @@ namespace BIT.EfCore.Sync
 
         public override Task<IEnumerable<IDelta>> GetDeltasAsync(string startIndex, CancellationToken cancellationToken = default)
         {
+            startIndex = GuardStartIndex(startIndex);
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult(DeltaDbContext.Deltas.Where(d => d.Index.CompareTo(startIndex) > 0).ToList().Cast<IDelta>());
+        }
+        string GuardStartIndex(string startIndex)
+        {
+            if (startIndex == null)
+            {
+                return "";
+            }
+            else
+            {
+                return startIndex;
+            }
         }
         public override Task<IEnumerable<IDelta>> GetDeltasByIdentityAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
           
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(DeltaDbContext.Deltas.Where(d => string.Compare(d.Index, startIndex) > 0 && d.Identity == identity).ToList().Cast<IDelta>());
+            startIndex=GuardStartIndex(startIndex);
+            IEnumerable<IDelta> result = DeltaDbContext.Deltas.Where(d => string.Compare(d.Index, startIndex) > 0 && d.Identity == identity).ToList().Cast<IDelta>();
+             return Task.FromResult(result);
         }
 
         public async override Task<string> GetLastPushedDeltaAsync(string identity, CancellationToken cancellationToken = default)

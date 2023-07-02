@@ -47,18 +47,18 @@ namespace BIT.Data.Sync.Imp
         public override Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var result = Deltas.Where(d => d.Index.CompareTo(startIndex) > 0 && string.Compare(d.Identity, identity, StringComparison.Ordinal) != 0);
+            var result = Deltas.Where(d => string.Compare(d.Index, startIndex) > 0 && string.Compare(d.Identity, identity, StringComparison.Ordinal) != 0);
             return Task.FromResult(result.Cast<IDelta>());
         }
         public override Task<IEnumerable<IDelta>> GetDeltasByIdentityAsync(string startIndex, string identity, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(Deltas.Where(d => d.Index.CompareTo(startIndex) > 0 && d.Identity == identity) .ToList().Cast<IDelta>());
+            return Task.FromResult(Deltas.Where(d => string.Compare(d.Index, startIndex) > 0 && d.Identity == identity) .ToList().Cast<IDelta>());
         }
         public override Task<IEnumerable<IDelta>> GetDeltasAsync(string startIndex, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(Deltas.Where(d => d.Index.CompareTo(startIndex) > 0 ).ToList().Cast<IDelta>());
+            return Task.FromResult(Deltas.Where(d => string.Compare(d.Index, startIndex) > 0).ToList().Cast<IDelta>());
         }
 
         public override async Task<string> GetLastProcessedDeltaAsync(string identity, CancellationToken cancellationToken = default)

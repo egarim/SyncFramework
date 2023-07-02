@@ -27,7 +27,7 @@ namespace BIT.Data.Sync.Imp
 
             sequence.LastNumber++;
 
-            string result = $"{Prefix}{sequence.LastNumber:D4}";
+            string result = $"{Prefix}{sequence.LastNumber:D10}";
             Debug.WriteLine(result);
             return Task.FromResult(result);
         }

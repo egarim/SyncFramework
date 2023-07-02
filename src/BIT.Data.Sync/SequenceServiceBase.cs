@@ -6,6 +6,8 @@ namespace BIT.Data.Sync
 {
     public abstract class SequenceServiceBase : ISequenceService
     {
+        //TODO use for marting the sequence length
+        protected string Placeholder = "D10";
         protected ISequencePrefixStrategy sequencePrefixStrategy;
         public SequenceServiceBase(ISequencePrefixStrategy sequencePrefixStrategy)
         {
