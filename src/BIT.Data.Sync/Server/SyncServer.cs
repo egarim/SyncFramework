@@ -22,26 +22,26 @@ namespace BIT.Data.Sync.Server
 
        
 
-        public async Task<IEnumerable<IDelta>> GetDeltasAsync(string NodeId, Guid startindex, CancellationToken cancellationToken)
+        public async Task<IEnumerable<IDelta>> GetDeltasAsync(string NodeId, string startIndex, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ISyncServerNode Node = GetNode(NodeId);
             if (Node != null)
             {
-                return await Node.GetDeltasAsync(startindex,null, cancellationToken).ConfigureAwait(false);
+                return await Node.GetDeltasAsync(startIndex,null, cancellationToken).ConfigureAwait(false);
             }
 
             IEnumerable<IDelta> result = new List<IDelta>();
             return result;
         }
-        public async Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string nodeId, Guid startindex, string identity, CancellationToken cancellationToken)
+        public async Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string nodeId, string startIndex, string identity, CancellationToken cancellationToken)
         {
 
             cancellationToken.ThrowIfCancellationRequested();
             ISyncServerNode Node = GetNode(nodeId);
             if (Node != null)
             {
-                return await Node.GetDeltasAsync(startindex, identity, cancellationToken).ConfigureAwait(false);
+                return await Node.GetDeltasAsync(startIndex, identity, cancellationToken).ConfigureAwait(false);
             }
             IEnumerable<IDelta> result = new List<IDelta>();
             return result;

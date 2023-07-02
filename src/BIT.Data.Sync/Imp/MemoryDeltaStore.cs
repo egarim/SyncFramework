@@ -7,15 +7,23 @@ using System.Threading.Tasks;
 
 namespace BIT.Data.Sync.Imp
 {
+    public class SequenceService
+    {
+        public int DeltaIndex = 0;
+        public SequenceService()
+        {
+            
+        }
+    }
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     public class MemoryDeltaStore : DeltaStoreBase
     {
         readonly IList<IDelta> _Deltas;
         public IList<IDelta> Deltas => _Deltas;
         readonly IDictionary<string, SyncStatus> _syncStatus;
-        Guid LastPushedDelta;
-        Guid LastProcessedDelta;
-
+        string LastPushedDelta;
+        string LastProcessedDelta;
+        SequenceService sequenceService = new SequenceService();
         public MemoryDeltaStore(IEnumerable<IDelta> Deltas) : base()
         {
             this._Deltas = new List<IDelta>(Deltas);
@@ -27,7 +35,7 @@ namespace BIT.Data.Sync.Imp
 
         }
 
-
+    
         public async override Task SaveDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken = default)
 
         {
@@ -35,33 +43,35 @@ namespace BIT.Data.Sync.Imp
             foreach (IDelta delta in deltas)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                Deltas.Add(new Delta(delta));
+                Delta item = new Delta(delta);
+                item.Index = sequenceService.DeltaIndex++.ToString();
+                Deltas.Add(item);
             }
         }
 
-        public override Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(Guid startindex, string identity, CancellationToken cancellationToken = default)
+        public override Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var result = Deltas.Where(d => d.Index.CompareTo(startindex) > 0 && string.Compare(d.Identity, identity, StringComparison.Ordinal) != 0);
+            var result = Deltas.Where(d => d.Index.CompareTo(startIndex) > 0 && string.Compare(d.Identity, identity, StringComparison.Ordinal) != 0);
             return Task.FromResult(result.Cast<IDelta>());
         }
-        public override Task<IEnumerable<IDelta>> GetDeltasByIdentityAsync(Guid startindex, string identity, CancellationToken cancellationToken)
+        public override Task<IEnumerable<IDelta>> GetDeltasByIdentityAsync(string startIndex, string identity, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(Deltas.Where(d => d.Index.CompareTo(startindex) > 0 && d.Identity == identity) .ToList().Cast<IDelta>());
+            return Task.FromResult(Deltas.Where(d => d.Index.CompareTo(startIndex) > 0 && d.Identity == identity) .ToList().Cast<IDelta>());
         }
-        public override Task<IEnumerable<IDelta>> GetDeltasAsync(Guid startindex, CancellationToken cancellationToken = default)
+        public override Task<IEnumerable<IDelta>> GetDeltasAsync(string startIndex, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(Deltas.Where(d => d.Index.CompareTo(startindex) > 0 ).ToList().Cast<IDelta>());
+            return Task.FromResult(Deltas.Where(d => d.Index.CompareTo(startIndex) > 0 ).ToList().Cast<IDelta>());
         }
 
-        public override async Task<Guid> GetLastProcessedDeltaAsync(string identity, CancellationToken cancellationToken = default)
+        public override async Task<string> GetLastProcessedDeltaAsync(string identity, CancellationToken cancellationToken = default)
         {
             return _syncStatus[identity].LastProcessedDelta;
         }
 
-        public override async Task SetLastProcessedDeltaAsync(Guid Index, string identity, CancellationToken cancellationToken = default)
+        public override async Task SetLastProcessedDeltaAsync(string Index, string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             _syncStatus.Add(identity, new SyncStatus() { LastProcessedDelta=Index,LastPushedDelta=Index });
@@ -70,12 +80,12 @@ namespace BIT.Data.Sync.Imp
 
         }
 
-        public async override Task<Guid> GetLastPushedDeltaAsync(string identity, CancellationToken cancellationToken)
+        public async override Task<string> GetLastPushedDeltaAsync(string identity, CancellationToken cancellationToken)
         {
             return _syncStatus[identity].LastPushedDelta;
         }
 
-        public async override Task SetLastPushedDeltaAsync(Guid Index, string identity, CancellationToken cancellationToken = default)
+        public async override Task SetLastPushedDeltaAsync(string Index, string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (!_syncStatus.ContainsKey(identity))
@@ -85,10 +95,10 @@ namespace BIT.Data.Sync.Imp
 
         }
 
-        public async override Task<int> GetDeltaCountAsync(Guid startindex, string identity, CancellationToken cancellationToken = default)
+        public async override Task<int> GetDeltaCountAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Deltas.Count(d => d.Index.CompareTo(startindex) > 0 && d.Identity == identity);
+            return Deltas.Count(d => d.Index.CompareTo(startIndex) > 0 && d.Identity == identity);
         }
 
         public async override Task PurgeDeltasAsync(string identity, CancellationToken cancellationToken = default)
@@ -124,8 +134,8 @@ namespace BIT.Data.Sync.Imp
     class SyncStatus
     {
         public int LastTransactionLogProcessed { get; set; }
-        public Guid LastProcessedDelta { get; set; }
-        public Guid LastPushedDelta { get; set; }
+        public string LastProcessedDelta { get; set; }
+        public string LastPushedDelta { get; set; }
 
     }
 }

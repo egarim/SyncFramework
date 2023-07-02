@@ -31,9 +31,9 @@ namespace BIT.Data.Sync
             {
                 Date = now,
                 Identity = Identity,
-              
+
                 Operation = SerializationHelper.CompressCore(SerializationHelper.SerializeCore(Operations)),
-                Index = Delta.GetGuid()
+                Index = ""// Delta.GetGuid() TODO fix this after index string change
             };
             delta.Epoch = now.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
             return delta;

@@ -45,8 +45,8 @@ namespace BIT.Data.Sync.EfCore.Tests.Controllers
             using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(body)))
             {
               
-                DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(List<Delta>));
-                List<Delta> Deltas = (List<Delta>)deserializer.ReadObject(ms);
+                DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(List<Delta>));
+                List<Delta> Deltas = (List<Delta>)deserialized.ReadObject(ms);
                 await _SyncServer.SaveDeltasAsync(NodeId, Deltas, new CancellationToken());
                 var Message = $"Push to node:{NodeId}{Environment.NewLine}Deltas Received:{Deltas.Count}{Environment.NewLine}Identity:{Deltas.FirstOrDefault()?.Identity}";
                 _logger.LogInformation(Message);
@@ -59,29 +59,33 @@ namespace BIT.Data.Sync.EfCore.Tests.Controllers
 
         }
         [HttpGet("Fetch")]
-        public async Task<string> Fetch(Guid startindex, string identity)
+        public async Task<string> Fetch(string startIndex, string identity)
         {
 
             string NodeId = GetHeader("NodeId");
 
 
-            var Message = $"Fetch from node:{NodeId}{Environment.NewLine}Start delta index:{startindex}{Environment.NewLine}Client identity:{identity}";
+            var Message = $"Fetch from node:{NodeId}{Environment.NewLine}Start delta index:{startIndex}{Environment.NewLine}Client identity:{identity}";
             _logger.LogInformation(Message);
             Debug.WriteLine(Message);
             IEnumerable<IDelta> enumerable;
-            if (string.IsNullOrEmpty(identity))
-                enumerable = await _SyncServer.GetDeltasAsync(NodeId, startindex, new CancellationToken());
-            else
-                enumerable = await _SyncServer.GetDeltasFromOtherNodes(NodeId, startindex, identity, new CancellationToken());
 
-            List<Delta> toserialzie = new List<Delta>();
+            if(startIndex == null)
+                startIndex = "";
+
+            if (string.IsNullOrEmpty(identity))
+                enumerable = await _SyncServer.GetDeltasAsync(NodeId, startIndex, new CancellationToken());
+            else
+                enumerable = await _SyncServer.GetDeltasFromOtherNodes(NodeId, startIndex, identity, new CancellationToken());
+
+            List<Delta> toSerialize = new List<Delta>();
             foreach (IDelta delta in enumerable)
             {
-                toserialzie.Add(new Delta(delta));
+                toSerialize.Add(new Delta(delta));
             }
             DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(List<Delta>));
             MemoryStream msObj = new MemoryStream();
-            js.WriteObject(msObj, toserialzie);
+            js.WriteObject(msObj, toSerialize);
             msObj.Position = 0;
             StreamReader sr = new StreamReader(msObj);
             string jsonDeltas = sr.ReadToEnd();

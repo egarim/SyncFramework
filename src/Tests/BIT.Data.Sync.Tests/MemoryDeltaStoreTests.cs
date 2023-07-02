@@ -28,7 +28,7 @@ namespace BIT.Data.Sync.Tests
 
             await memoryDeltaStore.SaveDeltasAsync(new List<IDelta>(){ DeltaHello },default);
 
-            Assert.AreEqual(1, await memoryDeltaStore.GetDeltaCountAsync(Guid.Empty,"A",default));
+            Assert.AreEqual(1, await memoryDeltaStore.GetDeltaCountAsync(string.Empty,"A",default));
 
         }
 
@@ -41,7 +41,7 @@ namespace BIT.Data.Sync.Tests
 
             await memoryDeltaStore.SetLastProcessedDeltaAsync(DeltaHello.Index,"A",default);
 
-            Guid actual = await memoryDeltaStore.GetLastProcessedDeltaAsync("A", default);
+            var actual = await memoryDeltaStore.GetLastProcessedDeltaAsync("A", default);
             Assert.AreEqual(DeltaHello.Index, actual);
 
         }
@@ -56,7 +56,7 @@ namespace BIT.Data.Sync.Tests
             
             await memoryDeltaStore.SaveDeltasAsync(new List<IDelta>() { DeltaHello , DeltaWorld }, default);
 
-            IEnumerable<IDelta> DeltasFromStore = await memoryDeltaStore.GetDeltasAsync(Guid.Empty, default);
+            IEnumerable<IDelta> DeltasFromStore = await memoryDeltaStore.GetDeltasAsync(string.Empty, default);
            
 
             Assert.NotNull(DeltasFromStore.FirstOrDefault(d=>d.Index==DeltaHello.Index));
@@ -72,7 +72,7 @@ namespace BIT.Data.Sync.Tests
             await memoryDeltaStore.SaveDeltasAsync(new List<IDelta>() { DeltaHello });
 
             await memoryDeltaStore.PurgeDeltasAsync("");
-            Assert.AreEqual(0, await memoryDeltaStore.GetDeltaCountAsync(Guid.Empty, ""));
+            Assert.AreEqual(0, await memoryDeltaStore.GetDeltaCountAsync(string.Empty, ""));
 
         }
     }

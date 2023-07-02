@@ -17,22 +17,23 @@ namespace BIT.Data.Sync
 
         public abstract Task SaveDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken = default);
 
-        public abstract Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(Guid startindex, string identity, CancellationToken cancellationToken = default);
-        public abstract Task<Guid> GetLastProcessedDeltaAsync(string identity, CancellationToken cancellationToken = default);
-        public abstract Task SetLastProcessedDeltaAsync(Guid Index, string identity, CancellationToken cancellationToken = default);
+        public abstract Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string startIndex, string identity, CancellationToken cancellationToken = default);
+        public abstract Task<string> GetLastProcessedDeltaAsync(string identity, CancellationToken cancellationToken = default);
+        public abstract Task SetLastProcessedDeltaAsync(string Index, string identity, CancellationToken cancellationToken = default);
 
-        public abstract Task<IEnumerable<IDelta>> GetDeltasAsync(Guid startindex, CancellationToken cancellationToken = default);
-        public abstract Task<IEnumerable<IDelta>> GetDeltasByIdentityAsync(Guid startindex, string identity, CancellationToken cancellationToken = default);
+        public abstract Task<IEnumerable<IDelta>> GetDeltasAsync(string startIndex, CancellationToken cancellationToken = default);
+        public abstract Task<IEnumerable<IDelta>> GetDeltasByIdentityAsync(string startIndex, string identity, CancellationToken cancellationToken = default);
 
-        public abstract Task<Guid> GetLastPushedDeltaAsync(string identity, CancellationToken cancellationToken = default);
-        public abstract Task SetLastPushedDeltaAsync(Guid Index, string identity, CancellationToken cancellationToken = default);
+        public abstract Task<string> GetLastPushedDeltaAsync(string identity, CancellationToken cancellationToken = default);
+        public abstract Task SetLastPushedDeltaAsync(string Index, string identity, CancellationToken cancellationToken = default);
 
-        public abstract Task<int> GetDeltaCountAsync(Guid startindex, string identity, CancellationToken cancellationToken=default);
+        public abstract Task<int> GetDeltaCountAsync(string startIndex, string identity, CancellationToken cancellationToken=default);
         public abstract Task PurgeDeltasAsync(string identity, CancellationToken cancellationToken=default);
 
         public abstract Task ResetDeltasStatusAsync(string identity, CancellationToken cancellationToken=default);
 
         public abstract Task<bool> CanRestoreDatabaseAsync(string identity, CancellationToken cancellationToken);
-        
+
+    
     }
 }

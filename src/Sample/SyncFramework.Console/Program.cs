@@ -283,7 +283,7 @@ namespace SyncFramework.ConsoleApp
         }
         static async Task ShowDeltats()
         {
-            var deltas = await _context.DeltaStore.GetDeltasByIdentityAsync(Guid.Empty, _context.Identity, CancellationToken.None).ConfigureAwait(false);
+            var deltas = await _context.DeltaStore.GetDeltasByIdentityAsync(string.Empty, _context.Identity, CancellationToken.None).ConfigureAwait(false);
             System.Console.WriteLine("\n----------------------------------------------------------------------");
             Console.WriteLine($"Client {_selectedClient} Deltas: Total Found {deltas.Count()}");
             System.Console.WriteLine("----------------------------------------------------------------------");

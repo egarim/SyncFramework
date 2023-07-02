@@ -68,9 +68,9 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
 
             //11 - Get deltas from all databases
 
-            var DeltasFromDatabaseA = await A_Database.DeltaStore.GetDeltasAsync(Guid.Empty, default);
-            var DeltasFromDatabaseB = await B_Database.DeltaStore.GetDeltasAsync(Guid.Empty, default);
-            var DeltasFromMaster = await Master.DeltaStore.GetDeltasAsync(Guid.Empty, default);
+            var DeltasFromDatabaseA = await A_Database.DeltaStore.GetDeltasAsync(string.Empty, default);
+            var DeltasFromDatabaseB = await B_Database.DeltaStore.GetDeltasAsync(string.Empty, default);
+            var DeltasFromMaster = await Master.DeltaStore.GetDeltasAsync(string.Empty, default);
 
             //12 - Process deltas in the master and save the index of last delta processed
             await Master_DeltaProcessor.ProcessDeltasAsync(DeltasFromDatabaseA, default);
@@ -97,13 +97,13 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
 
             Debug.WriteLine("Data in A_Database");
             A_Database.Data.ForEach(r => Debug.WriteLine(r.ToString()));
-            Guid A_LastIndexProccesded = await A_Database.DeltaStore.GetLastProcessedDeltaAsync(nameof(A_Database), default);
-            Debug.WriteLine("Data in A_Database Last Processed Delta Index:" + A_LastIndexProccesded);
+            string A_LastIndexProcessed = await A_Database.DeltaStore.GetLastProcessedDeltaAsync(nameof(A_Database), default);
+            Debug.WriteLine("Data in A_Database Last Processed Delta Index:" + A_LastIndexProcessed);
 
             Debug.WriteLine("Data in B_Database");
             B_Database.Data.ForEach(r => Debug.WriteLine(r.ToString()));
-            Guid B_LastIndexProccesded = await B_Database.DeltaStore.GetLastProcessedDeltaAsync(nameof(B_Database), default);
-            Debug.WriteLine("Data in B_Database Last Processed Delta Index:" + B_LastIndexProccesded);
+            string B_LastIndexProcessed = await B_Database.DeltaStore.GetLastProcessedDeltaAsync(nameof(B_Database), default);
+            Debug.WriteLine("Data in B_Database Last Processed Delta Index:" + B_LastIndexProcessed);
 
 
             //16 - Delete and update records in the master database
@@ -112,8 +112,8 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
             Master.Update(Mundo);
 
             //17 - Get deltas from the master and process them on the other nodes 
-            await A_DeltaProcessor.ProcessDeltasAsync(await Master.DeltaStore.GetDeltasAsync(A_LastIndexProccesded, default), default);
-            await B_DeltaProcessor.ProcessDeltasAsync(await Master.DeltaStore.GetDeltasAsync(B_LastIndexProccesded, default), default);
+            await A_DeltaProcessor.ProcessDeltasAsync(await Master.DeltaStore.GetDeltasAsync(A_LastIndexProcessed, default), default);
+            await B_DeltaProcessor.ProcessDeltasAsync(await Master.DeltaStore.GetDeltasAsync(B_LastIndexProcessed, default), default);
 
 
             Debug.WriteLine($"{System.Environment.NewLine}{System.Environment.NewLine}{System.Environment.NewLine}{System.Environment.NewLine}{System.Environment.NewLine}");

@@ -22,7 +22,7 @@ namespace BIT.Data.Sync.EfCore.Data
             Date = ((Delta)Delta).Date;
         }
 
-        public EFDelta(string identity, Guid index, byte[] operation) : base(identity, index, operation)
+        public EFDelta(string identity, string index, byte[] operation) : base(identity, index, operation)
         {
 
         }

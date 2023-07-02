@@ -11,8 +11,8 @@ namespace BIT.EfCore.Sync
         [Required]
         public string Identity { get; set; }
         public int LastTransactionLogProcessed { get; set; }
-        public Guid LastProcessedDelta { get; set; }
-        public Guid LastPushedDelta { get; set; }
+        public string LastProcessedDelta { get; set; }
+        public string LastPushedDelta { get; set; }
         public EFSyncStatus()
         {
 

@@ -55,7 +55,7 @@ namespace BIT.Data.Sync.EfCore.Tests
         DbContextOptionsBuilder node_BContextOptionbuilder = new DbContextOptionsBuilder();
         DbContextOptionsBuilder node_CContextOptionbuilder = new DbContextOptionsBuilder();
         MySqlServerVersion serverVersion;
-        SqliteConnection GetSqliteMemoryConnection(string Name)
+        SqliteConnection GetSQLiteMemoryConnection(string Name)
         {
             var connection = new SqliteConnection($"Data Source={Name};Mode=Memory;");
             connection.Open();
@@ -65,7 +65,7 @@ namespace BIT.Data.Sync.EfCore.Tests
         public async Task MainTest()
         {
 
-            var MasterHttpCLient = HttpClientFactory.CreateClient("Master");
+            var MasterHttpClient = HttpClientFactory.CreateClient("Master");
             var Node_A_HttpClient = HttpClientFactory.CreateClient("Node A");
             var Node_B_HttpClient = HttpClientFactory.CreateClient("Node B");
             var Node_C_HttpClient = HttpClientFactory.CreateClient("Node C");
@@ -88,7 +88,7 @@ namespace BIT.Data.Sync.EfCore.Tests
 
 
 
-            ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb2"); }, MasterHttpCLient, "MemoryDeltaStore1", "Master", additionalDeltaGenerators);
+            ServiceCollectionMaster.AddEfSynchronization((options) => { options.UseInMemoryDatabase("MemoryDb1"); }, MasterHttpClient, "MemoryDeltaStore1", "Master", additionalDeltaGenerators);
             ServiceCollectionMaster.AddEntityFrameworkSqlServer();
 
 

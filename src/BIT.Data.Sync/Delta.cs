@@ -37,7 +37,7 @@ namespace BIT.Data.Sync
             Operation = Delta.Operation;
             Epoch = Delta.Epoch;
         }
-        public Delta(string identity, Guid index, byte[] operation)
+        public Delta(string identity, string index, byte[] operation)
         {
 
             Identity = identity;
@@ -51,7 +51,7 @@ namespace BIT.Data.Sync
         public virtual string Identity { get; set; }
 
         [DataMember]
-        public virtual Guid Index { get; set; }
+        public virtual string Index { get; set; }
 
         [DataMember]
         public virtual byte[] Operation { get; set; }

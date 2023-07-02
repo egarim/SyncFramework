@@ -31,16 +31,16 @@ namespace BIT.Data.Sync.Client
         public virtual async Task PushAsync(IEnumerable<IDelta> Deltas, CancellationToken cancellationToken  = default)
         {
 
-            List<Delta> toserialzie = new List<Delta>();
+            List<Delta> ToSerialize = new List<Delta>();
             foreach (IDelta delta in Deltas)
             {
-                toserialzie.Add(new Delta(delta));
+                ToSerialize.Add(new Delta(delta));
             }
             cancellationToken.ThrowIfCancellationRequested();
 
             DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(List<Delta>));
             MemoryStream msObj = new MemoryStream();
-            js.WriteObject(msObj, toserialzie);
+            js.WriteObject(msObj, ToSerialize);
             msObj.Position = 0;
             StreamReader sr = new StreamReader(msObj);
             string jsonDeltas = sr.ReadToEnd();
@@ -49,10 +49,14 @@ namespace BIT.Data.Sync.Client
             await _httpClient.PostAsync("/Sync/Push", data, cancellationToken).ConfigureAwait(false);
 
         }
-        public virtual async Task<List<Delta>> FetchAsync(Guid startindex, string identity, CancellationToken cancellationToken = default)
+        public virtual async Task<List<Delta>> FetchAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
+            if(startIndex == null)
+                startIndex = "";
+
+
             var QueryParams = new Dictionary<string, string>();
-            QueryParams.Add(nameof(startindex), startindex.ToString());
+            QueryParams.Add(nameof(startIndex), startIndex.ToString());
             QueryParams.Add(nameof(identity), identity);
             cancellationToken.ThrowIfCancellationRequested();
             var query = HttpUtility.ParseQueryString("");
@@ -60,13 +64,13 @@ namespace BIT.Data.Sync.Client
             {
                 query[CurrentParam.Key] = CurrentParam.Value;
             }
-            var reponse = await _httpClient.GetStringAsync($"/Sync/Fetch?{query}").ConfigureAwait(false);
+            var response = await _httpClient.GetStringAsync($"/Sync/Fetch?{query}").ConfigureAwait(false);
 
-            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(reponse)))
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(response)))
             {
 
-                DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(List<Delta>));
-                List<Delta> Deltas = (List<Delta>)deserializer.ReadObject(ms);
+                DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(List<Delta>));
+                List<Delta> Deltas = (List<Delta>)deserialized.ReadObject(ms);
 
                 return Deltas;
             }

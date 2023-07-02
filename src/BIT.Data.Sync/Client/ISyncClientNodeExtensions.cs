@@ -13,11 +13,12 @@ namespace BIT.Data.Sync.Client
         {
             cancellationToken.ThrowIfCancellationRequested();
             var statusExists = await instance.DeltaStore.CanRestoreDatabaseAsync(instance.Identity, cancellationToken);
-            var LastDetalIndex = await instance.DeltaStore.GetLastProcessedDeltaAsync(instance.Identity, cancellationToken).ConfigureAwait(false);
+            var LastDeltaIndex = await instance.DeltaStore.GetLastProcessedDeltaAsync(instance.Identity, cancellationToken).ConfigureAwait(false);
+            //TODO this might not be needed 
             if (!statusExists)
-                return await instance.SyncFrameworkClient.FetchAsync(LastDetalIndex, string.Empty, cancellationToken).ConfigureAwait(false);
-            
-            return await instance.SyncFrameworkClient.FetchAsync(LastDetalIndex, instance.Identity, cancellationToken).ConfigureAwait(false);
+                return await instance.SyncFrameworkClient.FetchAsync(LastDeltaIndex, string.Empty, cancellationToken).ConfigureAwait(false);
+
+            return await instance.SyncFrameworkClient.FetchAsync(LastDeltaIndex, instance.Identity, cancellationToken).ConfigureAwait(false);
         }
         public static async Task PullAsync(this ISyncClientNode instance, CancellationToken cancellationToken = default)
         {            
@@ -26,7 +27,7 @@ namespace BIT.Data.Sync.Client
             if (Deltas.Any())
             {
                 await instance.DeltaProcessor.ProcessDeltasAsync(Deltas, cancellationToken).ConfigureAwait(false);
-                Guid index = Deltas.Max(d => d.Index);
+                string index = Deltas.Max(d => d.Index);
                 await instance.DeltaStore.SetLastProcessedDeltaAsync(index, instance.Identity, cancellationToken).ConfigureAwait(false);
             }
 
