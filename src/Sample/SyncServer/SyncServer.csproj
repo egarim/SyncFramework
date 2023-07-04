@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
-    <ProjectReference Include="..\SyncFramework.Console\SyncFramework.ConsoleApp.csproj" />
   </ItemGroup>
 
 </Project>

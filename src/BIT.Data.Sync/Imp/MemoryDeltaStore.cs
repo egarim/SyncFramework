@@ -15,7 +15,7 @@ namespace BIT.Data.Sync.Imp
         public IList<IDelta> Deltas => _Deltas;
         readonly IDictionary<string, SyncStatus> _syncStatus;
         string LastPushedDelta;
-        string LastProcessedDelta;
+        //string LastProcessedDelta;
         //TODO pass this in the constructor or add dependency injection
         MemorySequenceService sequenceService = new MemorySequenceService(new YearSequencePrefixStrategy());
         public MemoryDeltaStore(IEnumerable<IDelta> Deltas) : base()
@@ -26,7 +26,7 @@ namespace BIT.Data.Sync.Imp
         }
         public MemoryDeltaStore() : this(new List<IDelta>())
         {
-
+          
         }
 
     
@@ -69,14 +69,25 @@ namespace BIT.Data.Sync.Imp
         public override async Task SetLastProcessedDeltaAsync(string Index, string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            _syncStatus.Add(identity, new SyncStatus() { LastProcessedDelta=Index,LastPushedDelta=Index });
-            LastProcessedDelta = Index;
+            if(_syncStatus.ContainsKey(identity))
+            {
+                _syncStatus[identity].LastProcessedDelta = Index;
+            }
+            else
+            {
+                _syncStatus.Add(identity, new SyncStatus() { LastProcessedDelta = Index, LastPushedDelta = Index });
+            }
+        
+            
 
 
         }
 
         public async override Task<string> GetLastPushedDeltaAsync(string identity, CancellationToken cancellationToken)
         {
+            if (!_syncStatus.ContainsKey(identity))
+                return string.Empty;
+
             return _syncStatus[identity].LastPushedDelta;
         }
 

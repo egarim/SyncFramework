@@ -31,6 +31,7 @@
 	  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.1.0" />
   </ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\..\BIT.Data.Sync.AspNetCore\BIT.Data.Sync.AspNetCore.csproj" />
 		<ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
 	</ItemGroup>
 

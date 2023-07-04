@@ -24,13 +24,10 @@ namespace BIT.Data.Sync.Tests.Startups
         {
             services.AddControllers();
 
-           
-         
-            SyncServerNode syncServerNode = new SyncServerNode(new MemoryDeltaStore(), null, "MemoryDeltaStore1");
 
+            services.AddSyncServerWithMemoryNode("MemoryDeltaStore1");
             
-            services.AddSingleton<ISyncServer>(new SyncServer(syncServerNode));
-            
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
