@@ -265,9 +265,20 @@ public class SyncController : ControllerBase
 
 }
 ```
+### Installing project templates
 
-Now we are ready to sync your data between your clients and your server.
+```
 
+dotnet new -i BIT.Data.Sync.Templates
+
+```
+### To create a new SyncServer
+
+```
+
+dotnet new SyncServer -o MySyncServer
+
+```
 ## Changelog
 
 You can see the current list of changes [here](Changes.md)
