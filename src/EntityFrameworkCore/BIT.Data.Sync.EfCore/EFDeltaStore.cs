@@ -22,7 +22,11 @@ namespace BIT.EfCore.Sync
             this.DeltaDbContext.Database.EnsureCreated();
             this.sequenceService=  DeltaDbContext.GetService<ISequenceService>();
         }
-
+        public EFDeltaStore(DbContextOptionsBuilder<DeltaDbContext> dbContextOptionsBuilder):this(new DeltaDbContext(dbContextOptionsBuilder.Options))
+        {
+           
+            
+        }
         protected EFDeltaStore()
         {
             DbContextOptionsBuilder<DeltaDbContext> dbContextOptionsBuilder = new DbContextOptionsBuilder<DeltaDbContext>();

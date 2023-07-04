@@ -7,6 +7,14 @@ using System.Threading.Tasks;
 
 namespace BIT.Data.Sync.Server
 {
+    public class SynServerNodeList:List<ISyncServerNode>
+    {
+        
+        public SynServerNodeList()
+        {
+            
+        }
+    }
     public class SyncServer : ISyncServer
     {
 
@@ -17,7 +25,10 @@ namespace BIT.Data.Sync.Server
         {
             this._Nodes = Nodes;
         }
-
+        public SyncServer(SynServerNodeList Nodes)
+        {
+            this._Nodes = Nodes;
+        }
         public IEnumerable<ISyncServerNode> Nodes => _Nodes;
 
        

@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Jose Manuel Ojeda Melgar",
+  "classifications": [ "SyncFramework", "WebApi" ],
+  "identity": "BIT.SyncFramework.AspNetCore.Server",
+  "name": "SyncServer basic implementation",
+  "shortName": "SyncServer",
+  "sourceName": "SyncServerTemplate",
+  "preferNameDirectory": true,
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  }
+}

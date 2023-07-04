@@ -3,10 +3,10 @@
     -Added extension AddSyncFrameworkForNpgsql
     -Added extension AddSyncFrameworkForSqlite
     -Added extension AddSyncFrameworkForSqlServer
-
     -Added BIT.Data.Sync.AspNetCore to host the controlers and extension for the sync server
-
     -Added AddSyncServerWithMemoryNode to add a memory node to the sync server
+    -Added AddSyncServerWithNodes to the sync server
+    -Added SyncServer template
 
 ## version 7.0.3.1
 ## version BIT.Data.Sync 1.0.1

@@ -19,5 +19,10 @@ namespace Microsoft.AspNetCore.Builder
             serviceCollection.AddSingleton<ISyncServer>(new SyncServer(syncServerNode));
             return serviceCollection;
         }
+        public static IServiceCollection AddSyncServerWithNodes(this IServiceCollection serviceCollection, params ISyncServerNode[] Nodes)
+        {
+            serviceCollection.AddSingleton<ISyncServer>(new SyncServer(Nodes));
+            return serviceCollection;
+        }
     }
 }
