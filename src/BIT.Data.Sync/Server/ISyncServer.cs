@@ -29,4 +29,6 @@ namespace BIT.Data.Sync.Server
         Task ProcessDeltasAsync(string Name, IEnumerable<IDelta> deltas, CancellationToken cancellationToken);
         Task SaveDeltasAsync(string name, IEnumerable<IDelta> deltas, CancellationToken cancellationToken);
     }
+    
+    
 }

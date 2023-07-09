@@ -1,4 +1,5 @@
-﻿using BIT.Data.Sync;
+﻿
+using BIT.Data.Sync;
 using BIT.Data.Sync.Imp;
 using BIT.Data.Sync.Server;
 using Microsoft.AspNetCore.Components;
@@ -16,6 +17,7 @@ namespace SyncFramework.Playground.Shared
             SyncServerNode syncServerNode = new SyncServerNode(deltaStore, null, NodeId);
             var Server = new SyncServer(syncServerNode);
             this.HttpClient = new HttpClient(new FakeHandler(Server));
+            this.HttpClient.BaseAddress=new Uri("http://FakeHandlerAddress");   
             base.OnInitialized();
         }
         public HttpClient HttpClient { get; set; }

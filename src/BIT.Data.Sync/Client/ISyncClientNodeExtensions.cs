@@ -1,10 +1,12 @@
-﻿using System;
+﻿using BIT.Data.Sync;
+using BIT.Data.Sync.Client;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BIT.Data.Sync.Client
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ISyncClientNodeExtensions
     {
