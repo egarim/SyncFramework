@@ -1,35 +1,54 @@
 ﻿@page "/efcore"
 @using SyncFramework.Playground.EfCore;
-
+@using MudBlazor;
 
 <PageTitle>EfCore Demo</PageTitle>
 
 <h1>Server</h1>
 
 <SyncServerComponent deltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
+<MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="AddClientNode">Add client node</MudButton>
+<MudStack>
+    @foreach (var item in this.ClientNodes)
+    {
+        
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">@item.Id</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>Delta count @item.DeltaCount</MudText>
+                <MudForm>
+                    <MudTextField @bind-Value="@item.BlogName" Label="Blog Name" />
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>item.AddBlog(item.BlogName))">Add</MudButton>
+                </MudForm>
+               @*  <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText> *@
+                <MudStack Row="true">
+                    <MudDataGrid Items="@item.DbContext.Blogs" Hover="true" Striped="true"  Dense="true" MultiSelection="false" SelectedItem="@item.SelectedBlog">
+                        <Columns>
+                            <PropertyColumn Property="x => x.Name" Title="Blog name" />
+                        </Columns>
+                    </MudDataGrid>
+                    <MudDataGrid Items="@item.Posts" Hover="true" Striped="true" Dense="true" MultiSelection="false">
+                        <Columns>
+                            <PropertyColumn Property="x => x.Title" Title="Blog name" />
+                        </Columns>
+                    </MudDataGrid>
+               </MudStack>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Variant="Variant.Text" Color="Color.Primary">Read More</MudButton>
+            </MudCardActions>
+        </MudCard>
+    }
+    @* <MudPaper Class="pa-3">Item 1</MudPaper>
+    <MudPaper Class="pa-3">Item 2</MudPaper>
+    <MudPaper Class="pa-3">Item 3</MudPaper> *@
+</MudStack>
 
-<QuickGrid Items="@ClientNodes" TGridItem="@ClientNodeInstance">
-    <TemplateColumn Title="Client Node">
-        <div class="flex items
--center">
-            <nobr>
-                <strong>@context.Id</strong>, @context.DeltaCount
-            </nobr>
-            <QuickGrid Items="@context.DbContext.Blogs" TGridItem="@Blog">
-                <PropertyColumn Property="@(b => b.Name)" Sortable="true" />
-                @* <TemplateColumn Title="Actions">
-                   <button @onclick="@(() => Delete(context,context.DbContext))">Delete</button>
-                   <button @onclick="@(() => Delete(context,context.DbContext))">Edit</button>
-                 </TemplateColumn> *@
-            </QuickGrid>
-        </div>
-      
-    </TemplateColumn>
-    <TemplateColumn Title="Actions">
-        <button @onclick="@(() => Push(context))">Push Deltas</button>
-        <button @onclick="@(() => Pull(context))">Pull Deltas</button>
-    </TemplateColumn>
-</QuickGrid>
 
-
-<button class="btn btn-primary" @onclick="AddClientNode">Add client node</button>

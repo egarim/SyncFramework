@@ -10,6 +10,8 @@ using SyncFramework.Playground.Shared;
 using System;
 using System.Net.Http;
 using System.Security.Principal;
+using static MudBlazor.CategoryTypes;
+
 namespace SyncFramework.Playground.Pages
 {
     public partial class EfCore
@@ -35,11 +37,13 @@ namespace SyncFramework.Playground.Pages
         SyncServerComponent serverComponent;
         private List<ClientNodeInstance> clientNodes = new List<ClientNodeInstance>();
 
+        private int NodeCount;
         private async void AddClientNode()
         {
-            string DbName = Guid.NewGuid().ToString();
+            NodeCount++;
+            string DbName = $"ClientNode_{NodeCount}";
             ServiceCollection serviceCollection = new ServiceCollection();
-            serviceCollection.AddSyncFrameworkForSQLite($"Data Source={DbName}_Deltas.db", this.serverComponent.HttpClient, this.serverComponent.NodeId, "Node A", deltaGeneratorBases);
+            serviceCollection.AddSyncFrameworkForSQLite($"Data Source={DbName}_Deltas.db", this.serverComponent.HttpClient, this.serverComponent.NodeId, DbName, deltaGeneratorBases);
 
             YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
             serviceCollection.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
@@ -65,9 +69,9 @@ namespace SyncFramework.Playground.Pages
             DbContextInstance.Add(SqliteBlog);
             DbContextInstance.Add(NpgsqlBlog);
             DbContextInstance.Add(PomeloMySqlBlog);
-
-            this.clientNodes.Add(new ClientNodeInstance { Id = DbName, DbContext = DbContextInstance });
             await DbContextInstance.SaveChangesAsync();
+            this.clientNodes.Add(new ClientNodeInstance { Id = DbName, DbContext = DbContextInstance });
+         
             //await DbContextInstance.PushAsync();
         }
         private static Blog GetBlog(string Name, string Title1, string Title2)
@@ -88,6 +92,11 @@ namespace SyncFramework.Playground.Pages
         void Pull(ClientNodeInstance p)
         {
           
+        }
+     
+        private void PrcdBtnClick(ClientNodeInstance x)
+        {
+            //ElementsList = ElementsList.Where(u => u.ID != x.ID).ToList();
         }
     }
 }

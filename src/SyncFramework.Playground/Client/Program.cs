@@ -6,6 +6,7 @@ using BIT.EfCore.Sync;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor.Services;
 using SyncFramework.Playground;
 
 namespace SyncFramework.Playground
@@ -30,8 +31,8 @@ namespace SyncFramework.Playground
             builder.Services.AddSingleton<DeltaGeneratorBase[]>(additionalDeltaGenerators);
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-            builder.Services.AddQuickGridEntityFrameworkAdapter();
-
+           
+            builder.Services.AddMudServices();
             await builder.Build().RunAsync();
         }
     }

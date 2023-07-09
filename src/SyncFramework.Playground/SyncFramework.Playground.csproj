@@ -15,8 +15,6 @@
 	<ItemGroup>
 		<!--<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0-preview.4.23260.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.0-preview.4.23260.4" PrivateAssets="all" />-->
-		<PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="0.1.0-alpha.22351.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="0.1.0-alpha.22351.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.8" PrivateAssets="all" />
 	</ItemGroup>
@@ -28,6 +26,7 @@
 	<ItemGroup>
 	  <!--<PackageReference Include="Microsoft.Data.Sqlite" Version="(EfCoreSqliteVersion)" />-->
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EfCoreSqliteVersion)" />
+	  <PackageReference Include="MudBlazor" Version="6.6.0" />
 	  <ProjectReference Include="..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
 	  <ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Pomelo.MySql\BIT.Data.Sync.EfCore.Pomelo.MySql.csproj" />
 	  <ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Sqlite\BIT.Data.Sync.EfCore.Sqlite.csproj" />
