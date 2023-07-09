@@ -15,18 +15,18 @@ using System.Threading.Tasks;
 
 namespace BIT.Data.Sync.EfCore
 {
-    public class EFDeltaProcessor : DeltaProcessorBase
+    public class EfDeltaProcessor : DeltaProcessorBase
     {
         string CurrentDbEngine;
 
         string connectionString;
         DbContext _dBContext;
         DbProviderFactory factory;
-        public EFDeltaProcessor(DbContext dBContext) 
+        public EfDeltaProcessor(DbContext dBContext) 
         {
             _dBContext = dBContext;
         }
-        public EFDeltaProcessor(string connectionstring, string DbEngineAlias, string ProviderInvariantName)
+        public EfDeltaProcessor(string connectionstring, string DbEngineAlias, string ProviderInvariantName)
         {
 
             this.CurrentDbEngine = DbEngineAlias;

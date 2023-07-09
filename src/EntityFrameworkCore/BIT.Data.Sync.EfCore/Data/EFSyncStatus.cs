@@ -1,9 +1,10 @@
-﻿using System;
+﻿using BIT.Data.Sync;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace BIT.EfCore.Sync
 {
-    public class EFSyncStatus
+    public class EfSyncStatus : ISyncStatus
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key, Column(Order = 0)]
@@ -13,7 +14,7 @@ namespace BIT.EfCore.Sync
         public int LastTransactionLogProcessed { get; set; }
         public string LastProcessedDelta { get; set; }
         public string LastPushedDelta { get; set; }
-        public EFSyncStatus()
+        public EfSyncStatus()
         {
 
         }

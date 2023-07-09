@@ -26,6 +26,10 @@ namespace BIT.Data.Sync
             Operation = operation;
           
         }
+        public void SetDeltaInfo()
+        {
+            
+        }
         public Delta(IDelta Delta)
         {
 

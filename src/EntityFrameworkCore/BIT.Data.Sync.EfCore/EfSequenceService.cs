@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace BIT.EfCore.Sync
 {
+
     public class EfSequenceService : SequenceServiceBase, ISequenceService
     {
         DeltaDbContext DeltaDbContext;
@@ -33,4 +34,5 @@ namespace BIT.EfCore.Sync
 
 
     }
+
 }

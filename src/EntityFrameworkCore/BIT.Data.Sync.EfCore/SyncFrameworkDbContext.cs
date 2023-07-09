@@ -27,7 +27,7 @@ namespace BIT.EfCore.Sync
             ) : base(options)
         {
             this.serviceProvider = serviceProvider;
-            this.DeltaProcessor = new EFDeltaProcessor(this);
+            this.DeltaProcessor = new EfDeltaProcessor(this);
         }
 
         protected SyncFrameworkDbContext(DbContextOptions options) : base(options)

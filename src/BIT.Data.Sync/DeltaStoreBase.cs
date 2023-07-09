@@ -15,7 +15,17 @@ namespace BIT.Data.Sync
         {
 
         }
-   
+        protected virtual string GuardStartIndex(string startIndex)
+        {
+            if (startIndex == null)
+            {
+                return "";
+            }
+            else
+            {
+                return startIndex;
+            }
+        }
 
         public abstract Task SaveDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken = default);
 

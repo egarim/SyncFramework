@@ -11,23 +11,23 @@ using System.Threading.Tasks;
 
 namespace BIT.EfCore.Sync
 {
-    public class EFDeltaStore : DeltaStoreBase
+    public class EfDeltaStore : DeltaStoreBase
     {
         DeltaDbContext DeltaDbContext;
-        public EFDeltaStore(DeltaDbContext DeltaDbContext)
+        public EfDeltaStore(DeltaDbContext DeltaDbContext)
         {
             this.DeltaDbContext = DeltaDbContext;
             //HACK TEST remove the comment below to ensure a clean delta database for testing
-            //this.DeltaDbContext.Database.EnsureDeleted();
+            this.DeltaDbContext.Database.EnsureDeleted();
             this.DeltaDbContext.Database.EnsureCreated();
             this.sequenceService=  DeltaDbContext.GetService<ISequenceService>();
         }
-        public EFDeltaStore(DbContextOptionsBuilder<DeltaDbContext> dbContextOptionsBuilder):this(new DeltaDbContext(dbContextOptionsBuilder.Options))
+        public EfDeltaStore(DbContextOptionsBuilder<DeltaDbContext> dbContextOptionsBuilder):this(new DeltaDbContext(dbContextOptionsBuilder.Options))
         {
            
             
         }
-        protected EFDeltaStore()
+        protected EfDeltaStore()
         {
             DbContextOptionsBuilder<DeltaDbContext> dbContextOptionsBuilder = new DbContextOptionsBuilder<DeltaDbContext>();
             dbContextOptionsBuilder.UseInMemoryDatabase("MemoryDb");
@@ -40,7 +40,7 @@ namespace BIT.EfCore.Sync
             cancellationToken.ThrowIfCancellationRequested();
             foreach (IDelta delta in deltas)
             {
-                EFDelta entity = new EFDelta(delta);
+                EfDelta entity = new EfDelta(delta);
                 entity.Index= await sequenceService.GenerateNextSequenceAsync();
                 DeltaDbContext.Deltas.Add(entity);
             }
@@ -64,7 +64,7 @@ namespace BIT.EfCore.Sync
             var CurrentDeltaIndex = await DeltaDbContext.EFSyncStatus.FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
             if (CurrentDeltaIndex == null)
             {
-                CurrentDeltaIndex = new EFSyncStatus()
+                CurrentDeltaIndex = new EfSyncStatus()
                 {
                     Identity = identity
                 };
@@ -82,17 +82,7 @@ namespace BIT.EfCore.Sync
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult(DeltaDbContext.Deltas.Where(d => d.Index.CompareTo(startIndex) > 0).ToList().Cast<IDelta>());
         }
-        string GuardStartIndex(string startIndex)
-        {
-            if (startIndex == null)
-            {
-                return "";
-            }
-            else
-            {
-                return startIndex;
-            }
-        }
+  
         public override Task<IEnumerable<IDelta>> GetDeltasByIdentityAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
           
@@ -118,7 +108,7 @@ namespace BIT.EfCore.Sync
             var CurrentDeltaIndex = await DeltaDbContext.EFSyncStatus.FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
             if (CurrentDeltaIndex == null)
             {
-                CurrentDeltaIndex = new EFSyncStatus()
+                CurrentDeltaIndex = new EfSyncStatus()
                 {
                     Identity = identity
                 };
@@ -150,8 +140,8 @@ namespace BIT.EfCore.Sync
             cancellationToken.ThrowIfCancellationRequested();
             /* By default there is no Ef translation set for string.Compare in PostgreSql. luckily the PostgreSql is by default case sensitive */
             //IQueryable<EFDelta> result = DeltaDbContext.Deltas.Where(d => d.Index.CompareTo(startIndex) > 0 && string.Compare(d.Identity, identity, StringComparison.Ordinal) != 0);
-            IQueryable<EFDelta> result = DeltaDbContext.Deltas.Where(d => d.Index.CompareTo(startIndex) > 0 && d.Identity != identity);
-            List<EFDelta> eFDeltas = result.ToList();
+            IQueryable<EfDelta> result = DeltaDbContext.Deltas.Where(d => d.Index.CompareTo(startIndex) > 0 && d.Identity != identity);
+            List<EfDelta> eFDeltas = result.ToList();
             return await Task.FromResult(eFDeltas.Cast<IDelta>()).ConfigureAwait(false);
         }
 

@@ -38,7 +38,7 @@ namespace BIT.EfCore.Sync
             serviceCollection.AddSingleton(typeof(ISyncFrameworkClient), SyncFrameworkClient);
             serviceCollection.AddScoped<IBatchExecutor, SyncFrameworkBatchExecutor>();
             serviceCollection.AddDbContext<DeltaDbContext>(DeltaStoreDbContextOptions);
-            serviceCollection.AddSingleton<IDeltaStore, EFDeltaStore>();
+            serviceCollection.AddSingleton<IDeltaStore, EfDeltaStore>();
             serviceCollection.AddSingleton<IModificationCommandToCommandDataService>(new ModificationCommandToCommandDataService(AdditionalDeltaGenerators));
             serviceCollection.AddSingleton<ISyncIdentityService>(new SyncIdentityService(Identity));
             Dictionary<string, string> KnownUpdaters = new Dictionary<string, string>();

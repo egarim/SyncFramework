@@ -4,24 +4,24 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BIT.Data.Sync.EfCore.Data
 {
-    public class EFDelta : Delta, IDelta
+    public class EfDelta : Delta, IDelta
     {
-        public EFDelta()
+        public EfDelta()
         {
 
         }
 
-        public EFDelta(string identity, byte[] operation) : base(identity, operation)
+        public EfDelta(string identity, byte[] operation) : base(identity, operation)
         {
 
         }
 
-        public EFDelta(IDelta Delta) : base(Delta)
+        public EfDelta(IDelta Delta) : base(Delta)
         {
             Date = ((Delta)Delta).Date;
         }
 
-        public EFDelta(string identity, string index, byte[] operation) : base(identity, index, operation)
+        public EfDelta(string identity, string index, byte[] operation) : base(identity, index, operation)
         {
 
         }
