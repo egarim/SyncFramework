@@ -18,7 +18,7 @@ namespace BIT.EfCore.Sync
         {
             this.DeltaDbContext = DeltaDbContext;
             //HACK TEST remove the comment below to ensure a clean delta database for testing
-            this.DeltaDbContext.Database.EnsureDeleted();
+            //this.DeltaDbContext.Database.EnsureDeleted();
             this.DeltaDbContext.Database.EnsureCreated();
             this.sequenceService=  DeltaDbContext.GetService<ISequenceService>();
         }
