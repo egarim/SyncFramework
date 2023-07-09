@@ -8,20 +8,20 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BIT.Data.Sync.EfCore.SQLite
+namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class Extension
+    public static class ExtensionSyncFrameworkForNpgsql
     {
-        public static IServiceCollection AddSyncFrameworkForSQLite(this IServiceCollection serviceCollection,string SQliteDeltaStoreConnectionString, HttpClient httpClient, string ServerNodeId, string Identity, params DeltaGeneratorBase[] AdditionalDeltaGenerators)
+        public static IServiceCollection AddSyncFrameworkForNpgsql(this IServiceCollection serviceCollection,string NpgsqlDeltaStoreConnectionString, HttpClient httpClient, string ServerNodeId, string Identity, params DeltaGeneratorBase[] AdditionalDeltaGenerators)
         {
             serviceCollection.AddEfSynchronization((options) => 
             { 
-                options.UseSqlite(SQliteDeltaStoreConnectionString); },
+                options.UseNpgsql(NpgsqlDeltaStoreConnectionString); },
                 httpClient,
                 ServerNodeId, 
                 Identity,
                 AdditionalDeltaGenerators);
-            serviceCollection.AddEntityFrameworkSqlite();
+            serviceCollection.AddEntityFrameworkNpgsql();
             return serviceCollection;
 
         }

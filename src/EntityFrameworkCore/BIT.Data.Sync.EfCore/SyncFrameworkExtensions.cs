@@ -1,6 +1,7 @@
 ﻿using BIT.Data.Sync;
 using BIT.Data.Sync.Client;
 using BIT.Data.Sync.EfCore;
+using BIT.EfCore.Sync;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Update;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 
-namespace BIT.EfCore.Sync
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class SyncFrameworkExtensions
     {

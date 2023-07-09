@@ -8,9 +8,9 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BIT.Data.Sync.EfCore.SqlServer
+namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class Extension
+    public static class ExtensionSyncFrameworkForSqlServer
     {
         public static IServiceCollection AddSyncFrameworkForSqlServer(this IServiceCollection serviceCollection,string sqlServerDeltaStoreConnectionString, HttpClient httpClient, string ServerNodeId, string Identity, params DeltaGeneratorBase[] AdditionalDeltaGenerators)
         {

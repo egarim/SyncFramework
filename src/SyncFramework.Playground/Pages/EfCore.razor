@@ -1,18 +1,9 @@
 ﻿@page "/efcore"
 
-<PageTitle>Counter</PageTitle>
+<PageTitle>EfCore Demo</PageTitle>
 
-<h1>Counter</h1>
+<h1>Server</h1>
 
-<p role="status">Current count: @currentCount</p>
+<SyncServerComponent deltaStore="@deltaStore" NodeId="@NodeId" @ref="@serverComponent" />
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
-
-@code {
-    private int currentCount = 0;
-
-    private void IncrementCount()
-    {
-        currentCount++;
-    }
-}
+<button class="btn btn-primary" @onclick="AddClientNode">Add client node</button>

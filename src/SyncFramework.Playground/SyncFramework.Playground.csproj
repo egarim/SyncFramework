@@ -20,6 +20,8 @@
 		<NativeFileReference Include="Data\e_sqlite3.o" />
 	</ItemGroup>
 	<ItemGroup>
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EfCoreSqliteVersion)" />
+	  <ProjectReference Include="..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
 	  <ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Pomelo.MySql\BIT.Data.Sync.EfCore.Pomelo.MySql.csproj" />
 	  <ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Sqlite\BIT.Data.Sync.EfCore.Sqlite.csproj" />
 	  <ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore.SqlServer\BIT.Data.Sync.EfCore.SqlServer.csproj" />
