@@ -1,9 +1,34 @@
 ﻿@page "/efcore"
+@using SyncFramework.Playground.EfCore;
+
 
 <PageTitle>EfCore Demo</PageTitle>
 
 <h1>Server</h1>
 
-<SyncServerComponent deltaStore="@deltaStore" NodeId="@NodeId" @ref="@serverComponent" />
+<SyncServerComponent deltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
+
+<QuickGrid Items="@ClientNodes" TGridItem="@ClientNodeInstance">
+    <TemplateColumn Title="Client Node">
+        <div class="flex items-center">
+            <nobr>
+                <strong>@context.Id</strong>, @context.DeltaCount
+            </nobr>
+            <QuickGrid Items="@context.DbContext.Blogs" TGridItem="@Blog">
+                <PropertyColumn Property="@(b => b.Name)" Sortable="true" />
+                @* <TemplateColumn Title="Actions">
+                   <button @onclick="@(() => Delete(context,context.DbContext))">Delete</button>
+                   <button @onclick="@(() => Delete(context,context.DbContext))">Edit</button>
+                 </TemplateColumn> *@
+            </QuickGrid>
+        </div>
+      
+    </TemplateColumn>
+    <TemplateColumn Title="Actions">
+        <button @onclick="@(() => Push(context))">Push Deltas</button>
+        <button @onclick="@(() => Pull(context))">Pull Deltas</button>
+    </TemplateColumn>
+</QuickGrid>
+
 
 <button class="btn btn-primary" @onclick="AddClientNode">Add client node</button>
