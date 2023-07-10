@@ -7,9 +7,8 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
-using SyncFramework.Playground;
 
-namespace SyncFramework.Playground
+namespace SyncFramework.Playground.Client
 {
     public class Program
     {

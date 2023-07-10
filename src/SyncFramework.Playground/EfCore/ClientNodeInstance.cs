@@ -1,7 +1,11 @@
-﻿namespace SyncFramework.Playground.EfCore
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.JSInterop;
+
+namespace SyncFramework.Playground.EfCore
 {
     public class ClientNodeInstance
     {
+        public IJSRuntime js { get; set; }
         public string Id { get; set; }
         public BlogsDbContext DbContext
         {
@@ -58,6 +62,12 @@
         public void OnRowClicked(object Blog)
         {
             //selectedOrderItem = selectItem; //StateHasChanged();
+        }
+        public async void DownloadFile()
+        {
+            var test=this.dbContext.Database;
+            var DbBytes = File.ReadAllBytes($"{Id}_Data.db");
+            await FileUtil.SaveAs(js, $"{Id}_Data.db", DbBytes);
         }
     }
 }

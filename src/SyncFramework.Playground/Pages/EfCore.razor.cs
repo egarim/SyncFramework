@@ -5,6 +5,7 @@ using BIT.EfCore.Sync;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.JSInterop;
 using SyncFramework.Playground.EfCore;
 using SyncFramework.Playground.Shared;
 using System;
@@ -25,6 +26,8 @@ namespace SyncFramework.Playground.Pages
            
         }
         [Inject]
+        private IJSRuntime js { get; set; }
+        [Inject]
         public DeltaGeneratorBase[] deltaGeneratorBases { get; set; }
         public IDeltaStore ServerDeltaStore { get; set; }
         public string NodeId { get; set; }
@@ -33,6 +36,22 @@ namespace SyncFramework.Playground.Pages
             base.OnInitialized();
             ServerDeltaStore = new MemoryDeltaStore();
             NodeId = "MainServer";
+
+            
+
+        }
+        public byte[] GetResource(string filename)
+        {
+
+
+            using (var stream = this.GetType().Assembly.
+                       GetManifestResourceStream("SyncFramework.Playground." + filename))
+            {
+                var Ms = new MemoryStream();
+                stream.CopyTo(Ms);
+                return Ms.ToArray();
+            }
+
         }
         SyncServerComponent serverComponent;
         private List<ClientNodeInstance> clientNodes = new List<ClientNodeInstance>();
@@ -42,6 +61,9 @@ namespace SyncFramework.Playground.Pages
         {
             NodeCount++;
             string DbName = $"ClientNode_{NodeCount}";
+
+            File.WriteAllBytes($"{DbName}_Deltas.db", GetResource("mydb.db"));
+
             ServiceCollection serviceCollection = new ServiceCollection();
             serviceCollection.AddSyncFrameworkForSQLite($"Data Source={DbName}_Deltas.db", this.serverComponent.HttpClient, this.serverComponent.NodeId, DbName, deltaGeneratorBases);
 
@@ -54,6 +76,8 @@ namespace SyncFramework.Playground.Pages
 
             DbContextOptionsBuilder OptionsBuilder = new DbContextOptionsBuilder();
             OptionsBuilder.UseSqlite($"Data Source={DbName}_Data.db");
+
+            File.WriteAllBytes($"{DbName}_Data.db", GetResource("mydb.db"));
 
             var DbContextInstance = new BlogsDbContext(OptionsBuilder.Options, ServiceProvider);
             await DbContextInstance.Database.EnsureDeletedAsync();
@@ -70,7 +94,7 @@ namespace SyncFramework.Playground.Pages
             DbContextInstance.Add(NpgsqlBlog);
             DbContextInstance.Add(PomeloMySqlBlog);
             await DbContextInstance.SaveChangesAsync();
-            this.clientNodes.Add(new ClientNodeInstance { Id = DbName, DbContext = DbContextInstance });
+            this.clientNodes.Add(new ClientNodeInstance { Id = DbName, DbContext = DbContextInstance, js=this.js });
          
             //await DbContextInstance.PushAsync();
         }
