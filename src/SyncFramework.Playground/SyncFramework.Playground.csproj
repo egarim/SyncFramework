@@ -15,6 +15,8 @@
 	<ItemGroup>
 		<!--<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0-preview.4.23260.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.0-preview.4.23260.4" PrivateAssets="all" />-->
+		<PackageReference Include="BlazorComponentBus" Version="2.2.0" />
+		<PackageReference Include="Bogus" Version="34.0.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.8" PrivateAssets="all" />
 	</ItemGroup>

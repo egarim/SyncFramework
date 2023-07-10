@@ -64,7 +64,9 @@ namespace BIT.Data.Sync.Client
             {
                 query[CurrentParam.Key] = CurrentParam.Value;
             }
-            var response = await _httpClient.GetStringAsync($"/Sync/Fetch?{query}").ConfigureAwait(false);
+
+            string requestUri = $"/Sync/Fetch?{query}";
+            var response = await _httpClient.GetStringAsync(requestUri).ConfigureAwait(false);
 
             using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(response)))
             {

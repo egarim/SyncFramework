@@ -5,29 +5,29 @@ using System;
 
 namespace SyncFramework.Playground.EfCore
 {
-    public class BlogsDbContext : SyncFrameworkDbContext
+    public class ContactsDbContext : SyncFrameworkDbContext
     {
         /// <summary>
         /// <para>
-        /// Initializes a new instance of the <see cref="BlogsDbContext" /> class. The
+        /// Initializes a new instance of the <see cref="ContactsDbContext" /> class. The
         /// <see cref="M:Microsoft.EntityFrameworkCore.DbContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)" />
         /// method will be called to configure the database (and other options) to be used for this context.
         /// </para>
         /// </summary>
-        protected BlogsDbContext()
+        protected ContactsDbContext()
         {
 
         }
 
         /// <summary>
         /// <para>
-        /// Initializes a new instance of the <see cref="BlogsDbContext" /> class using the specified options.
+        /// Initializes a new instance of the <see cref="ContactsDbContext" /> class using the specified options.
         /// The <see cref="M:Microsoft.EntityFrameworkCore.DbContext.OnConfiguring(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder)" /> method will still be called to allow further
         /// configuration of the options.
         /// </para>
         /// </summary>
         /// <param name="options">The options for this context.</param>
-        public BlogsDbContext(DbContextOptions options, IServiceProvider SyncFrameworkServiceCollection) : base(options, SyncFrameworkServiceCollection)
+        public ContactsDbContext(DbContextOptions options, IServiceProvider SyncFrameworkServiceCollection) : base(options, SyncFrameworkServiceCollection)
         {
             //ServiceCollection.AddSingleton<ISyncIdentityService>(new SyncIdentityService(Identity));
         }
@@ -37,7 +37,8 @@ namespace SyncFramework.Playground.EfCore
             base.OnConfiguring(optionsBuilder);
         }
 
-        public DbSet<Blog> Blogs { get; set; }
+        public DbSet<Person> Persons { get; set; }
+        public DbSet<PhoneNumber> Phones { get; set; }
     }
 
 }

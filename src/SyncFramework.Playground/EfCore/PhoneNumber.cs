@@ -4,14 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SyncFramework.Playground.EfCore
 {
-    public class Post
+    public class PhoneNumber
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key, Column(Order = 0)]
         public Guid Id { get; set; }
 
-        public string Title { get; set; }
+        public string Number { get; set; }
 
-        public Blog Blog { get; set; }
+        public Person Person { get; set; }
     }
 }

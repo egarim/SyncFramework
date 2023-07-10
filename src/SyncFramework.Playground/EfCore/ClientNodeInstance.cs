@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
+using System.Text;
 
 namespace SyncFramework.Playground.EfCore
 {
@@ -7,7 +8,7 @@ namespace SyncFramework.Playground.EfCore
     {
         public IJSRuntime js { get; set; }
         public string Id { get; set; }
-        public BlogsDbContext DbContext
+        public ContactsDbContext DbContext
         {
             get
             {
@@ -16,11 +17,11 @@ namespace SyncFramework.Playground.EfCore
             set
             {
                 dbContext = value;
-                //this.SelectedBlog = dbContext.Blogs.FirstOrDefault();
+              
             }
         }
 
-        public string BlogName { get; set; }
+        public string PersonName { get; set; }
         public int DeltaCount
         {
             get
@@ -32,42 +33,60 @@ namespace SyncFramework.Playground.EfCore
 
 
         }
-        Blog selectedBlog;
-        private BlogsDbContext dbContext;
+        public BlazorComponentBus.ComponentBus Bus { get; set; }
+        Person selectedPerson;
+        private ContactsDbContext dbContext;
 
-        public Blog SelectedBlog
+        public Person SelectedPerson
         {
             get
             {
-                return selectedBlog;
+                return selectedPerson;
             }
 
             set
             {
-                selectedBlog = value;
-                SelectedBlogChanged(selectedBlog);
+                selectedPerson = value;
+                SelectedBlogChanged(selectedPerson);
             }
         }
-        public async Task AddBlog(string BlogName)
+        public async Task AddPerson(string personName)
         {
-            DbContext.Blogs.Add(new Blog { Name = BlogName });
+            var PersonFullName=personName.Split(' ');
+            var LastName= PersonFullName.Length > 1 ? PersonFullName[1] : string.Empty;
+            DbContext.Persons.Add(new Person { FirstName = PersonFullName[0], LastName=LastName });
             await DbContext.SaveChangesAsync();
-            BlogName = string.Empty;
+            this.PersonName = string.Empty;
         }
-        public List<Post> Posts { get; set; }
-        public void SelectedBlogChanged(Blog Blog)
+        public List<PhoneNumber> PhoneNumbers { get; set; }
+        public void SelectedBlogChanged(Person Person)
         {
-            Posts = Blog?.Posts?.ToList();
+            
+            PhoneNumbers = this.dbContext.Phones.Where(x => x.Person.Id == Person.Id).ToList();
         }
-        public void OnRowClicked(object Blog)
-        {
-            //selectedOrderItem = selectItem; //StateHasChanged();
-        }
+    
         public async void DownloadFile()
         {
-            var test=this.dbContext.Database;
-            var DbBytes = File.ReadAllBytes($"{Id}_Data.db");
-            await FileUtil.SaveAs(js, $"{Id}_Data.db", DbBytes);
+            Dictionary<string, byte[]> files = new Dictionary<string, byte[]>();
+
+            string DataFileName = $"{Id}_Data.db";
+            string DeltaFileName = $"{Id}_Deltas.db";
+            var DataDbBytes = File.ReadAllBytes(DataFileName);
+            var DeltasDbBytes = File.ReadAllBytes(DeltaFileName);
+            files.Add(DataFileName, DataDbBytes);
+            files.Add(DeltaFileName, DeltasDbBytes);
+            var zipBytes = FileUtil.CreateZipFromByteArrays(files);
+            await FileUtil.SaveAs(js, $"{Id}.zip", zipBytes);
+        }
+        public async Task Push()
+        {
+          
+            await DbContext.PushAsync();
+            await Bus.Publish(new object());
+        }
+        public async Task Pull()
+        {
+            await DbContext.PullAsync();
         }
     }
 }

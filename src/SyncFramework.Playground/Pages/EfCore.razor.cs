@@ -2,6 +2,8 @@
 using BIT.Data.Sync.Imp;
 using BIT.Data.Sync.Server;
 using BIT.EfCore.Sync;
+using BlazorComponentBus;
+using Bogus;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -13,11 +15,13 @@ using System;
 using System.Net.Http;
 using System.Security.Principal;
 using static MudBlazor.CategoryTypes;
+using Person = SyncFramework.Playground.EfCore.Person;
 
 namespace SyncFramework.Playground.Pages
 {
     public partial class EfCore
     {
+    
         public IQueryable<ClientNodeInstance> ClientNodes
         {
             get
@@ -26,6 +30,9 @@ namespace SyncFramework.Playground.Pages
             }
            
         }
+        [Inject]
+        BlazorComponentBus.ComponentBus Bus { get; set; }
+
         [Inject]
         private IJSRuntime js { get; set; }
         [Inject]
@@ -37,23 +44,20 @@ namespace SyncFramework.Playground.Pages
             base.OnInitialized();
             ServerDeltaStore = new MemoryDeltaStore();
             NodeId = "MainServer";
-
-            
+            //Subscribe Component to Specific Message
+            Bus.Subscribe<object>(RefreshDeltaCount);
+            Randomizer.Seed = new Random(8675309);
 
         }
-        public byte[] GetResource(string filename)
+        private async void RefreshDeltaCount(MessageArgs args)
         {
-
-
-            using (var stream = this.GetType().Assembly.
-                       GetManifestResourceStream("SyncFramework.Playground." + filename))
-            {
-                var Ms = new MemoryStream();
-                stream.CopyTo(Ms);
-                return Ms.ToArray();
-            }
-
+            var message = args.GetMessage<object>();
+            DeltaCount = await this.ServerDeltaStore.GetDeltaCountAsync("", NodeId, default);
+           
+            this.StateHasChanged();
+           
         }
+        public bool GenerateRandomData { get; set; } = true;
         SyncServerComponent serverComponent;
         private List<ClientNodeInstance> clientNodes = new List<ClientNodeInstance>();
 
@@ -81,31 +85,23 @@ namespace SyncFramework.Playground.Pages
             DbContextOptionsBuilder OptionsBuilder = new DbContextOptionsBuilder();
             string DataConnectionString = $"Data Source={DbName}_Data.db";
             
-            CreateDatabaseConnection(DataConnectionString);
-
             OptionsBuilder.UseSqlite(DataConnectionString);
 
-           
-         
-
-            var DbContextInstance = new BlogsDbContext(OptionsBuilder.Options, ServiceProvider);
+            var DbContextInstance = new ContactsDbContext(OptionsBuilder.Options, ServiceProvider);
+            //Delete the database if it exists
             await DbContextInstance.Database.EnsureDeletedAsync();
+            //Create the database with the sqlite connection
+            CreateDatabaseConnection(DataConnectionString);
             await DbContextInstance.Database.EnsureCreatedAsync();
 
-
-            Blog SqlServerBlog = GetBlog("SqlServer blog", "EF Core 3.1!", "EF Core 5.0!");
-            Blog SqliteBlog = GetBlog("Sqlite blog", "Sqlite blog EF Core 3.1!", "EF Core 5.0!");
-            Blog NpgsqlBlog = GetBlog("Npgsql blog", "Npgsql blog EF Core 3.1!", "EF Core 5.0!");
-            Blog PomeloMySqlBlog = GetBlog("Pomelo MySql blog", "Pomelo MySql blog EF Core 3.1!", "EF Core 5.0!");
-
-            DbContextInstance.Add(SqlServerBlog);
-            DbContextInstance.Add(SqliteBlog);
-            DbContextInstance.Add(NpgsqlBlog);
-            DbContextInstance.Add(PomeloMySqlBlog);
-            await DbContextInstance.SaveChangesAsync();
-
-            
-            this.clientNodes.Add(new ClientNodeInstance { Id = DbName, DbContext = DbContextInstance, js = this.js });
+            if(GenerateRandomData)
+            {
+                var Persons = GetPerson(5);
+                DbContextInstance.AddRange(Persons);
+                await DbContextInstance.SaveChangesAsync();
+            }
+           
+            this.clientNodes.Add(new ClientNodeInstance { Id = DbName, DbContext = DbContextInstance, js = this.js,Bus=this.Bus });
 
             //await DbContextInstance.PushAsync();
         }
@@ -125,29 +121,30 @@ namespace SyncFramework.Playground.Pages
             }
         }
 
-        private static Blog GetBlog(string Name, string Title1, string Title2)
+        private static IEnumerable<Person> GetPerson(int Count)
         {
-            return new Blog { Name = Name, Posts = { new Post { Title = Title1 }, new Post { Title = Title2 } } };
-        }
-        async Task Delete(Blog b,BlogsDbContext d)
-        {
-            d.Remove(b);
-            await d.SaveChangesAsync();
-           
-        }
-        void Push(ClientNodeInstance p)
-        {
-           
+            var testUsers = new Faker<Person>()
+            .RuleFor(u => u.FirstName, f => f.Name.FirstName())
+            .RuleFor(u => u.LastName, f => f.Name.LastName());
+            var user = testUsers.Generate(Count);
+
+            var TestPhones = new Faker<PhoneNumber>()
+            .RuleFor(u => u.Number, f => f.Phone.PhoneNumber());
+            
+        
+
+            foreach (Person person in user)
+            {
+                var Phones=TestPhones.Generate(3);
+                foreach (var item in Phones)
+                {
+                    person.PhoneNumbers.Add(item);
+                }
+                
+            }
+            return user;
         }
 
-        void Pull(ClientNodeInstance p)
-        {
-          
-        }
-     
-        private void PrcdBtnClick(ClientNodeInstance x)
-        {
-            //ElementsList = ElementsList.Where(u => u.ID != x.ID).ToList();
-        }
+        public int DeltaCount { get; set; }
     }
 }

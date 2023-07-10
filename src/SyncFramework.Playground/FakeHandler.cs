@@ -1,11 +1,13 @@
 ﻿using BIT.Data.Sync;
 using BIT.Data.Sync.Server;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Web;
 
 namespace SyncFramework.Playground
 {
@@ -18,10 +20,10 @@ namespace SyncFramework.Playground
         }
         protected string GetHeader(string HeaderName, HttpRequestMessage request)
         {
-            var stringValues = request.Headers.FirstOrDefault(h=>h.Key==HeaderName);
-            return stringValues.Value.FirstOrDefault(); 
+            var stringValues = request.Headers.FirstOrDefault(h => h.Key == HeaderName);
+            return stringValues.Value.FirstOrDefault();
         }
-        public async Task  ProcessPush(HttpRequestMessage request, CancellationToken cancellationToken)
+        public async Task ProcessPush(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             string NodeId = GetHeader("NodeId", request);
             var stream = new StreamReader(request.Content.ReadAsStream());
@@ -45,7 +47,7 @@ namespace SyncFramework.Playground
 
 
             var Message = $"Fetch from node:{NodeId}{Environment.NewLine}Start delta index:{startIndex}{Environment.NewLine}Client identity:{identity}";
-            
+
             Debug.WriteLine(Message);
             IEnumerable<IDelta> enumerable;
 
@@ -71,6 +73,33 @@ namespace SyncFramework.Playground
             return jsonDeltas;
 
         }
+        private static Dictionary<string, string> GetQueryParameters(Uri uri)
+        {
+            return HttpUtility.ParseQueryString(uri.Query)
+                .AllKeys
+                .ToDictionary(key => key, key => HttpUtility.ParseQueryString(uri.Query)[key]);
+        }
+        public static Dictionary<string, string> Parse(string queryString)
+        {
+            var queryDictionary = new Dictionary<string, string>();
+
+            if (!string.IsNullOrEmpty(queryString))
+            {
+                queryString = queryString.StartsWith('?') ? queryString.Substring(1) : queryString;
+                var pairs = queryString.Split('&');
+
+                foreach (var pair in pairs)
+                {
+                    var keyValue = pair.Split('=');
+                    if (keyValue.Length == 2)
+                    {
+                        queryDictionary[keyValue[0]] = Uri.UnescapeDataString(keyValue[1]);
+                    }
+                }
+            }
+
+            return queryDictionary;
+        }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -79,14 +108,28 @@ namespace SyncFramework.Playground
             switch (request.Method.Method)
             {
                 case "GET":
+                    var Values=Parse(request.RequestUri.Query);
+                    //NameValueCollection Values = System.Web.HttpUtility.ParseQueryString(request.RequestUri.Query);
+
+                    //var queryParams = GetQueryParameters(request.RequestUri);
+                    //foreach (var param in queryParams)
+                    //{
+                    //    Debug.WriteLine($"{param.Key} = {param.Value}");
+                    //}
+
+                    string startIndex = Values.FirstOrDefault().Value.ToString();
+                    string identity = Values.LastOrDefault().Value.ToString();
+                    //startIndex = Values.Get("startIndex");
+                    //identity = Values.Get("identity");
+                    var output=await ProcessFetch(startIndex, identity, request, cancellationToken);
                     responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
                     {
-                        Content = new StringContent("Hello! This is a response to a GET request!")
+                        Content = new StringContent(output)
                     };
                     break;
                 case "POST":
                     await ProcessPush(request, cancellationToken);
-                
+
                     responseMessage = new HttpResponseMessage(HttpStatusCode.Created)
                     {
                         Content = new StringContent("Hello! This is a response to a POST request!")

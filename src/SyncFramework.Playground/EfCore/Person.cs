@@ -5,15 +5,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SyncFramework.Playground.EfCore
 {
-    public class Blog
+    public class Person
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key, Column(Order = 0)]
         public Guid Id { get; set; }
 
-        public string Name { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
 
 
-        public ICollection<Post> Posts { get; } = new List<Post>();
+
+        public ICollection<PhoneNumber> PhoneNumbers { get; } = new List<PhoneNumber>();
     }
 }

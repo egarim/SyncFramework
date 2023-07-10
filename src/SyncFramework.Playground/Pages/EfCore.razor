@@ -7,7 +7,15 @@
 <h1>Server</h1>
 
 <SyncServerComponent deltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
-<MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="AddClientNode">Add client node</MudButton>
+
+
+<MudStack Row="true">
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="AddClientNode">Add client node</MudButton>
+    <MudCheckBox Label="Generate Random Data" @bind-Checked="@GenerateRandomData" />
+    <MudElement>Deltas:@this.DeltaCount</MudElement>
+</MudStack>
+
+
 <MudStack>
     @foreach (var item in this.ClientNodes)
     {
@@ -24,26 +32,30 @@
             <MudCardContent>
                 <MudText>Delta count @item.DeltaCount</MudText>
                 <MudForm>
-                    <MudTextField @bind-Value="@item.BlogName" Label="Blog Name" />
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>item.AddBlog(item.BlogName))">Add</MudButton>
-                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" OnClick="@(()=>item.DownloadFile())">Download Databases</MudButton>
+                    <MudTextField @bind-Value="@item.PersonName" Label="Blog Name" />
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>item.AddPerson(item.PersonName))">Add</MudButton>
+                   
                 </MudForm>
                 <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText>
                 <MudStack Row="true">
-                    <MudDataGrid Items="@item.DbContext.Blogs" @bind-SelectedItem="@item.SelectedBlog" Hover="true" Striped="true"  Dense="true" MultiSelection="false">
+                    <MudDataGrid Items="@item.DbContext.Persons" @bind-SelectedItem="@item.SelectedPerson" Hover="true" Striped="true"  Dense="true" MultiSelection="false">
                         <Columns>
-                            <PropertyColumn Property="x => x.Name" Title="Blog name" />
+                            <PropertyColumn Property="x => x.FirstName" Title="First Name" />
+                            <PropertyColumn Property="x => x.LastName" Title="Last Name" />
                         </Columns>
                     </MudDataGrid>
-                    <MudDataGrid Items="@item.Posts" Hover="true" Striped="true" Dense="true" MultiSelection="false">
+                    <MudDataGrid Items="@item.PhoneNumbers" Hover="true" Striped="true" Dense="true" MultiSelection="false">
                         <Columns>
-                            <PropertyColumn Property="x => x.Title" Title="Blog name" />
+                            <PropertyColumn Property="x => x.Number" Title="Number" />
                         </Columns>
                     </MudDataGrid>
                </MudStack>
             </MudCardContent>
             <MudCardActions>
-                <MudButton Variant="Variant.Text" Color="Color.Primary">Read More</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>item.Push())">Push deltas</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" OnClick="@(()=>item.Pull())">Pull deltas</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Primary">Preview Deltas</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>item.DownloadFile())">Download Databases</MudButton>
             </MudCardActions>
         </MudCard>
     }
