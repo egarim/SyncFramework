@@ -28,9 +28,9 @@
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>item.AddBlog(item.BlogName))">Add</MudButton>
                     <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" OnClick="@(()=>item.DownloadFile())">Download Databases</MudButton>
                 </MudForm>
-               @*  <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText> *@
+                <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText>
                 <MudStack Row="true">
-                    <MudDataGrid Items="@item.DbContext.Blogs" Hover="true" Striped="true"  Dense="true" MultiSelection="false" SelectedItem="@item.SelectedBlog">
+                    <MudDataGrid Items="@item.DbContext.Blogs" @bind-SelectedItem="@item.SelectedBlog" Hover="true" Striped="true"  Dense="true" MultiSelection="false">
                         <Columns>
                             <PropertyColumn Property="x => x.Name" Title="Blog name" />
                         </Columns>

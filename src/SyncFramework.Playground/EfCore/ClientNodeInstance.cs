@@ -16,7 +16,7 @@ namespace SyncFramework.Playground.EfCore
             set
             {
                 dbContext = value;
-                this.SelectedBlog = dbContext.Blogs.FirstOrDefault();
+                //this.SelectedBlog = dbContext.Blogs.FirstOrDefault();
             }
         }
 

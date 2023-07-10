@@ -3,6 +3,7 @@ using BIT.Data.Sync.Imp;
 using BIT.Data.Sync.Server;
 using BIT.EfCore.Sync;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
@@ -62,10 +63,13 @@ namespace SyncFramework.Playground.Pages
             NodeCount++;
             string DbName = $"ClientNode_{NodeCount}";
 
-            File.WriteAllBytes($"{DbName}_Deltas.db", GetResource("mydb.db"));
+           
 
             ServiceCollection serviceCollection = new ServiceCollection();
-            serviceCollection.AddSyncFrameworkForSQLite($"Data Source={DbName}_Deltas.db", this.serverComponent.HttpClient, this.serverComponent.NodeId, DbName, deltaGeneratorBases);
+            string sQliteDeltaStoreConnectionString = $"Data Source={DbName}_Deltas.db";
+            CreateDatabaseConnection(sQliteDeltaStoreConnectionString);
+
+            serviceCollection.AddSyncFrameworkForSQLite(sQliteDeltaStoreConnectionString, serverComponent.HttpClient, serverComponent.NodeId, DbName, deltaGeneratorBases);
 
             YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
             serviceCollection.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
@@ -75,9 +79,14 @@ namespace SyncFramework.Playground.Pages
             var ServiceProvider = serviceCollection.BuildServiceProvider();
 
             DbContextOptionsBuilder OptionsBuilder = new DbContextOptionsBuilder();
-            OptionsBuilder.UseSqlite($"Data Source={DbName}_Data.db");
+            string DataConnectionString = $"Data Source={DbName}_Data.db";
+            
+            CreateDatabaseConnection(DataConnectionString);
 
-            File.WriteAllBytes($"{DbName}_Data.db", GetResource("mydb.db"));
+            OptionsBuilder.UseSqlite(DataConnectionString);
+
+           
+         
 
             var DbContextInstance = new BlogsDbContext(OptionsBuilder.Options, ServiceProvider);
             await DbContextInstance.Database.EnsureDeletedAsync();
@@ -85,19 +94,37 @@ namespace SyncFramework.Playground.Pages
 
 
             Blog SqlServerBlog = GetBlog("SqlServer blog", "EF Core 3.1!", "EF Core 5.0!");
-            Blog SqliteBlog = GetBlog("Sqlite blog", "EF Core 3.1!", "EF Core 5.0!");
-            Blog NpgsqlBlog = GetBlog("Npgsql blog", "EF Core 3.1!", "EF Core 5.0!");
-            Blog PomeloMySqlBlog = GetBlog("Pomelo MySql blog", "EF Core 3.1!", "EF Core 5.0!");
+            Blog SqliteBlog = GetBlog("Sqlite blog", "Sqlite blog EF Core 3.1!", "EF Core 5.0!");
+            Blog NpgsqlBlog = GetBlog("Npgsql blog", "Npgsql blog EF Core 3.1!", "EF Core 5.0!");
+            Blog PomeloMySqlBlog = GetBlog("Pomelo MySql blog", "Pomelo MySql blog EF Core 3.1!", "EF Core 5.0!");
 
             DbContextInstance.Add(SqlServerBlog);
             DbContextInstance.Add(SqliteBlog);
             DbContextInstance.Add(NpgsqlBlog);
             DbContextInstance.Add(PomeloMySqlBlog);
             await DbContextInstance.SaveChangesAsync();
-            this.clientNodes.Add(new ClientNodeInstance { Id = DbName, DbContext = DbContextInstance, js=this.js });
-         
+
+            
+            this.clientNodes.Add(new ClientNodeInstance { Id = DbName, DbContext = DbContextInstance, js = this.js });
+
             //await DbContextInstance.PushAsync();
         }
+
+        /// <summary>
+        /// This method is used to create the database,DbContextInstance.Database.EnsureCreatedAsync does not create a physical database
+        /// </summary>
+        /// <param name="DatabaseConnectionString"></param>
+        private static void CreateDatabaseConnection(string DatabaseConnectionString)
+        {
+            using (var connection = new SqliteConnection(DatabaseConnectionString))
+            {
+                connection.Open();  //  <== The database file is created here.
+
+                
+
+            }
+        }
+
         private static Blog GetBlog(string Name, string Title1, string Title2)
         {
             return new Blog { Name = Name, Posts = { new Post { Title = Title1 }, new Post { Title = Title2 } } };
