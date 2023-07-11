@@ -62,6 +62,22 @@ else
                      </TemplateColumn>
                     </Columns>
                 </MudDataGrid>
+             <MudDataGrid Items="@item.Deltas" Hover="true" Striped="true" Dense="true" MultiSelection="false">
+                 <Columns>
+                     <PropertyColumn Property="x => x.Key.Epoch" Title="Epoch" />
+                     <PropertyColumn Property="x => x.Key.Date" Title="Date" />
+                     <PropertyColumn Property="x => x.Key.Index" Title="Index" />
+                   @*   <PropertyColumn Property="x => x.Value" Title="Sql" /> *@
+                     <TemplateColumn CellClass="d-flex justify-end">
+                         <CellTemplate>
+                             <MudStack Row>
+                                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Success" OnClick="@(()=>PreviewDelta(context.Item.Value))"></MudIconButton>
+                                 
+                             </MudStack>
+                         </CellTemplate>
+                     </TemplateColumn>
+                 </Columns>
+             </MudDataGrid>
             </MudStack>
         </MudCardContent>
         <MudCardActions>

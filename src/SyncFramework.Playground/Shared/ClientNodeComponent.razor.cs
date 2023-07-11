@@ -45,6 +45,18 @@ namespace SyncFramework.Playground.Shared
                 //Servers.RemoveAll(item => item.Id == deletedServer);
             }
         }
+        public async void PreviewDelta(string Delta)
+        {
+            Delta = Delta.Replace("\\u0022", "\"").Replace("\\u0060", "\'").Replace("\\n", "");
+            DialogOptions fullScreen = new DialogOptions() { FullScreen = true, CloseButton = true };
+            var parameters = new DialogParameters<IPhoneNumber>
+            {
+                { "Content", Delta }
+            };
+
+            var dialog = await DialogService.ShowAsync<DeltaPreviewComponent>("Delta", parameters, fullScreen);
+           
+        }
         public async void EditPerson(IPerson Person)
         {
             //var options = new DialogOptions { CloseOnEscapeKey = true, Position = DialogPosition.Center, CloseButton=true };

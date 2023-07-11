@@ -7,6 +7,9 @@ using Microsoft.JSInterop;
 using System.Text;
 using Microsoft.Data.Sqlite;
 using Bogus;
+using BIT.Data.Sync.EfCore.Data;
+using System.Diagnostics;
+using System.Text.Json;
 
 namespace SyncFramework.Playground.EfCore
 {
@@ -205,6 +208,28 @@ namespace SyncFramework.Playground.EfCore
         public Action RefreshAction { get; set; }
         public Action<string> ShowMessage { get; set; }
 
+        public Dictionary<IDelta, string> Deltas
+        {
+            get
+            {
+               var GetDeltasTask=  this.dbContext.DeltaStore.GetDeltasAsync("", default);
+                GetDeltasTask.Wait();
+                Dictionary<IDelta, string> keyValuePairs = new Dictionary<IDelta, string>(GetDeltasTask.Result.Count());
+                foreach (IDelta delta in GetDeltasTask.Result)
+                {
+                    var Content=this.dbContext.DeltaProcessor.GetDeltaOperations<List<ModificationCommandData>>(delta);
+                    StringBuilder stringBuilder= new StringBuilder();
+                    foreach (ModificationCommandData modificationCommandData in Content)
+                    {
+                        var JsonModification= System.Text.Json.JsonSerializer.Serialize(modificationCommandData, new JsonSerializerOptions { WriteIndented = true });
+                        stringBuilder.AppendLine(JsonModification);
+                    }
+                    keyValuePairs.Add(delta, stringBuilder.ToString()); 
+                }
+                return keyValuePairs;
+            }
+        }
+
         public async Task Pull()
         {
             await DbContext.PullAsync();
@@ -240,9 +265,10 @@ namespace SyncFramework.Playground.EfCore
         {
             var PhoneToUpdate = await this.DbContext.Phones.FindAsync(Phone.Id);
             PhoneToUpdate.Number = Phone.Number;
-        
 
-           
+            
+
+
             await this.DbContext.SaveChangesAsync();
             SelectedPersonChange(PhoneToUpdate.Person);
             await UpdateDeltaCount();
@@ -254,6 +280,11 @@ namespace SyncFramework.Playground.EfCore
             await ReloadPeople();
             this.RefreshAction?.Invoke();
             ShowMessage($"{this.Id} Refreshed");
+        }
+
+        public async Task PreviewDelta(string DeltaContent)
+        {
+            var test=DeltaContent; 
         }
     }
 }

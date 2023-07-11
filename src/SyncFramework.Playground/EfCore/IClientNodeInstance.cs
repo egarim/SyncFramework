@@ -1,4 +1,5 @@
-﻿using BlazorComponentBus;
+﻿using BIT.Data.Sync;
+using BlazorComponentBus;
 using Microsoft.JSInterop;
 
 namespace SyncFramework.Playground.EfCore
@@ -16,6 +17,7 @@ namespace SyncFramework.Playground.EfCore
         IPerson SelectedPerson { get; set; }
         bool IsLoading { get; set; }
         public Action RefreshAction { get; set; }
+        public Dictionary<IDelta,string> Deltas { get; }
         public Action<string> ShowMessage { get; set; }
         Task AddPerson(string personName);
         public Task RemovePerson(IPerson person);
@@ -26,6 +28,7 @@ namespace SyncFramework.Playground.EfCore
         void DownloadFile();
         Task Pull();
         Task Push();
+        Task PreviewDelta(string DeltaContent);
         public Task Init();
         void SelectedPersonChange(IPerson Person);
     }
