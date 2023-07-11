@@ -207,5 +207,22 @@ namespace SyncFramework.Playground.EfCore
             await ReloadPeople();
             this.RefreshAction?.Invoke();
         }
+
+        public Task RemovePerson(IPerson person)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task UpdatePerson(IPerson person)
+        {
+            var PersonToUpdate= await this.DbContext.Persons.FindAsync(person.Id);
+            PersonToUpdate.FirstName = person.FirstName;
+            PersonToUpdate.LastName = person.LastName;
+               
+            //this.dbContext.Update(person as Person);
+            await this.DbContext.SaveChangesAsync();
+            await this.ReloadPeople();
+            this.RefreshAction?.Invoke();
+        }
     }
 }

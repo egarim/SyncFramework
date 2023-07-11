@@ -9,6 +9,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
+using MudBlazor;
 using SyncFramework.Playground.EfCore;
 using SyncFramework.Playground.Shared;
 using System;
@@ -32,7 +33,8 @@ namespace SyncFramework.Playground.Pages
         }
         [Inject]
         BlazorComponentBus.ComponentBus Bus { get; set; }
-
+        [Inject]
+        public IDialogService DialogService { get; set; }
         [Inject]
         private IJSRuntime js { get; set; }
         [Inject]
