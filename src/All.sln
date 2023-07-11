@@ -42,7 +42,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Xpo", "Xpo", "{48E9D6A4-FE8
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIT.Data.Sync.Xpo.DeltaStore", "BIT.Data.Sync.Xpo.DeltaStore\BIT.Data.Sync.Xpo.DeltaStore.csproj", "{FD80FF17-9917-42C9-AD0B-FA79CF328C48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncFramework.Playground", "SyncFramework.Playground\SyncFramework.Playground.csproj", "{8715A9DB-76CC-4327-A77C-231C3572F20E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SyncFramework.Playground", "SyncFramework.Playground\SyncFramework.Playground.csproj", "{8715A9DB-76CC-4327-A77C-231C3572F20E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SyncFramework.Playground.EfCore
 {
-    public class PhoneNumber
+    public class PhoneNumber : IPhoneNumber
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key, Column(Order = 0)]

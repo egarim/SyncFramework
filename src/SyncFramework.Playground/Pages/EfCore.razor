@@ -1,4 +1,4 @@
-﻿@page "/efcore"
+﻿@page "/"
 @using SyncFramework.Playground.EfCore;
 @using MudBlazor;
 
@@ -52,16 +52,17 @@
                </MudStack>
             </MudCardContent>
             <MudCardActions>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>item.Push())">Push deltas</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" OnClick="@(()=>item.Pull())">Pull deltas</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Tertiary" DisableElevation="true">Preview Deltas</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Success" DisableElevation="true" OnClick="@(()=>item.DownloadFile())">Download Databases</MudButton>
+                <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
+                    <MudButton StartIcon="@Icons.Material.Filled.ArrowUpward" OnClick="@(()=>item.Push())">Push Deltas</MudButton>
+                    <MudButton  StartIcon="@Icons.Material.Filled.ArrowDownward" OnClick="@(()=>item.Pull())">Pull Deltas</MudButton>
+                    <MudButton  StartIcon="@Icons.Material.Filled.Preview" OnClick="@(()=>item.Pull())">Preview Deltas</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.SaveAlt" OnClick="@(()=>item.DownloadFile())">Download Databases</MudButton>
+                </MudButtonGroup>
+            
             </MudCardActions>
         </MudCard>
     }
-    @* <MudPaper Class="pa-3">Item 1</MudPaper>
-    <MudPaper Class="pa-3">Item 2</MudPaper>
-    <MudPaper Class="pa-3">Item 3</MudPaper> *@
+ 
 </MudStack>
 
 
