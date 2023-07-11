@@ -16,9 +16,13 @@ namespace SyncFramework.Playground.EfCore
         IPerson SelectedPerson { get; set; }
         bool IsLoading { get; set; }
         public Action RefreshAction { get; set; }
+        public Action<string> ShowMessage { get; set; }
         Task AddPerson(string personName);
         public Task RemovePerson(IPerson person);
         public Task UpdatePerson(IPerson person);
+        public Task RemovePhone(IPhoneNumber person);
+        public Task UpdatePhone(IPhoneNumber person);
+        public Task ReloadData();
         void DownloadFile();
         Task Pull();
         Task Push();

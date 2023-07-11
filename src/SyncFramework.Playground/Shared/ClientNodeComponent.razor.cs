@@ -16,11 +16,36 @@ namespace SyncFramework.Playground.Shared
         {
             base.OnInitialized();
             item.RefreshAction= Refresh;
+            item.ShowMessage = ShowMessage;
             await item.Init();
             
            
         }
-        public async void OpenDialog(IPerson Person)
+        public void ShowMessage(string Message)
+        {
+            Snackbar.Add(Message, Severity.Success);
+        }
+        public async void EditPhone(IPhoneNumber phone)
+        {
+            
+            var parameters = new DialogParameters<IPhoneNumber>
+            {
+                { "Phone", phone }
+            };
+
+            var dialog = await DialogService.ShowAsync<EditPhoneComponent>("Edit Phone", parameters);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                var UpdatedPhoneNumber = result.Data as IPhoneNumber;
+                await this.item.UpdatePhone(UpdatedPhoneNumber);
+                //In a real world scenario we would reload the data from the source here since we "removed" it in the dialog already.
+                //Guid.TryParse(result.Data.ToString(), out Guid deletedServer);
+                //Servers.RemoveAll(item => item.Id == deletedServer);
+            }
+        }
+        public async void EditPerson(IPerson Person)
         {
             //var options = new DialogOptions { CloseOnEscapeKey = true, Position = DialogPosition.Center, CloseButton=true };
             //DialogService.Show<EditPersonComponent>("Edit Person", options);
@@ -45,6 +70,7 @@ namespace SyncFramework.Playground.Shared
         void Refresh()
         {
             this.StateHasChanged();
+
         }
     }
 }

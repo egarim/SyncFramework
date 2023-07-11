@@ -73,7 +73,7 @@ namespace SyncFramework.Playground.EfCore
 
             if (GenerateRandomData)
             {
-                var Persons = GetPerson(5);
+                var Persons = GetPerson(3);
                 DbContext.AddRange(Persons);
                 await DbContext.SaveChangesAsync();
             }
@@ -94,7 +94,7 @@ namespace SyncFramework.Playground.EfCore
             }
             await UpdateDeltaCount();
         }
-
+     
         private async Task UpdateDeltaCount()
         {
             this.DeltaCount = await DbContext.DeltaStore.GetDeltaCountAsync("", this.Id, default);
@@ -198,14 +198,20 @@ namespace SyncFramework.Playground.EfCore
 
             await DbContext.PushAsync();
             await Bus.Publish(new object());
-            
+            ShowMessage($"{this.Id} Deltas Pushed");
+
+
         }
         public Action RefreshAction { get; set; }
+        public Action<string> ShowMessage { get; set; }
+
         public async Task Pull()
         {
             await DbContext.PullAsync();
             await ReloadPeople();
             this.RefreshAction?.Invoke();
+            ShowMessage($"{this.Id} Deltas Pulled");
+
         }
 
         public Task RemovePerson(IPerson person)
@@ -223,6 +229,31 @@ namespace SyncFramework.Playground.EfCore
             await this.DbContext.SaveChangesAsync();
             await this.ReloadPeople();
             this.RefreshAction?.Invoke();
+        }
+
+        public Task RemovePhone(IPhoneNumber person)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task UpdatePhone(IPhoneNumber Phone)
+        {
+            var PhoneToUpdate = await this.DbContext.Phones.FindAsync(Phone.Id);
+            PhoneToUpdate.Number = Phone.Number;
+        
+
+           
+            await this.DbContext.SaveChangesAsync();
+            SelectedPersonChange(PhoneToUpdate.Person);
+            await UpdateDeltaCount();
+            this.RefreshAction?.Invoke();
+        }
+
+        public async Task ReloadData()
+        {
+            await ReloadPeople();
+            this.RefreshAction?.Invoke();
+            ShowMessage($"{this.Id} Refreshed");
         }
     }
 }

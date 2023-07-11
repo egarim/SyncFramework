@@ -1,0 +1,18 @@
+﻿@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Edit" Class="mr-3 mb-n1" />
+            Edit
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField Value="@Phone.Id.ToString()" Label="ID" ReadOnly="true" />
+        <MudTextField @bind-Value="@Phone.Number" Label="Number" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="UpdatePhone">Close</MudButton>
+    </DialogActions>
+</MudDialog>
