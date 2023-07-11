@@ -37,11 +37,27 @@ else
                     <Columns>
                         <PropertyColumn Property="x => x.FirstName" Title="First Name" />
                         <PropertyColumn Property="x => x.LastName" Title="Last Name" />
+                        <TemplateColumn CellClass="d-flex justify-end">
+                            <CellTemplate>
+                             <MudStack Row>
+                                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Success"></MudIconButton>
+                                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"></MudIconButton>
+                             </MudStack>
+                         </CellTemplate>
+                     </TemplateColumn>
                     </Columns>
                 </MudDataGrid>
                 <MudDataGrid Items="@item.PhoneNumbers" Hover="true" Striped="true" Dense="true" MultiSelection="false">
                     <Columns>
-                        <PropertyColumn Property="x => x.Number" Title="Number" />
+                     <PropertyColumn Property="x => x.Number" Title="Number" />
+                     <TemplateColumn CellClass="d-flex justify-end">
+                         <CellTemplate>
+                             <MudStack Row>
+                                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Success"></MudIconButton>
+                                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"></MudIconButton>
+                             </MudStack>
+                         </CellTemplate>
+                     </TemplateColumn>
                     </Columns>
                 </MudDataGrid>
             </MudStack>
