@@ -54,8 +54,8 @@
             <MudCardActions>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>item.Push())">Push deltas</MudButton>
                 <MudButton Variant="Variant.Filled" Color="Color.Secondary" DisableElevation="true" OnClick="@(()=>item.Pull())">Pull deltas</MudButton>
-                <MudButton Variant="Variant.Text" Color="Color.Primary">Preview Deltas</MudButton>
-                <MudButton Variant="Variant.Text" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>item.DownloadFile())">Download Databases</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Tertiary" DisableElevation="true">Preview Deltas</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Success" DisableElevation="true" OnClick="@(()=>item.DownloadFile())">Download Databases</MudButton>
             </MudCardActions>
         </MudCard>
     }
