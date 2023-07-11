@@ -1,6 +1,7 @@
 ﻿using BIT.Data.Sync;
 using Microsoft.AspNetCore.Components;
 using SyncFramework.Playground.EfCore;
+using static MudBlazor.CategoryTypes;
 
 namespace SyncFramework.Playground.Shared
 {
@@ -8,5 +9,17 @@ namespace SyncFramework.Playground.Shared
     {
         [Parameter]
         public IClientNodeInstance item { get; set; }
+        protected async override void OnInitialized()
+        {
+            base.OnInitialized();
+            item.RefreshAction= Refresh;
+            await item.Init();
+            
+           
+        }
+        void Refresh()
+        {
+            this.StateHasChanged();
+        }
     }
 }

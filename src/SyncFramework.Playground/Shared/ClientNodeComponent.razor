@@ -1,44 +1,64 @@
-﻿<MudCard>
-    <MudCardHeader>
-        <CardHeaderContent>
-            <MudText Typo="Typo.h6">@item.Id</MudText>
-        </CardHeaderContent>
-        <CardHeaderActions>
-            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
-        </CardHeaderActions>
-    </MudCardHeader>
-    <MudCardContent>
-        <MudText>Delta count @item.DeltaCount</MudText>
-        <MudForm>
-            <MudTextField @bind-Value="@item.PersonName" Label="Blog Name" />
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>item.AddPerson(item.PersonName))">Add</MudButton>
+﻿@if(this.item.IsLoading)
+{
+    <MudCard>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px" />
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+        </MudCardActions>
+    </MudCard>
+}
+else
+{
+    <MudCard>
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">@item.Id</MudText>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+            </CardHeaderActions>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudText>Delta count @item.DeltaCount</MudText>
+            <MudForm>
+                <MudTextField @bind-Value="@item.PersonName" Label="Blog Name" />
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>item.AddPerson(item.PersonName))">Add</MudButton>
 
-        </MudForm>
-        <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText>
-        <MudStack Row="true">
-            <MudDataGrid Items="@item.People" @bind-SelectedItem="@item.SelectedPerson" Hover="true" Striped="true" Dense="true" MultiSelection="false">
-                <Columns>
-                    <PropertyColumn Property="x => x.FirstName" Title="First Name" />
-                    <PropertyColumn Property="x => x.LastName" Title="Last Name" />
-                </Columns>
-            </MudDataGrid>
-            <MudDataGrid Items="@item.PhoneNumbers" Hover="true" Striped="true" Dense="true" MultiSelection="false">
-                <Columns>
-                    <PropertyColumn Property="x => x.Number" Title="Number" />
-                </Columns>
-            </MudDataGrid>
-        </MudStack>
-    </MudCardContent>
-    <MudCardActions>
-        <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
-            <MudButton StartIcon="@Icons.Material.Filled.ArrowUpward" OnClick="@(()=>item.Push())">Push Deltas</MudButton>
-            <MudButton StartIcon="@Icons.Material.Filled.ArrowDownward" OnClick="@(()=>item.Pull())">Pull Deltas</MudButton>
-            <MudButton StartIcon="@Icons.Material.Filled.Preview" OnClick="@(()=>item.Pull())">Preview Deltas</MudButton>
-            <MudButton StartIcon="@Icons.Material.Filled.SaveAlt" OnClick="@(()=>item.DownloadFile())">Download Databases</MudButton>
-        </MudButtonGroup>
+            </MudForm>
+            <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText>
+            <MudStack Row="true">
+                <MudDataGrid Items="@item.People" @bind-SelectedItem="@item.SelectedPerson" Hover="true" Striped="true" Dense="true" MultiSelection="false">
+                    <Columns>
+                        <PropertyColumn Property="x => x.FirstName" Title="First Name" />
+                        <PropertyColumn Property="x => x.LastName" Title="Last Name" />
+                    </Columns>
+                </MudDataGrid>
+                <MudDataGrid Items="@item.PhoneNumbers" Hover="true" Striped="true" Dense="true" MultiSelection="false">
+                    <Columns>
+                        <PropertyColumn Property="x => x.Number" Title="Number" />
+                    </Columns>
+                </MudDataGrid>
+            </MudStack>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
+                <MudButton StartIcon="@Icons.Material.Filled.ArrowUpward" OnClick="@(()=>item.Push())">Push Deltas</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.ArrowDownward" OnClick="@(()=>item.Pull())">Pull Deltas</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Preview" OnClick="@(()=>item.Pull())">Preview Deltas</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.SaveAlt" OnClick="@(()=>item.DownloadFile())">Download Databases</MudButton>
+            </MudButtonGroup>
 
-    </MudCardActions>
-</MudCard>
+        </MudCardActions>
+    </MudCard>
+}
+
+
 
 @code {
 

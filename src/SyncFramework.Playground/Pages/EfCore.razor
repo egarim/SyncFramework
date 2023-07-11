@@ -19,8 +19,8 @@
 <MudStack>
     @foreach (var item in this.ClientNodes)
     {
-        
-        <MudCard>
+        <ClientNodeComponent item="@item"></ClientNodeComponent>
+       @*  <MudCard>
             <MudCardHeader>
                 <CardHeaderContent>
                     <MudText Typo="Typo.h6">@item.Id</MudText>
@@ -38,7 +38,7 @@
                 </MudForm>
                 <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText>
                 <MudStack Row="true">
-                    <MudDataGrid Items="@item.DbContext.Persons" @bind-SelectedItem="@item.SelectedPerson" Hover="true" Striped="true"  Dense="true" MultiSelection="false">
+                    <MudDataGrid Items="@item.People" @bind-SelectedItem="@item.SelectedPerson" Hover="true" Striped="true"  Dense="true" MultiSelection="false">
                         <Columns>
                             <PropertyColumn Property="x => x.FirstName" Title="First Name" />
                             <PropertyColumn Property="x => x.LastName" Title="Last Name" />
@@ -60,7 +60,7 @@
                 </MudButtonGroup>
             
             </MudCardActions>
-        </MudCard>
+        </MudCard> *@
     }
  
 </MudStack>

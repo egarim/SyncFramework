@@ -22,7 +22,7 @@ namespace SyncFramework.Playground.Pages
     public partial class EfCore
     {
     
-        public IQueryable<ClientNodeInstance> ClientNodes
+        public IQueryable<IClientNodeInstance> ClientNodes
         {
             get
             {
@@ -59,7 +59,7 @@ namespace SyncFramework.Playground.Pages
         }
         public bool GenerateRandomData { get; set; } = true;
         SyncServerComponent serverComponent;
-        private List<ClientNodeInstance> clientNodes = new List<ClientNodeInstance>();
+        private List<IClientNodeInstance> clientNodes = new List<IClientNodeInstance>();
 
         private int NodeCount;
         private async void AddClientNode()
@@ -69,40 +69,43 @@ namespace SyncFramework.Playground.Pages
 
            
 
-            ServiceCollection serviceCollection = new ServiceCollection();
-            string sQliteDeltaStoreConnectionString = $"Data Source={DbName}_Deltas.db";
-            CreateDatabaseConnection(sQliteDeltaStoreConnectionString);
+            //ServiceCollection serviceCollection = new ServiceCollection();
+            //string sQliteDeltaStoreConnectionString = $"Data Source={DbName}_Deltas.db";
+            //CreateDatabaseConnection(sQliteDeltaStoreConnectionString);
 
-            serviceCollection.AddSyncFrameworkForSQLite(sQliteDeltaStoreConnectionString, serverComponent.HttpClient, serverComponent.NodeId, DbName, deltaGeneratorBases);
+            //serviceCollection.AddSyncFrameworkForSQLite(sQliteDeltaStoreConnectionString, serverComponent.HttpClient, serverComponent.NodeId, DbName, deltaGeneratorBases);
 
-            YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
-            serviceCollection.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
+            //YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
+            //serviceCollection.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
 
-            serviceCollection.AddSingleton(typeof(ISequenceService), typeof(EfSequenceService));
+            //serviceCollection.AddSingleton(typeof(ISequenceService), typeof(EfSequenceService));
 
-            var ServiceProvider = serviceCollection.BuildServiceProvider();
+            //var ServiceProvider = serviceCollection.BuildServiceProvider();
 
-            DbContextOptionsBuilder OptionsBuilder = new DbContextOptionsBuilder();
-            string DataConnectionString = $"Data Source={DbName}_Data.db";
+            //DbContextOptionsBuilder OptionsBuilder = new DbContextOptionsBuilder();
+            //string DataConnectionString = $"Data Source={DbName}_Data.db";
             
-            OptionsBuilder.UseSqlite(DataConnectionString);
+            //OptionsBuilder.UseSqlite(DataConnectionString);
 
-            var DbContextInstance = new ContactsDbContext(OptionsBuilder.Options, ServiceProvider);
-            //Delete the database if it exists
-            await DbContextInstance.Database.EnsureDeletedAsync();
-            //Create the database with the sqlite connection
-            CreateDatabaseConnection(DataConnectionString);
-            await DbContextInstance.Database.EnsureCreatedAsync();
+            //var DbContextInstance = new ContactsDbContext(OptionsBuilder.Options, ServiceProvider);
+            ////Delete the database if it exists
+            //await DbContextInstance.Database.EnsureDeletedAsync();
+            ////Create the database with the sqlite connection
+            //CreateDatabaseConnection(DataConnectionString);
+            //await DbContextInstance.Database.EnsureCreatedAsync();
 
-            if(GenerateRandomData)
-            {
-                var Persons = GetPerson(5);
-                DbContextInstance.AddRange(Persons);
-                await DbContextInstance.SaveChangesAsync();
-            }
+            //if(GenerateRandomData)
+            //{
+            //    var Persons = GetPerson(5);
+            //    DbContextInstance.AddRange(Persons);
+            //    await DbContextInstance.SaveChangesAsync();
+            //}
+
+            //this.clientNodes.Add(new EfClientNodeInstance { Id = DbName, DbContext = DbContextInstance, js = this.js,Bus=this.Bus });
+            var NodeInstance=new EfClientNodeInstance(js, DbName,Bus, DbName,this.serverComponent.HttpClient,this.serverComponent.NodeId, deltaGeneratorBases, this.GenerateRandomData);
            
-            this.clientNodes.Add(new ClientNodeInstance { Id = DbName, DbContext = DbContextInstance, js = this.js,Bus=this.Bus });
-
+            this.clientNodes.Add(NodeInstance);
+            //NodeInstance.Init();
             //await DbContextInstance.PushAsync();
         }
 
@@ -116,7 +119,7 @@ namespace SyncFramework.Playground.Pages
             {
                 connection.Open();  //  <== The database file is created here.
 
-                
+
 
             }
         }
