@@ -65,6 +65,7 @@ namespace SyncFramework.Playground.EfCore
             await ReloadPeople();
 
             IsLoading = false;
+            this.SelectedPerson = this.People.FirstOrDefault();
             this.RefreshAction?.Invoke();
         }
 

@@ -98,9 +98,9 @@ namespace SyncFramework.Playground.Pages
 
         }
 
-     
 
-   
+
+ 
         public int DeltaCount { get; set; }
     }
 }

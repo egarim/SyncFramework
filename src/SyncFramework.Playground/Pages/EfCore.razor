@@ -5,8 +5,8 @@
 
 <PageTitle>EfCore Demo</PageTitle>
 
-<h1>Server</h1>
 
+<SyncServerComponent DeltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
 <MudStack Row="true">
     <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="AddClientNode">Add client node</MudButton>
     <MudCheckBox Label="Generate Random Data" @bind-Checked="@GenerateRandomData" />
@@ -17,7 +17,7 @@
     <MudCheckBox Label="MySql" @bind-Checked="@MySql" />
     <MudCheckBox Label="SqlServer" @bind-Checked="@SqlServer" />
 </MudStack>
-<SyncServerComponent DeltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
+
 
 
 

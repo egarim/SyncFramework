@@ -1,8 +1,14 @@
-﻿<h3>SyncServer</h3>
-<label>@NodeId</label>
+﻿<MudText Typo="Typo.h5" Align="Align.Center" >Sync Server</MudText>
+<MudText Typo="Typo.h5" Align="Align.Center" >Server Node Id:@NodeId</MudText>
 
-<MudDataGrid Items="@this.Deltas" Hover="true" Striped="true" Dense="true" MultiSelection="false">
+
+
+<MudText Typo="Typo.body1">This playground is a demo of the <MudLink Underline="Underline.Always" Href="https://github.com/egarim/SyncFramework">SyncFramework</MudLink> created by <MudLink Underline="Underline.Always" Href="https://www.jocheojeda.com">Joche Ojeda</MudLink>  </MudText>
+
+<MudText Typo="Typo.h6" Align="Align.Center">Server Deltas</MudText>
+<MudDataGrid Items="@this.Deltas" Hover="true" Striped="true" Dense="true" MultiSelection="false" Virtualize="true" FixedHeader="true" Height="250px">
     <Columns>
+        <PropertyColumn Property="x => x.Key.Identity" Title="Node Identity" />
         <PropertyColumn Property="x => x.Key.Epoch" Title="Epoch" />
         <PropertyColumn Property="x => x.Key.Date" Title="Date" />
         <PropertyColumn Property="x => x.Key.Index" Title="Index" />
@@ -18,6 +24,3 @@
     </Columns>
 </MudDataGrid>
 
-@code {
-
-}
