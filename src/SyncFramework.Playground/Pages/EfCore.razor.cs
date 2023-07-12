@@ -38,7 +38,7 @@ namespace SyncFramework.Playground.Pages
         [Inject]
         private IJSRuntime js { get; set; }
         [Inject]
-        public DeltaGeneratorBase[] deltaGeneratorBases { get; set; }
+        public Dictionary<string, DeltaGeneratorBase> deltaGeneratorBases { get; set; }
         public IDeltaStore ServerDeltaStore { get; set; }
         public string NodeId { get; set; }
         protected override void OnInitialized()
@@ -64,92 +64,41 @@ namespace SyncFramework.Playground.Pages
         private List<IClientNodeInstance> clientNodes = new List<IClientNodeInstance>();
 
         private int NodeCount;
+        public bool Postgres { get; set; } = true;
+        public bool Sqlite { get; set; } = true;
+        public bool SqlServer { get; set; } = true;
+        public bool MySql { get; set; } = true;
         private async void AddClientNode()
         {
             NodeCount++;
             string DbName = $"ClientNode_{NodeCount}";
+            List<DeltaGeneratorBase> Generators = new List<DeltaGeneratorBase>();
 
-           
-
-            //ServiceCollection serviceCollection = new ServiceCollection();
-            //string sQliteDeltaStoreConnectionString = $"Data Source={DbName}_Deltas.db";
-            //CreateDatabaseConnection(sQliteDeltaStoreConnectionString);
-
-            //serviceCollection.AddSyncFrameworkForSQLite(sQliteDeltaStoreConnectionString, serverComponent.HttpClient, serverComponent.NodeId, DbName, deltaGeneratorBases);
-
-            //YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
-            //serviceCollection.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
-
-            //serviceCollection.AddSingleton(typeof(ISequenceService), typeof(EfSequenceService));
-
-            //var ServiceProvider = serviceCollection.BuildServiceProvider();
-
-            //DbContextOptionsBuilder OptionsBuilder = new DbContextOptionsBuilder();
-            //string DataConnectionString = $"Data Source={DbName}_Data.db";
-            
-            //OptionsBuilder.UseSqlite(DataConnectionString);
-
-            //var DbContextInstance = new ContactsDbContext(OptionsBuilder.Options, ServiceProvider);
-            ////Delete the database if it exists
-            //await DbContextInstance.Database.EnsureDeletedAsync();
-            ////Create the database with the sqlite connection
-            //CreateDatabaseConnection(DataConnectionString);
-            //await DbContextInstance.Database.EnsureCreatedAsync();
-
-            //if(GenerateRandomData)
+            if (Postgres)
+            {
+                Generators.Add(deltaGeneratorBases["Postgres"]);
+            }
+            //if (Sqlite)
             //{
-            //    var Persons = GetPerson(5);
-            //    DbContextInstance.AddRange(Persons);
-            //    await DbContextInstance.SaveChangesAsync();
+            //    Generators.Add(deltaGeneratorBases["SQLite"]);
             //}
+            if (MySql)
+            {
+                Generators.Add(deltaGeneratorBases["MySQL"]);
+            }
+            if (SqlServer)
+            {
+                Generators.Add(deltaGeneratorBases["SqlServer"]);
+            }
 
-            //this.clientNodes.Add(new EfClientNodeInstance { Id = DbName, DbContext = DbContextInstance, js = this.js,Bus=this.Bus });
-            var NodeInstance=new EfClientNodeInstance(js, DbName,Bus, DbName,this.serverComponent.HttpClient,this.serverComponent.NodeId, deltaGeneratorBases, this.GenerateRandomData);
-           
+            var NodeInstance=new EfClientNodeInstance(js, DbName,Bus, DbName,this.serverComponent.HttpClient,this.serverComponent.NodeId, Generators.ToArray(), this.GenerateRandomData);
             this.clientNodes.Add(NodeInstance);
-            //NodeInstance.Init();
-            //await DbContextInstance.PushAsync();
+           
         }
 
-        /// <summary>
-        /// This method is used to create the database,DbContextInstance.Database.EnsureCreatedAsync does not create a physical database
-        /// </summary>
-        /// <param name="DatabaseConnectionString"></param>
-        private static void CreateDatabaseConnection(string DatabaseConnectionString)
-        {
-            using (var connection = new SqliteConnection(DatabaseConnectionString))
-            {
-                connection.Open();  //  <== The database file is created here.
+     
 
-
-
-            }
-        }
-
-        private static IEnumerable<Person> GetPerson(int Count)
-        {
-            var testUsers = new Faker<Person>()
-            .RuleFor(u => u.FirstName, f => f.Name.FirstName())
-            .RuleFor(u => u.LastName, f => f.Name.LastName());
-            var user = testUsers.Generate(Count);
-
-            var TestPhones = new Faker<PhoneNumber>()
-            .RuleFor(u => u.Number, f => f.Phone.PhoneNumber());
-            
-        
-
-            foreach (Person person in user)
-            {
-                var Phones=TestPhones.Generate(3);
-                foreach (var item in Phones)
-                {
-                    person.PhoneNumbers.Add(item);
-                }
-                
-            }
-            return user;
-        }
-
+   
         public int DeltaCount { get; set; }
     }
 }

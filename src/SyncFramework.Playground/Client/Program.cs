@@ -21,14 +21,15 @@ namespace SyncFramework.Playground.Client
 
             MySqlServerVersion serverVersion;
             serverVersion = new MySqlServerVersion(new Version(8, 0, 31));
-
-            List<DeltaGeneratorBase> DeltaGenerators = new List<DeltaGeneratorBase>();
-            DeltaGenerators.Add(new NpgsqlDeltaGenerator());
-            DeltaGenerators.Add(new PomeloMySqlDeltaGenerator(serverVersion));
-            DeltaGenerators.Add(new SqliteDeltaGenerator());
-            DeltaGenerators.Add(new SqlServerDeltaGenerator());
-            DeltaGeneratorBase[] additionalDeltaGenerators = DeltaGenerators.ToArray();
-            builder.Services.AddSingleton<DeltaGeneratorBase[]>(additionalDeltaGenerators);
+            Dictionary<string, DeltaGeneratorBase> DeltaGenerators = new Dictionary<string, DeltaGeneratorBase>();
+      
+            DeltaGenerators.Add("Postgres",new NpgsqlDeltaGenerator());
+            DeltaGenerators.Add("MySQL",new PomeloMySqlDeltaGenerator(serverVersion));
+            //HACK not needed the main db is Sqlite anyways
+            //DeltaGenerators.Add("SQLite",new SqliteDeltaGenerator());
+            DeltaGenerators.Add("SqlServer",new SqlServerDeltaGenerator());
+            
+            builder.Services.AddSingleton<Dictionary<string, DeltaGeneratorBase>>(DeltaGenerators);
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
             builder.Services.AddScoped<ComponentBus>();

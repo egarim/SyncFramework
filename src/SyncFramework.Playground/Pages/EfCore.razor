@@ -15,6 +15,11 @@
     <MudElement>Deltas:@this.DeltaCount</MudElement>
 </MudStack>
 
+<MudStack Row="true">
+    <MudCheckBox Label="Postgres" @bind-Checked="@Postgres" />
+    <MudCheckBox Label="MySql" @bind-Checked="@MySql" />
+    <MudCheckBox Label="SqlServer" @bind-Checked="@SqlServer" />
+</MudStack>
 
 <MudStack>
     @foreach (var item in this.ClientNodes)

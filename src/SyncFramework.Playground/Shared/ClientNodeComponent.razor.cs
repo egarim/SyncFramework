@@ -1,7 +1,9 @@
 ﻿using BIT.Data.Sync;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using MudBlazor;
 using SyncFramework.Playground.EfCore;
+using System.Text;
 using static MudBlazor.CategoryTypes;
 
 namespace SyncFramework.Playground.Shared
@@ -12,6 +14,8 @@ namespace SyncFramework.Playground.Shared
         public IDialogService DialogService { get; set; }
         [Parameter]
         public IClientNodeInstance item { get; set; }
+        [Inject]
+        public IJSRuntime js { get; set; }
         protected async override void OnInitialized()
         {
             base.OnInitialized();
@@ -47,7 +51,7 @@ namespace SyncFramework.Playground.Shared
         }
         public async void PreviewDelta(string Delta)
         {
-            Delta = Delta.Replace("\\u0022", "\"").Replace("\\u0060", "\'").Replace("\\n", "");
+            Delta = CleanDelta(Delta);
             DialogOptions fullScreen = new DialogOptions() { FullScreen = true, CloseButton = true };
             var parameters = new DialogParameters<IPhoneNumber>
             {
@@ -55,7 +59,20 @@ namespace SyncFramework.Playground.Shared
             };
 
             var dialog = await DialogService.ShowAsync<DeltaPreviewComponent>("Delta", parameters, fullScreen);
-           
+
+        }
+
+        private static string CleanDelta(string Delta)
+        {
+            Delta = Delta.Replace("\\u0022", "\"").Replace("\\u0060", "\'").Replace("\\n", "");
+            return Delta;
+        }
+
+        public async void DownloadDelta(KeyValuePair<IDelta,string> Delta)
+        {
+            byte[] byteArray = Encoding.UTF8.GetBytes(CleanDelta(Delta.Value));
+            await FileUtil.SaveAs(js, $"{Delta.Key.Index}.json", byteArray);
+
         }
         public async void EditPerson(IPerson Person)
         {

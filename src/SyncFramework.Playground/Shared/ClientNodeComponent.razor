@@ -67,12 +67,12 @@ else
                      <PropertyColumn Property="x => x.Key.Epoch" Title="Epoch" />
                      <PropertyColumn Property="x => x.Key.Date" Title="Date" />
                      <PropertyColumn Property="x => x.Key.Index" Title="Index" />
-                   @*   <PropertyColumn Property="x => x.Value" Title="Sql" /> *@
+                 
                      <TemplateColumn CellClass="d-flex justify-end">
                          <CellTemplate>
                              <MudStack Row>
-                                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Success" OnClick="@(()=>PreviewDelta(context.Item.Value))"></MudIconButton>
-                                 
+                                 <MudButton  StartIcon="@Icons.Material.Filled.Preview" Color="Color.Success" OnClick="@(()=>PreviewDelta(context.Item.Value))">Preview</MudButton >
+                                 <MudButton StartIcon="@Icons.Material.Filled.Download" Color="Color.Success" OnClick="@(()=>DownloadDelta(context.Item))">Download</MudButton>
                              </MudStack>
                          </CellTemplate>
                      </TemplateColumn>
