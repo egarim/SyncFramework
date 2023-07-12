@@ -212,6 +212,16 @@ namespace SyncFramework.Playground.EfCore
 
 
         }
+        public async Task PurgeDeltas()
+        {
+
+            await DbContext.DeltaStore.PurgeDeltasAsync(DbContext.Identity);
+            this.RefreshAction.Invoke();
+            //await Bus.Publish(new object());
+            ShowMessage($"{this.Id} Deltas Purged");
+
+
+        }
         public Action RefreshAction { get; set; }
         public Action<string> ShowMessage { get; set; }
 
@@ -289,9 +299,6 @@ namespace SyncFramework.Playground.EfCore
             ShowMessage($"{this.Id} Refreshed");
         }
 
-        public async Task PreviewDelta(string DeltaContent)
-        {
-            var test=DeltaContent; 
-        }
+    
     }
 }

@@ -85,7 +85,7 @@ else
              <MudButton StartIcon="@Icons.Material.Filled.Refresh" Color="Color.Success" OnClick="@(()=>item.ReloadData())">Reload Data</MudButton>
                 <MudButton StartIcon="@Icons.Material.Filled.ArrowUpward" OnClick="@(()=>item.Push())">Push Deltas</MudButton>
                 <MudButton StartIcon="@Icons.Material.Filled.ArrowDownward" OnClick="@(()=>item.Pull())">Pull Deltas</MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.Preview" OnClick="@(()=>item.Pull())">Preview Deltas</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.DeleteForever" OnClick="@(()=>item.PurgeDeltas())">Purge Deltas</MudButton>
                 <MudButton StartIcon="@Icons.Material.Filled.SaveAlt" OnClick="@(()=>item.DownloadFile())">Download Databases</MudButton>
             </MudButtonGroup>
 

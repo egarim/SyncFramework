@@ -93,7 +93,9 @@ namespace SyncFramework.Playground.Pages
 
             var NodeInstance=new EfClientNodeInstance(js, DbName,Bus, DbName,this.serverComponent.HttpClient,this.serverComponent.NodeId, Generators.ToArray(), this.GenerateRandomData);
             this.clientNodes.Add(NodeInstance);
-           
+
+            Snackbar.Add($"New client added: {DbName}", Severity.Success);
+
         }
 
      

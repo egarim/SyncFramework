@@ -1,6 +1,23 @@
 ﻿<h3>SyncServer</h3>
 <label>@NodeId</label>
 
+<MudDataGrid Items="@this.Deltas" Hover="true" Striped="true" Dense="true" MultiSelection="false">
+    <Columns>
+        <PropertyColumn Property="x => x.Key.Epoch" Title="Epoch" />
+        <PropertyColumn Property="x => x.Key.Date" Title="Date" />
+        <PropertyColumn Property="x => x.Key.Index" Title="Index" />
+
+        <TemplateColumn CellClass="d-flex justify-end">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudButton StartIcon="@Icons.Material.Filled.Preview" Color="Color.Success" OnClick="@(()=>PreviewDelta(context.Item.Value))">Preview</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.Download" Color="Color.Success" OnClick="@(()=>DownloadDelta(context.Item))">Download</MudButton>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
 @code {
 
 }

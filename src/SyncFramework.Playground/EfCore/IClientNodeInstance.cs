@@ -24,11 +24,12 @@ namespace SyncFramework.Playground.EfCore
         public Task UpdatePerson(IPerson person);
         public Task RemovePhone(IPhoneNumber person);
         public Task UpdatePhone(IPhoneNumber person);
+        public Task PurgeDeltas();
         public Task ReloadData();
         void DownloadFile();
         Task Pull();
         Task Push();
-        Task PreviewDelta(string DeltaContent);
+  
         public Task Init();
         void SelectedPersonChange(IPerson Person);
     }

@@ -1,18 +1,15 @@
 ﻿@page "/"
 @using SyncFramework.Playground.EfCore;
 @using MudBlazor;
+@inject ISnackbar Snackbar
 
 <PageTitle>EfCore Demo</PageTitle>
 
 <h1>Server</h1>
 
-<SyncServerComponent deltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
-
-
 <MudStack Row="true">
     <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="AddClientNode">Add client node</MudButton>
     <MudCheckBox Label="Generate Random Data" @bind-Checked="@GenerateRandomData" />
-    <MudElement>Deltas:@this.DeltaCount</MudElement>
 </MudStack>
 
 <MudStack Row="true">
@@ -20,6 +17,10 @@
     <MudCheckBox Label="MySql" @bind-Checked="@MySql" />
     <MudCheckBox Label="SqlServer" @bind-Checked="@SqlServer" />
 </MudStack>
+<SyncServerComponent DeltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
+
+
+
 
 <MudStack>
     @foreach (var item in this.ClientNodes)
@@ -29,4 +30,6 @@
  
 </MudStack>
 
-
+<MudScrollToTop>
+    <MudFab Color="Color.Tertiary" Icon="@Icons.Material.Filled.ArrowCircleUp" />
+</MudScrollToTop>

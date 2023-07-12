@@ -9,7 +9,11 @@ namespace BIT.Data.Sync
             var Data = deltaStore.Decompress(delta.Operation);
             return deltaStore.DeSerialize<T>(Data);
         }
-
+        public static T GetDeltaOperations<T>(this IDeltaStore deltaStore, IDelta delta)
+        {
+            var Data = deltaStore.Decompress(delta.Operation);
+            return deltaStore.DeSerialize<T>(Data);
+        }
         public static byte[] Serialize(this IDeltaProcessor deltaStore, object Instance)
         {
             return SerializationHelper.SerializeCore(Instance);
@@ -48,12 +52,18 @@ namespace BIT.Data.Sync
             return SerializationHelper.CompressCore(data);
         }
 
-
+        public static byte[] Decompress(this IDeltaStore deltaStore, byte[] data)
+        {
+            return SerializationHelper.DecompressCore(data);
+        }
         public static byte[] Decompress(this IDeltaProcessor deltaStore, byte[] data)
         {
             return SerializationHelper.DecompressCore(data);
         }
-
+        public static T DeSerialize<T>(this IDeltaStore deltaStore, byte[] Instance)
+        {
+            return SerializationHelper.DeserializeCore<T>(Instance);
+        }
 
         public static T DeSerialize<T>(this IDeltaProcessor deltaStore, byte[] Instance)
         {
