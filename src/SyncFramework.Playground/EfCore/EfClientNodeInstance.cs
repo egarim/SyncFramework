@@ -49,31 +49,12 @@ namespace SyncFramework.Playground.EfCore
         public async Task Init()
         {
             await Task.Delay(TimeSpan.FromMilliseconds(100));
-            ServiceCollection serviceCollection = new ServiceCollection();
-            string sQliteDeltaStoreConnectionString = $"Data Source={DbName}_Deltas.db";
-            CreateDatabaseConnection(sQliteDeltaStoreConnectionString);
-
-            serviceCollection.AddSyncFrameworkForSQLite(sQliteDeltaStoreConnectionString, this.httpClient, this.ServerNodeId, DbName, deltaGeneratorBases);
-
-            YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
-            serviceCollection.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
-
-            serviceCollection.AddSingleton(typeof(ISequenceService), typeof(EfSequenceService));
-
-            var ServiceProvider = serviceCollection.BuildServiceProvider();
-
-            DbContextOptionsBuilder OptionsBuilder = new DbContextOptionsBuilder();
-            string DataConnectionString = $"Data Source={DbName}_Data.db";
-
-            OptionsBuilder.UseSqlite(DataConnectionString);
-
-            this.DbContext = new ContactsDbContext(OptionsBuilder.Options, ServiceProvider);
+            await InitCore();
             //Delete the database if it exists
             await DbContext.Database.EnsureDeletedAsync();
             //Create the database with the sqlite connection
-            CreateDatabaseConnection(DataConnectionString);
+            CreateDatabaseConnection(this.dataConnectionString);
             await DbContext.Database.EnsureCreatedAsync();
-
             if (GenerateRandomData)
             {
                 var Persons = GetPerson(3);
@@ -87,8 +68,32 @@ namespace SyncFramework.Playground.EfCore
             this.RefreshAction?.Invoke();
         }
 
+        private async Task InitCore()
+        {
+            ServiceCollection serviceCollection = new ServiceCollection();
+            deltaConnectionString = $"Data Source={DbName}_Deltas.db";
+            CreateDatabaseConnection(deltaConnectionString);
+
+            serviceCollection.AddSyncFrameworkForSQLite(deltaConnectionString, this.httpClient, this.ServerNodeId, DbName, deltaGeneratorBases);
+
+            YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
+            serviceCollection.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
+
+            serviceCollection.AddSingleton(typeof(ISequenceService), typeof(EfSequenceService));
+
+            var ServiceProvider = serviceCollection.BuildServiceProvider();
+
+            DbContextOptionsBuilder OptionsBuilder = new DbContextOptionsBuilder();
+            dataConnectionString = $"Data Source={DbName}_Data.db";
+            OptionsBuilder.UseSqlite(dataConnectionString);
+
+            this.DbContext = new ContactsDbContext(OptionsBuilder.Options, ServiceProvider);
+
+        }
+
         private async Task ReloadPeople()
         {
+            await InitCore();
             People.Clear();
             List<Person> people = await DbContext.Persons.ToListAsync();
             foreach (Person person in people)
@@ -145,6 +150,8 @@ namespace SyncFramework.Playground.EfCore
         public BlazorComponentBus.ComponentBus Bus { get; set; }
         IPerson selectedPerson;
         private ContactsDbContext dbContext;
+        string dataConnectionString;
+        string deltaConnectionString;
 
         public IPerson SelectedPerson
         {
