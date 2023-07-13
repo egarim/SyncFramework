@@ -29,6 +29,8 @@ else
         </MudCardHeader>
         <MudCardContent>
             <MudText Typo="Typo.h6" Align="Align.Left" Color="Color.Warning">DELTA COUNT: @item.DeltaCount</MudText>
+            <br>
+            <br>
             <MudButton StartIcon="@Icons.Material.Filled.Refresh"       Color="Color.Success" OnClick="@(()=>item.ReloadData())">Reload Data</MudButton>
             <MudButton StartIcon="@Icons.Material.Filled.ArrowUpward"   Color="Color.Primary" OnClick="@(()=>item.Push())">Push Deltas</MudButton>
             <MudButton StartIcon="@Icons.Material.Filled.ArrowDownward" Color="Color.Tertiary" OnClick="@(()=>item.Pull())">Pull Deltas</MudButton>
@@ -96,6 +98,7 @@ else
                          </TemplateColumn>
                      </Columns>
                  </MudDataGrid>
+             <br>
              </MudStack>
             
           

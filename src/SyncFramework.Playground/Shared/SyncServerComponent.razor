@@ -1,11 +1,16 @@
-﻿<MudText Typo="Typo.h5" Align="Align.Center" >Sync Server</MudText>
+﻿@* <MudText Typo="Typo.h5" Align="Align.Center" >Sync Server</MudText> *@
 <MudText Typo="Typo.h5" Align="Align.Center" >Server Node Id:@NodeId</MudText>
 
 
+@* 
+<MudText Typo="Typo.body1">This playground is a demo of the <MudLink Underline="Underline.Always" Href="https://github.com/egarim/SyncFramework">SyncFramework</MudLink> created by <MudLink Underline="Underline.Always" Href="https://www.jocheojeda.com">Joche Ojeda</MudLink>.CTO for the companies  <MudLink Underline="Underline.Always" Href="https://www.xari.io">XARI</MudLink> &  <MudLink Underline="Underline.Always" Href="https://www.bitframeworks.com">BIT Frameworks</MudLink> </MudText>
+<MudText Typo="Typo.body1">you can download all the nugets packages to implement your own Synchronization from  <MudLink Underline="Underline.Always" Href="https://www.nuget.org/packages?q=%09BIT.Data.Sync">Nuget.org</MudLink>.Here <MudLink Underline="Underline.Always" Href="https://www.jocheojeda.com">me</MudLink> and <MudLink Underline="Underline.Always" Href="https://xafmarin.com">Javier</MudLink> tal can see a demo on how the playground works </MudText>
 
-<MudText Typo="Typo.body1">This playground is a demo of the <MudLink Underline="Underline.Always" Href="https://github.com/egarim/SyncFramework">SyncFramework</MudLink> created by <MudLink Underline="Underline.Always" Href="https://www.jocheojeda.com">Joche Ojeda</MudLink>  </MudText>
+ *@
 
 <MudText Typo="Typo.h6" Align="Align.Center">Server Deltas</MudText>
+<br>
+<br>
 <MudDataGrid Items="@this.Deltas" Hover="true" Striped="true" Dense="true" MultiSelection="false" Virtualize="true" FixedHeader="true" Height="250px">
     <Columns>
         <PropertyColumn Property="x => x.Key.Identity" Title="Node Identity" />

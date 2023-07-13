@@ -5,7 +5,28 @@
 
 <PageTitle>EfCore Demo</PageTitle>
 
+@*
+<MudText Typo="Typo.body1">This playground is a demo of the <MudLink Underline="Underline.Always" Href="https://github.com/egarim/SyncFramework">SyncFramework</MudLink> created by <MudLink Underline="Underline.Always" Href="https://www.jocheojeda.com">Joche Ojeda</MudLink>.CTO for the companies  <MudLink Underline="Underline.Always" Href="https://www.xari.io">XARI</MudLink> &  <MudLink Underline="Underline.Always" Href="https://www.bitframeworks.com">BIT Frameworks</MudLink> </MudText>
+<MudText Typo="Typo.body1">you can download all the nugets packages to implement your own Synchronization from  <MudLink Underline="Underline.Always" Href="https://www.nuget.org/packages?q=%09BIT.Data.Sync">Nuget.org</MudLink>.Here <MudLink Underline="Underline.Always" Href="https://www.jocheojeda.com">me</MudLink> and <MudLink Underline="Underline.Always" Href="https://xafmarin.com">Javier</MudLink> tal can see a demo on how the playground works </MudText>
 
+ *@
+
+<MudText Typo="Typo.h5" Align="Align.Center">SyncFramework: A Demonstration</MudText>
+
+<br>
+<br>
+<br>
+
+<p>The following presentation is a professional demonstration of the <MudLink Underline="Underline.Always" Target="_blank" Href="https://github.com/egarim/SyncFramework">SyncFramework</MudLink> for Entity Framework Core, developed by <MudLink Target="_blank" Underline="Underline.Always" Href="https://www.jocheojeda.com">Joche Ojeda</MudLink>, who currently holds the position of Chief Technology Officer (CTO) at the esteemed firms <MudLink Underline="Underline.Always" Target="_blank" Href="https://www.xari.io">XARI</MudLink> and <MudLink Underline="Underline.Always" Target="_blank" Href="https://www.bitframeworks.com">BIT Frameworks</MudLink>.</p>
+
+<p>
+    All required NuGet packages for implementing your personalized synchronization are readily available for download at <MudLink Target="_blank" Underline="Underline.Always" Href="https://www.nuget.org/packages?q=%09BIT.Data.Sync">Nuget.org</MudLink>.
+    <br>
+    In the associated <MudLink Target="_blank" Underline="Underline.Always" Href="https://youtu.be/JqjGvcbIUzQ">video tutorial</MudLink> tutorial, my colleague <MudLink Target="_blank" Underline="Underline.Always" Href="https://xafmarin.com">Javier</MudLink> and <MudLink Target="_blank" Underline="Underline.Always" Href="https://www.jocheojeda.com">I</MudLink> will provide an in-depth explanation of the SyncFramework playground's operations.
+</p>
+<br>
+<br>
+<br>
 <SyncServerComponent DeltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
 <MudStack Row="true">
     <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddClientNode">Add client node</MudButton>
@@ -13,22 +34,25 @@
     <MudButton StartIcon="@Icons.Material.Filled.FileDownload" Color="Color.Primary" OnClick="DownloadAllDatabases">Download all databases</MudButton>
 </MudStack>
 
+
 <MudStack Row="true">
     <MudCheckBox Label="Postgres" @bind-Checked="@Postgres" />
     <MudCheckBox Label="MySql" @bind-Checked="@MySql" />
     <MudCheckBox Label="SqlServer" @bind-Checked="@SqlServer" />
 </MudStack>
-
-
-
-
+<MudText Typo="Typo.body1">Additional delta generators (check them to generate deltas compatible with other databases)</MudText>
+<br>
+<br>
 <MudText Typo="Typo.h5" Align="Align.Center">Client Nodes</MudText>
+<br>
+<br>
 <MudStack>
     @foreach (var item in this.ClientNodes)
     {
+        <br>
         <ClientNodeComponent item="@item"></ClientNodeComponent>
     }
- 
+
 </MudStack>
 
 <MudScrollToTop>
