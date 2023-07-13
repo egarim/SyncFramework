@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 using SyncFramework.Playground.EfCore;
+using System;
 using System.Text;
 using static MudBlazor.CategoryTypes;
 
@@ -16,11 +17,13 @@ namespace SyncFramework.Playground.Shared
         public IClientNodeInstance item { get; set; }
         [Inject]
         public IJSRuntime js { get; set; }
+        public MudBlazor.Color Color { get; set; }
         protected async override void OnInitialized()
         {
             base.OnInitialized();
             item.RefreshAction= Refresh;
             item.ShowMessage = ShowMessage;
+            this.Color=GetRandomEnumValue<MudBlazor.Color>();
             await item.Init();
             
            
@@ -29,7 +32,14 @@ namespace SyncFramework.Playground.Shared
         {
             Snackbar.Add(Message, Severity.Success);
         }
-        public async void EditPhone(IPhoneNumber phone)
+        private static readonly Random random = new Random();
+        public static T GetRandomEnumValue<T>()
+        {
+            var values = Enum.GetValues(typeof(T)).Cast<T>();
+            return values.ElementAt(random.Next(values.Count()));
+        }
+        
+        public async Task EditPhone(IPhoneNumber phone)
         {
             
             var parameters = new DialogParameters<IPhoneNumber>
@@ -44,9 +54,7 @@ namespace SyncFramework.Playground.Shared
             {
                 var UpdatedPhoneNumber = result.Data as IPhoneNumber;
                 await this.item.UpdatePhone(UpdatedPhoneNumber);
-                //In a real world scenario we would reload the data from the source here since we "removed" it in the dialog already.
-                //Guid.TryParse(result.Data.ToString(), out Guid deletedServer);
-                //Servers.RemoveAll(item => item.Id == deletedServer);
+             
             }
         }
         public async void PreviewDelta(string Delta)
@@ -74,11 +82,9 @@ namespace SyncFramework.Playground.Shared
             await FileUtil.SaveAs(js, $"{Delta.Key.Index}.json", byteArray);
 
         }
-        public async void EditPerson(IPerson Person)
+        public async Task EditPerson(IPerson Person)
         {
-            //var options = new DialogOptions { CloseOnEscapeKey = true, Position = DialogPosition.Center, CloseButton=true };
-            //DialogService.Show<EditPersonComponent>("Edit Person", options);
-
+           
             var parameters = new DialogParameters<IPerson>
             {
                 { "Person", Person }
@@ -91,14 +97,23 @@ namespace SyncFramework.Playground.Shared
             {
                 var UpdatedPerson= result.Data as IPerson;
                 await this.item.UpdatePerson(UpdatedPerson);
-                //In a real world scenario we would reload the data from the source here since we "removed" it in the dialog already.
-                //Guid.TryParse(result.Data.ToString(), out Guid deletedServer);
-                //Servers.RemoveAll(item => item.Id == deletedServer);
+              
             }
         }
         void Refresh()
         {
             this.StateHasChanged();
+
+        }
+        public async Task AddPerson()
+        {
+            await EditPerson(new Person());
+           
+        }
+        public async Task AddPhone()
+        {
+
+            await EditPhone(new PhoneNumber() { Person=this.item.SelectedPerson as Person });
 
         }
     }

@@ -17,28 +17,33 @@
 }
 else
 {
+   
     <MudCard>
         <MudCardHeader>
             <CardHeaderContent>
-                <MudText Typo="Typo.h6">@item.Id</MudText>
+                <MudText Typo="Typo.h5" Align="Align.Left" Color="Color.Primary">CLIENT ID:@item.Id</MudText>
             </CardHeaderContent>
             <CardHeaderActions>
-                <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+                <MudIconButton Icon="@Icons.Material.Filled.LaptopMac" Color="@Color" />
             </CardHeaderActions>
         </MudCardHeader>
         <MudCardContent>
-            <MudText>Delta count @item.DeltaCount</MudText>
-            <MudForm>
-                <MudTextField @bind-Value="@item.PersonName" Label="Blog Name" />
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>item.AddPerson(item.PersonName))">Add</MudButton>
-            </MudForm>
-           
-             <MudStack>
-                <MudStack Row="true" AlignItems="AlignItems.Stretch">
+            <MudText Typo="Typo.h6" Align="Align.Left" Color="Color.Warning">DELTA COUNT: @item.DeltaCount</MudText>
+            <MudButton StartIcon="@Icons.Material.Filled.Refresh"       Color="Color.Success" OnClick="@(()=>item.ReloadData())">Reload Data</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.ArrowUpward"   Color="Color.Primary" OnClick="@(()=>item.Push())">Push Deltas</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.ArrowDownward" Color="Color.Tertiary" OnClick="@(()=>item.Pull())">Pull Deltas</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.DeleteForever" Color="Color.Error" OnClick="@(()=>item.PurgeDeltas())">Purge Deltas</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.SaveAlt"       Color="Color.Info" OnClick="@(()=>item.DownloadFile())">Download Databases</MudButton>
+             <MudStack Row="true" AlignItems="AlignItems.Stretch">
                  <MudDataGrid Virtualize="true" FixedHeader="true" Height="250px" Items="@item.People" @bind-SelectedItem="@item.SelectedPerson" Hover="true" Striped="true" Dense="true" MultiSelection="false">
-                        <Columns>
-                            <PropertyColumn Property="x => x.FirstName" Title="First Name" />
-                            <PropertyColumn Property="x => x.LastName" Title="Last Name" />
+                    <ToolBarContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center">Contacts</MudText>
+                        <MudSpacer />
+                        <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="AddPerson" />
+                    </ToolBarContent>
+                    <Columns>
+                            <PropertyColumn Property="x => x.FirstName" Title="Name" />
+                            <PropertyColumn Property="x => x.LastName" Title="Lastname" />
                             <TemplateColumn CellClass="d-flex justify-end">
                                 <CellTemplate>
                                     <MudStack Row>
@@ -50,6 +55,11 @@ else
                      </Columns>
                  </MudDataGrid>
                  <MudDataGrid Virtualize="true" FixedHeader="true" Height="250px" Items="@item.PhoneNumbers" Hover="true" Striped="true" Dense="true" MultiSelection="false">
+                 <ToolBarContent>
+                     <MudText Typo="Typo.h6" Align="Align.Center">Phones</MudText>
+                     <MudSpacer />
+                     <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="AddPhone" />
+                 </ToolBarContent>
                      <Columns>
                          <PropertyColumn Property="x => x.Number" Title="Number" />
                          <TemplateColumn CellClass="d-flex justify-end">
@@ -63,6 +73,10 @@ else
                      </Columns>
                  </MudDataGrid>
                  <MudDataGrid Virtualize="true" FixedHeader="true" Height="250px" Items="@item.Deltas" Hover="true" Striped="true" Dense="true" MultiSelection="false">
+                      <ToolBarContent>
+                        <MudText Typo="Typo.h6" Align="Align.Center">Deltas</MudText>
+                        <MudSpacer />
+                    </ToolBarContent>
                      <Columns>
                          <PropertyColumn Property="x => x.Key.Epoch" Title="Epoch" />
                          <PropertyColumn Property="x => x.Key.Date" Title="Date" />
@@ -84,18 +98,11 @@ else
                  </MudDataGrid>
              </MudStack>
             
-            </MudStack>
+          
       
         </MudCardContent>
         <MudCardActions>
-            <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
-             <MudButton StartIcon="@Icons.Material.Filled.Refresh" Color="Color.Success" OnClick="@(()=>item.ReloadData())">Reload Data</MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.ArrowUpward" OnClick="@(()=>item.Push())">Push Deltas</MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.ArrowDownward" OnClick="@(()=>item.Pull())">Pull Deltas</MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.DeleteForever" OnClick="@(()=>item.PurgeDeltas())">Purge Deltas</MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.SaveAlt" OnClick="@(()=>item.DownloadFile())">Download Databases</MudButton>
-            </MudButtonGroup>
-
+           
         </MudCardActions>
     </MudCard>
 }

@@ -44,7 +44,11 @@ namespace SyncFramework.Playground.Pages
         protected override void OnInitialized()
         {
             base.OnInitialized();
-            ServerDeltaStore = new MemoryDeltaStore();
+            //DbContextOptionsBuilder ServerDbContextOptions = new DbContextOptionsBuilder();
+            //var ServerCnx = $"Data Source=Server_Deltas.db";
+            //ServerDbContextOptions.UseSqlite(ServerCnx);
+            //EfDeltaStore efDeltaStore = new EfDeltaStore(new DeltaDbContext(ServerDbContextOptions.Options));
+            ServerDeltaStore =new MemoryDeltaStore();
             NodeId = "MainServer";
             //Subscribe Component to Specific Message
             Bus.Subscribe<object>(RefreshDeltaCount);
@@ -68,7 +72,29 @@ namespace SyncFramework.Playground.Pages
         public bool Sqlite { get; set; } = true;
         public bool SqlServer { get; set; } = true;
         public bool MySql { get; set; } = true;
-        private async void AddClientNode()
+        private async void DownloadAllDatabases()
+        {
+            Dictionary<string, byte[]> files = new Dictionary<string, byte[]>();
+            string DataFileName = "";
+            string DeltaFileName = "";
+            foreach (IClientNodeInstance clientNodeInstance in this.clientNodes)
+            {
+                DataFileName = $"{clientNodeInstance.Id}_Data.db";
+                DeltaFileName = $"{clientNodeInstance.Id}_Deltas.db";
+                var DataDbBytes = File.ReadAllBytes(DataFileName);
+                var DeltasDbBytes = File.ReadAllBytes(DeltaFileName);
+                files.Add(DataFileName, DataDbBytes);
+                files.Add(DeltaFileName, DeltasDbBytes);
+            }
+            //var ServerDeltasBytes = File.ReadAllBytes("Server_Deltas.db");
+            //files.Add(DataFileName, ServerDeltasBytes);
+
+
+
+            var zipBytes = FileUtil.CreateZipFromByteArrays(files);
+            await FileUtil.SaveAs(js, $"SyncFrameworkPlayGround.zip", zipBytes);
+        }
+            private async void AddClientNode()
         {
             NodeCount++;
             string DbName = $"ClientNode_{NodeCount}";

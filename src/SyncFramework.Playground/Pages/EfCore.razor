@@ -8,8 +8,9 @@
 
 <SyncServerComponent DeltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
 <MudStack Row="true">
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="AddClientNode">Add client node</MudButton>
+    <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddClientNode">Add client node</MudButton>
     <MudCheckBox Label="Generate Random Data" @bind-Checked="@GenerateRandomData" />
+    <MudButton StartIcon="@Icons.Material.Filled.FileDownload" Color="Color.Primary" OnClick="DownloadAllDatabases">Download all databases</MudButton>
 </MudStack>
 
 <MudStack Row="true">
@@ -21,7 +22,7 @@
 
 
 
-
+<MudText Typo="Typo.h5" Align="Align.Center">Client Nodes</MudText>
 <MudStack>
     @foreach (var item in this.ClientNodes)
     {

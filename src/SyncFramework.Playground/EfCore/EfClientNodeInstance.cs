@@ -149,7 +149,7 @@ namespace SyncFramework.Playground.EfCore
         public string PersonName { get; set; }
         public int DeltaCount { get; set; }
         public BlazorComponentBus.ComponentBus Bus { get; set; }
-        IPerson selectedPerson;
+        public IPerson selectedPerson;
         private ContactsDbContext dbContext;
         string dataConnectionString;
         string deltaConnectionString;
@@ -248,6 +248,8 @@ namespace SyncFramework.Playground.EfCore
             }
         }
 
+   
+
         public async Task Pull()
         {
             await DbContext.PullAsync();
@@ -265,10 +267,18 @@ namespace SyncFramework.Playground.EfCore
         public async Task UpdatePerson(IPerson person)
         {
             var PersonToUpdate= await this.DbContext.Persons.FindAsync(person.Id);
-            PersonToUpdate.FirstName = person.FirstName;
-            PersonToUpdate.LastName = person.LastName;
+            if(PersonToUpdate==null)
+            {
+                PersonToUpdate= this.DbContext.Persons.Add(new Person { FirstName = person.FirstName, LastName = person.LastName }).Entity;
+            }
+            else
+            {
+                PersonToUpdate.FirstName = person.FirstName;
+                PersonToUpdate.LastName = person.LastName;
+            }
+          
                
-            //this.dbContext.Update(person as Person);
+     
             await this.DbContext.SaveChangesAsync();
             await this.ReloadPeople();
             this.RefreshAction?.Invoke();
@@ -282,6 +292,14 @@ namespace SyncFramework.Playground.EfCore
         public async Task UpdatePhone(IPhoneNumber Phone)
         {
             var PhoneToUpdate = await this.DbContext.Phones.FindAsync(Phone.Id);
+            if(PhoneToUpdate==null)
+            {
+                PhoneToUpdate = this.DbContext.Phones.Add(new PhoneNumber { Number = Phone.Number, Person = this.SelectedPerson as Person }).Entity;
+            }
+            else
+            {
+                PhoneToUpdate.Number = Phone.Number;
+            }
             PhoneToUpdate.Number = Phone.Number;
 
             
