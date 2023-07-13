@@ -48,6 +48,10 @@ Target Framework net6.0
 - EfCore Implementation for Sqlite https://www.nuget.org/packages/BIT.Data.Sync.EfCore.Sqlite/
 - EfCore Implementation for MsSqlServer https://www.nuget.org/packages/BIT.Data.Sync.EfCore.SqlServer/
 
+## Playground
+Chcke our new playground demo here
+
+https://syncframework.jocheojeda.com/
 
 
 ## Getting started
