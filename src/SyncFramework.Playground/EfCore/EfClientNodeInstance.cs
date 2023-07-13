@@ -287,9 +287,13 @@ namespace SyncFramework.Playground.EfCore
             this.RefreshAction?.Invoke();
         }
 
-        public Task RemovePhone(IPhoneNumber person)
+        public async Task RemovePhone(IPhoneNumber PhoneNumber)
         {
-            throw new NotImplementedException();
+            var Person = PhoneNumber.Person;
+            this.DbContext.Phones.Remove(PhoneNumber as PhoneNumber);
+            await this.DbContext.SaveChangesAsync();
+            this.SelectedPersonChange(Person);
+            this.RefreshAction?.Invoke();
         }
 
         public async Task UpdatePhone(IPhoneNumber Phone)

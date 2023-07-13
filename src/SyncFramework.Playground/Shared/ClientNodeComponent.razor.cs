@@ -104,6 +104,10 @@ namespace SyncFramework.Playground.Shared
         {
             await item.RemovePerson(Person);
         }
+        public async Task RemovePhoneNumber(IPhoneNumber phoneNumber)
+        {
+            await item.RemovePhone(phoneNumber);
+        }
         void Refresh()
         {
             this.StateHasChanged();
