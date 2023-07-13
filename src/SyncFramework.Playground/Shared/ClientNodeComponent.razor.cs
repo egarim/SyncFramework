@@ -100,6 +100,10 @@ namespace SyncFramework.Playground.Shared
               
             }
         }
+        public async Task RemovePerson(IPerson Person)
+        {
+            await item.RemovePerson(Person);
+        }
         void Refresh()
         {
             this.StateHasChanged();

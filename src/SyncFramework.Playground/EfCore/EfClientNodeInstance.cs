@@ -259,9 +259,12 @@ namespace SyncFramework.Playground.EfCore
 
         }
 
-        public Task RemovePerson(IPerson person)
+        public async Task RemovePerson(IPerson person)
         {
-            throw new NotImplementedException();
+            this.DbContext.Persons.Remove(person as Person);
+            await this.DbContext.SaveChangesAsync();
+            await this.ReloadPeople();
+            this.RefreshAction?.Invoke();
         }
 
         public async Task UpdatePerson(IPerson person)
