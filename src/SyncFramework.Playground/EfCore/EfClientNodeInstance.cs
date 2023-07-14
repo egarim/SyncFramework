@@ -49,7 +49,7 @@ namespace SyncFramework.Playground.EfCore
         public async Task Init()
         {
             await Task.Delay(TimeSpan.FromMilliseconds(100));
-            await InitCore();
+            await InitDbContext();
             //Delete the database if it exists
             await DbContext.Database.EnsureDeletedAsync();
             //Create the database with the sqlite connection
@@ -60,16 +60,17 @@ namespace SyncFramework.Playground.EfCore
                 var Persons = GetPerson(3);
                 DbContext.AddRange(Persons);
                 await DbContext.SaveChangesAsync();
+                await ReloadPeople();
+                this.SelectedPerson = this.People.FirstOrDefault();
             }
 
-            await ReloadPeople();
-
+          
             IsLoading = false;
-            this.SelectedPerson = this.People.FirstOrDefault();
+           
             this.RefreshAction?.Invoke();
         }
 
-        private async Task InitCore()
+        private async Task InitDbContext()
         {
             ServiceCollection serviceCollection = new ServiceCollection();
             deltaConnectionString = $"Data Source={DbName}_Deltas.db";
@@ -94,7 +95,7 @@ namespace SyncFramework.Playground.EfCore
 
         private async Task ReloadPeople()
         {
-            await InitCore();
+            await InitDbContext();
             People.Clear();
             List<Person> people = await DbContext.Persons.ToListAsync();
             foreach (Person person in people)
