@@ -36,10 +36,10 @@ namespace BIT.Data.Sync.Imp
             cancellationToken.ThrowIfCancellationRequested();
             foreach (IDelta delta in deltas)
             {
+                await SetDeltaIndex(delta);
                 cancellationToken.ThrowIfCancellationRequested();
                 Delta item = new Delta(delta);
-                item.Index = await sequenceService.GenerateNextSequenceAsync();
-                delta.Index=item.Index;
+                item.Index = delta.Index;
                 Deltas.Add(item);
             }
            

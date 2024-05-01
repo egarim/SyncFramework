@@ -124,15 +124,17 @@ namespace BIT.Data.Sync.Xpo.DeltaStore
             cancellationToken.ThrowIfCancellationRequested();
             foreach (IDelta delta in deltas)
             {
+                await SetDeltaIndex(delta);
                 XpoDelta entity = new XpoDelta(UoW);
                 entity.Identity = delta.Identity;
                 entity.Index = delta.Index;
                 entity.Operation = delta.Operation;
                 entity.Epoch = delta.Epoch;
                 entity.Date = delta.Date;
-                entity.Index = await sequenceService.GenerateNextSequenceAsync();
-                delta.Index=entity.Index;
-            
+                entity.Index = delta.Index;
+
+
+
             }
             await UoW.CommitChangesAsync(cancellationToken).ConfigureAwait(false);
         }

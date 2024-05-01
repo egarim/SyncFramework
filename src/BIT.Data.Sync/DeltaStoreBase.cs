@@ -15,10 +15,7 @@ namespace BIT.Data.Sync
         {
             this.sequenceService = sequenceService;
         }
-        //protected DeltaStoreBase()
-        //{
-
-        //}
+      
         protected virtual string GuardStartIndex(string startIndex)
         {
             if (startIndex == null)
@@ -30,7 +27,10 @@ namespace BIT.Data.Sync
                 return startIndex;
             }
         }
-
+        protected virtual async Task SetDeltaIndex(IDelta delta)
+        {
+            delta.Index = await sequenceService.GenerateNextSequenceAsync();
+        }
         public abstract Task SaveDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken = default);
 
         public abstract Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string startIndex, string identity, CancellationToken cancellationToken = default);

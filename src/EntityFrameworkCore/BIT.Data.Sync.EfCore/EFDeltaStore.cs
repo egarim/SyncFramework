@@ -44,8 +44,9 @@ namespace BIT.EfCore.Sync
             cancellationToken.ThrowIfCancellationRequested();
             foreach (IDelta delta in deltas)
             {
+                await SetDeltaIndex(delta);
                 EfDelta entity = new EfDelta(delta);
-                entity.Index= await sequenceService.GenerateNextSequenceAsync();
+               
                 DeltaDbContext.Deltas.Add(entity);
             }
             await DeltaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
