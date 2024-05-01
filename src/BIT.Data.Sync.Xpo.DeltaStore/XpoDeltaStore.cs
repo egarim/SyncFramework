@@ -71,8 +71,8 @@ namespace BIT.Data.Sync.Xpo.DeltaStore
             cancellationToken.ThrowIfCancellationRequested();
             var UoW = GetUnitOfWork();
             IQueryable<XpoDelta> result = UoW.Query<XpoDelta>().Where(d => d.Index.CompareTo(startIndex) > 0 && d.Identity != identity);
-           var eFDeltas = result.ToList();
-            return await Task.FromResult(eFDeltas.Cast<IDelta>()).ConfigureAwait(false);
+           var Deltas = result.ToList();
+            return await Task.FromResult(Deltas.Cast<IDelta>()).ConfigureAwait(false);
         }
 
         public override async Task<string> GetLastProcessedDeltaAsync(string identity, CancellationToken cancellationToken = default)
@@ -101,7 +101,7 @@ namespace BIT.Data.Sync.Xpo.DeltaStore
         {
             var UoW = GetUnitOfWork();
             cancellationToken.ThrowIfCancellationRequested();
-            var deltas = UoW.Query<XpoDelta>().Where(d => d.Identity == identity);
+            var deltas = UoW.Query<XpoDelta>().Where(d => d.Identity == identity).ToList();
             UoW.Delete(deltas);
             await UoW.CommitChangesAsync(cancellationToken).ConfigureAwait(false);
         }
@@ -131,6 +131,7 @@ namespace BIT.Data.Sync.Xpo.DeltaStore
                 entity.Epoch = delta.Epoch;
                 entity.Date = delta.Date;
                 entity.Index = await sequenceService.GenerateNextSequenceAsync();
+                delta.Index=entity.Index;
             
             }
             await UoW.CommitChangesAsync(cancellationToken).ConfigureAwait(false);

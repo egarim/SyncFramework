@@ -43,18 +43,18 @@ namespace BIT.Data.Sync.Xpo.DeltaStore.Tests
                 IDeltaStore DeltaStore = GetDeltaStore();
 
                 var DeltaHello = DeltaStore.CreateDelta("A", "Hello");
-
+                DeltaStore.SaveDeltasAsync(new List<IDelta>() { DeltaHello }, default).Wait();
                 await DeltaStore.SetLastProcessedDeltaAsync(DeltaHello.Index, "A", default);
 
                 var actual = await DeltaStore.GetLastProcessedDeltaAsync("A", default);
-                Assert.AreEqual(DeltaHello.Index, actual);
+                 Assert.AreEqual(DeltaHello.Index, actual);
 
             }
 
             [Test]
             public async Task GetDeltasAsync_Test()
             {
-                IDeltaStore memoryDeltaStore = new MemoryDeltaStore(new List<IDelta>());
+                IDeltaStore memoryDeltaStore =GetDeltaStore();
 
                 var DeltaHello = memoryDeltaStore.CreateDelta("A", "Hello");
                 var DeltaWorld = memoryDeltaStore.CreateDelta("A", "World");
@@ -70,14 +70,14 @@ namespace BIT.Data.Sync.Xpo.DeltaStore.Tests
             [Test]
             public async Task PurgeDeltasAsync_Test()
             {
-                MemoryDeltaStore memoryDeltaStore = new MemoryDeltaStore();
+                IDeltaStore deltaStore = GetDeltaStore();
 
-                var DeltaHello = memoryDeltaStore.CreateDelta("A", "Hello");
+                var DeltaHello = deltaStore.CreateDelta("A", "Hello");
 
-                await memoryDeltaStore.SaveDeltasAsync(new List<IDelta>() { DeltaHello });
+                await deltaStore.SaveDeltasAsync(new List<IDelta>() { DeltaHello }, default);
 
-                await memoryDeltaStore.PurgeDeltasAsync("");
-                Assert.AreEqual(0, await memoryDeltaStore.GetDeltaCountAsync(string.Empty, ""));
+                await deltaStore.PurgeDeltasAsync("A");
+                Assert.AreEqual(0, await deltaStore.GetDeltaCountAsync(string.Empty, "A", default));
 
             }
         }
