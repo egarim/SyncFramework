@@ -27,7 +27,7 @@ namespace BIT.EfCore.Sync
             ) : base(options)
         {
             this.serviceProvider = serviceProvider;
-            this.DeltaProcessor = new EfDeltaProcessor(this);
+            this.DeltaProcessor = new EfDeltaProcessor(this, serviceProvider.GetRequiredService<ISequenceService>());
         }
 
         protected SyncFrameworkDbContext(DbContextOptions options) : base(options)

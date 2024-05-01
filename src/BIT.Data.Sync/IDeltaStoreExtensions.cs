@@ -30,14 +30,15 @@ namespace BIT.Data.Sync
       
         public static IDelta CreateDeltaCore(string Identity, object Operations)
         {
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow;
+           
             var delta = new Delta()
             {
                 Date = now,
                 Identity = Identity,
 
                 Operation = SerializationHelper.CompressCore(SerializationHelper.SerializeCore(Operations)),
-                Index = ""// Delta.GetGuid() TODO fix this after index string change
+            
             };
             delta.Epoch = now.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
             return delta;

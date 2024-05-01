@@ -25,7 +25,7 @@ namespace BIT.Data.Sync.Xpo.DeltaStore
         public Guid Oid
         {
             get => oid;
-            private set => SetPropertyValue(nameof(Oid), ref oid, value);
+            set => SetPropertyValue(nameof(Oid), ref oid, value);
         }
 
         [Size(SizeAttribute.DefaultStringMappingFieldSize)]

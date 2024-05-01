@@ -16,9 +16,8 @@ namespace BIT.Data.Sync.Imp
         readonly IDictionary<string, SyncStatus> _syncStatus;
         string LastPushedDelta;
         //string LastProcessedDelta;
-        //TODO pass this in the constructor or add dependency injection
-        MemorySequenceService sequenceService = new MemorySequenceService(new YearSequencePrefixStrategy());
-        public MemoryDeltaStore(IEnumerable<IDelta> Deltas) : base()
+
+        public MemoryDeltaStore(IEnumerable<IDelta> Deltas) : base(new MemorySequenceService(new YearSequencePrefixStrategy()))
         {
             this._Deltas = new List<IDelta>(Deltas);
             this._syncStatus = new Dictionary<string, SyncStatus>();
@@ -33,15 +32,17 @@ namespace BIT.Data.Sync.Imp
         public async override Task SaveDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken = default)
 
         {
-            //TODO Review string index new functionality
+        
             cancellationToken.ThrowIfCancellationRequested();
             foreach (IDelta delta in deltas)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 Delta item = new Delta(delta);
                 item.Index = await sequenceService.GenerateNextSequenceAsync();
+                delta.Index=item.Index;
                 Deltas.Add(item);
             }
+           
         }
 
         public override Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string startIndex, string identity, CancellationToken cancellationToken = default)

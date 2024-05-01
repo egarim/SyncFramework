@@ -13,5 +13,6 @@ namespace BIT.Data.Sync
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>An empty task</returns>
         Task ProcessDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken);
+        ISequenceService SequenceService { get; }
     }
 }

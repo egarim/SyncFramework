@@ -22,11 +22,11 @@ namespace BIT.Data.Sync.EfCore
         string connectionString;
         DbContext _dBContext;
         DbProviderFactory factory;
-        public EfDeltaProcessor(DbContext dBContext) 
+        public EfDeltaProcessor(DbContext dBContext,ISequenceService sequenceService):base(sequenceService)
         {
             _dBContext = dBContext;
         }
-        public EfDeltaProcessor(string connectionstring, string DbEngineAlias, string ProviderInvariantName)
+        public EfDeltaProcessor(string connectionstring, string DbEngineAlias, string ProviderInvariantName, ISequenceService sequenceService) : base(sequenceService)
         {
 
             this.CurrentDbEngine = DbEngineAlias;

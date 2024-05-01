@@ -6,14 +6,32 @@ namespace BIT.Data.Sync.Xpo.DeltaStore
     public class XpoDeltaStore: DeltaStoreBase
     {
         public IDataLayer dataLayer { get; set; }
-        protected XpoDeltaStore()
+        protected XpoDeltaStore(ISequenceService sequenceService):base(sequenceService)
         {
 
         }
-        public XpoDeltaStore(IDataLayer dataLayer)
+        public XpoDeltaStore(IDataLayer dataLayer, ISequenceService sequenceService, bool initSchema = false) : base(sequenceService)
         {
             this.dataLayer = dataLayer;
+          
+            if (initSchema)
+            {
+                this.InitSchema();
+            }
+
         }
+        void InitSchema()
+        {
+            IDataLayer dl = dataLayer;
+            using (Session session = new Session(dl))
+            {
+                System.Reflection.Assembly[] assemblies = new System.Reflection.Assembly[] {
+                typeof(XpoDelta).Assembly};
+                session.UpdateSchema(assemblies);
+                session.CreateObjectTypeRecords(assemblies);
+            }
+        }
+
         protected virtual UnitOfWork GetUnitOfWork()
         {
             return new UnitOfWork(dataLayer);

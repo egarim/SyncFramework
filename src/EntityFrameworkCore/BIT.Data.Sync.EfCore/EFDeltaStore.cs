@@ -14,26 +14,30 @@ namespace BIT.EfCore.Sync
     public class EfDeltaStore : DeltaStoreBase
     {
         DeltaDbContext DeltaDbContext;
-        public EfDeltaStore(DeltaDbContext DeltaDbContext)
+        public EfDeltaStore(DeltaDbContext DeltaDbContext):base(DeltaDbContext.GetService<ISequenceService>())
         {
             this.DeltaDbContext = DeltaDbContext;
             //HACK TEST remove the comment below to ensure a clean delta database for testing
             //this.DeltaDbContext.Database.EnsureDeleted();
             this.DeltaDbContext.Database.EnsureCreated();
-            this.sequenceService=  DeltaDbContext.GetService<ISequenceService>();
+          
         }
         public EfDeltaStore(DbContextOptionsBuilder<DeltaDbContext> dbContextOptionsBuilder):this(new DeltaDbContext(dbContextOptionsBuilder.Options))
         {
            
             
         }
-        protected EfDeltaStore()
-        {
-            DbContextOptionsBuilder<DeltaDbContext> dbContextOptionsBuilder = new DbContextOptionsBuilder<DeltaDbContext>();
-            dbContextOptionsBuilder.UseInMemoryDatabase("MemoryDb");
-            this.DeltaDbContext = new DeltaDbContext(dbContextOptionsBuilder.Options);
-            this.DeltaDbContext.Database.EnsureCreated();
-        }
+
+
+        //TODO clean up later, constructor not needed
+
+        //protected EfDeltaStore()
+        //{
+        //    DbContextOptionsBuilder<DeltaDbContext> dbContextOptionsBuilder = new DbContextOptionsBuilder<DeltaDbContext>();
+        //    dbContextOptionsBuilder.UseInMemoryDatabase("MemoryDb");
+        //    this.DeltaDbContext = new DeltaDbContext(dbContextOptionsBuilder.Options);
+        //    this.DeltaDbContext.Database.EnsureCreated();
+        //}
      
         public async override Task SaveDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken = default)
         {

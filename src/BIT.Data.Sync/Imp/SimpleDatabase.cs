@@ -23,7 +23,7 @@ namespace BIT.Data.Sync.Imp
             DeltaStore = deltaStore;
             this.Data= Data;
             this.SyncFrameworkClient = syncFrameworkClient;
-            this.DeltaProcessor = new SimpleDatabaseDeltaProcessor(this.Data);
+            this.DeltaProcessor = new SimpleDatabaseDeltaProcessor(this.Data, deltaStore.SequenceService);
             this.EnableDeltaTracking = EnableDeltaTracking;
             
         

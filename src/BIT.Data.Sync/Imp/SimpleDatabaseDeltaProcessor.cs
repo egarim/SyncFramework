@@ -11,7 +11,7 @@ namespace BIT.Data.Sync.Imp
     {
         
         List<SimpleDatabaseRecord> _CurrentData;
-        public SimpleDatabaseDeltaProcessor(List<SimpleDatabaseRecord> CurrentData) 
+        public SimpleDatabaseDeltaProcessor(List<SimpleDatabaseRecord> CurrentData,ISequenceService sequenceService) : base(sequenceService)
         {
             _CurrentData= CurrentData;
         }

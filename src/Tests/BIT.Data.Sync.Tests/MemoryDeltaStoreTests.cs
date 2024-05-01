@@ -53,8 +53,9 @@ namespace BIT.Data.Sync.Tests
 
             var DeltaHello = memoryDeltaStore.CreateDelta("A", "Hello");
             var DeltaWorld = memoryDeltaStore.CreateDelta("A", "World");
-            
-            await memoryDeltaStore.SaveDeltasAsync(new List<IDelta>() { DeltaHello , DeltaWorld }, default);
+
+            List<IDelta> deltas = new List<IDelta>() { DeltaHello, DeltaWorld };
+            await memoryDeltaStore.SaveDeltasAsync(deltas, default);
 
             IEnumerable<IDelta> DeltasFromStore = await memoryDeltaStore.GetDeltasAsync(string.Empty, default);
            

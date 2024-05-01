@@ -11,10 +11,14 @@ namespace BIT.Data.Sync
         protected ISequenceService sequenceService;
         public ISequenceService SequenceService => sequenceService;
 
-        protected DeltaStoreBase()
+        public DeltaStoreBase(ISequenceService sequenceService)
         {
-
+            this.sequenceService = sequenceService;
         }
+        //protected DeltaStoreBase()
+        //{
+
+        //}
         protected virtual string GuardStartIndex(string startIndex)
         {
             if (startIndex == null)

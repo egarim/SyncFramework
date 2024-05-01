@@ -1,4 +1,15 @@
-﻿## version 7.0.3.2
+﻿## version BIT.Data.Sync 1.0.3
+- IDelta now has a read and write index property
+string Index { get; set; }
+
+- DeltaStoreBase now requires the sequence service as part of the constructor
+
+- IDeltaProcessor  now has a read only property for SequenceService 
+ISequenceService SequenceService { get; }
+
+- IDeltaStoreExtensions CreateDeltaCore save the delta creationdate on UTC
+
+## version 7.0.3.2
     -Added extension AddSyncFrameworkForMysql
     -Added extension AddSyncFrameworkForNpgsql
     -Added extension AddSyncFrameworkForSqlite

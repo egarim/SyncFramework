@@ -17,7 +17,7 @@ namespace BIT.Data.Sync
         /// <summary>
         /// The unique identifier of the delta
         /// </summary>
-        string Index { get; }
+        string Index { get; set; }
         /// <summary>
         /// The database transaction(s) that represents this delta
         /// </summary>

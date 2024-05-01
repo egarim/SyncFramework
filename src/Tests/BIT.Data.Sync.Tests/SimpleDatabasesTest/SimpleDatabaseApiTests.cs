@@ -6,7 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Microsoft.Extensions.DependencyInjection;
 namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
 {
     public class SimpleDatabaseApiTests : MultiServerBaseTest
@@ -36,7 +36,7 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
 
             //3- Creating database A
             SimpleDatabase A_Database = new SimpleDatabase("A", syncFrameworkClient);
-            SimpleDatabaseDeltaProcessor A_DeltaProcessor = new SimpleDatabaseDeltaProcessor(A_Database.Data);
+            SimpleDatabaseDeltaProcessor A_DeltaProcessor = new SimpleDatabaseDeltaProcessor(A_Database.Data,new MemorySequenceService(new YearSequencePrefixStrategy()));
 
             //4- Create data and save it on database A
             SimpleDatabaseRecord Hola = new SimpleDatabaseRecord() { Key = Guid.NewGuid(), Text = "Hola" };
