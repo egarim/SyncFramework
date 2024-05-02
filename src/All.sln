@@ -39,9 +39,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "templatepack", "templates\templatepack.csproj", "{481C40F7-96C2-4CFD-B1DE-1CC1DB95EBE9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Xpo", "Xpo", "{48E9D6A4-FE8C-4C3E-902C-93A4DCE4D686}"
-	ProjectSection(SolutionItems) = preProject
-		BIT.Data.Sync\LICENSE.txt = BIT.Data.Sync\LICENSE.txt
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIT.Data.Sync.Xpo.DeltaStore", "BIT.Data.Sync.Xpo.DeltaStore\BIT.Data.Sync.Xpo.DeltaStore.csproj", "{FD80FF17-9917-42C9-AD0B-FA79CF328C48}"
 EndProject
