@@ -1,4 +1,6 @@
-﻿## version BIT.Data.Sync 1.0.3
+﻿Implemented SetLastPushedDeltaAsync on  XpoDeltaStore
+
+## version BIT.Data.Sync 1.0.3
 - IDelta now has a read and write index property
 string Index { get; set; }
 

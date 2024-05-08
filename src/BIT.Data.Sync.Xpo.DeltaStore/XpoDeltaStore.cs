@@ -159,9 +159,24 @@ namespace BIT.Data.Sync.Xpo.DeltaStore
             await UoW.CommitChangesAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        public override Task SetLastPushedDeltaAsync(string Index, string identity, CancellationToken cancellationToken = default)
+        public override async Task SetLastPushedDeltaAsync(string Index, string identity, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            cancellationToken.ThrowIfCancellationRequested();
+            var UoW = GetUnitOfWork();
+            var CurrentDeltaIndex = await UoW.Query<XpoSyncStatus>().FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
+        
+            if (CurrentDeltaIndex == null)
+            {
+                CurrentDeltaIndex = new XpoSyncStatus(UoW)
+                {
+                    Identity = identity
+                };
+                UoW.CommitChanges();
+            }
+
+            CurrentDeltaIndex.LastPushedDelta = Index;
+
+            
         }
     }
 }
