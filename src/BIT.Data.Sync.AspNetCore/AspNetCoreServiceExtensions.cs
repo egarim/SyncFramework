@@ -1,4 +1,5 @@
-﻿using BIT.Data.Sync.Imp;
+﻿using BIT.Data.Sync;
+using BIT.Data.Sync.Imp;
 using BIT.Data.Sync.Server;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -16,6 +17,12 @@ namespace Microsoft.AspNetCore.Builder
         public static IServiceCollection AddSyncServerWithMemoryNode(this IServiceCollection serviceCollection, string NodeId)
         {
             SyncServerNode syncServerNode = new SyncServerNode(new MemoryDeltaStore(), null, NodeId);
+            serviceCollection.AddSingleton<ISyncServer>(new SyncServer(syncServerNode));
+            return serviceCollection;
+        }
+        public static IServiceCollection AddSyncServerWithDeltaStoreNode(this IServiceCollection serviceCollection,IDeltaStore  deltaStore ,string NodeId)
+        {
+            SyncServerNode syncServerNode = new SyncServerNode(deltaStore, null, NodeId);
             serviceCollection.AddSingleton<ISyncServer>(new SyncServer(syncServerNode));
             return serviceCollection;
         }

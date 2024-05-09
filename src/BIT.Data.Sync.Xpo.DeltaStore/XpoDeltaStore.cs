@@ -14,6 +14,7 @@ namespace BIT.Data.Sync.Xpo.DeltaStore
         {
             this.dataLayer = dataLayer;
           
+            
             if (initSchema)
             {
                 this.InitSchema();
@@ -81,7 +82,7 @@ namespace BIT.Data.Sync.Xpo.DeltaStore
             cancellationToken.ThrowIfCancellationRequested();
             var CurrentDeltaIndex = await UoW.Query<XpoSyncStatus>().FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
             if (CurrentDeltaIndex == null)
-                return string.Empty;
+                return "-1";
             else
                 return CurrentDeltaIndex.LastProcessedDelta;
         }
@@ -92,7 +93,7 @@ namespace BIT.Data.Sync.Xpo.DeltaStore
             cancellationToken.ThrowIfCancellationRequested();
             var CurrentDeltaIndex = await UoW.Query<XpoSyncStatus>().FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
             if (CurrentDeltaIndex == null)
-                return string.Empty;
+                return "-1";
             else
                 return CurrentDeltaIndex.LastPushedDelta;
         }
