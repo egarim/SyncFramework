@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using SyncFramework.Playground.EfCore;
 
 namespace SyncFramework.Playground.Shared
 {

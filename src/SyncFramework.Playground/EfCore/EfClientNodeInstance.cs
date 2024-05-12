@@ -10,6 +10,8 @@ using Bogus;
 using BIT.Data.Sync.EfCore.Data;
 using System.Diagnostics;
 using System.Text.Json;
+using SyncFramework.Playground.Components.Interfaces;
+using SyncFramework.Playground.Components;
 
 namespace SyncFramework.Playground.EfCore
 {
@@ -314,7 +316,7 @@ namespace SyncFramework.Playground.EfCore
 
 
             await this.DbContext.SaveChangesAsync();
-            SelectedPersonChange(PhoneToUpdate.Person);
+            SelectedPersonChange(PhoneToUpdate.Person as IPerson);
             await UpdateDeltaCount();
             this.RefreshAction?.Invoke();
         }

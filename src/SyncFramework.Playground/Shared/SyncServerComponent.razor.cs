@@ -7,8 +7,9 @@ using Microsoft.AspNetCore.Components;
 using System.Text.Json;
 using System.Text;
 using MudBlazor;
-using SyncFramework.Playground.EfCore;
 using Microsoft.JSInterop;
+using SyncFramework.Playground.Components;
+using SyncFramework.Playground.Components.Interfaces;
 
 namespace SyncFramework.Playground.Shared
 {

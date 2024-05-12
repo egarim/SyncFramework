@@ -2,7 +2,7 @@
 using BlazorComponentBus;
 using Microsoft.JSInterop;
 
-namespace SyncFramework.Playground.EfCore
+namespace SyncFramework.Playground.Components.Interfaces
 {
     public interface IClientNodeInstance
     {
@@ -14,10 +14,10 @@ namespace SyncFramework.Playground.EfCore
         string PersonName { get; set; }
         List<IPhoneNumber> PhoneNumbers { get; set; }
         List<IPerson> People { get; set; }
-  
+
         bool IsLoading { get; set; }
         public Action RefreshAction { get; set; }
-        public Dictionary<IDelta,string> Deltas { get; }
+        public Dictionary<IDelta, string> Deltas { get; }
         public Action<string> ShowMessage { get; set; }
         Task AddPerson(string personName);
         public Task RemovePerson(IPerson person);
@@ -29,7 +29,7 @@ namespace SyncFramework.Playground.EfCore
         void DownloadFile();
         Task Pull();
         Task Push();
-  
+
         public Task Init();
         void SelectedPersonChange(IPerson Person);
     }

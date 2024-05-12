@@ -1,3 +1,4 @@
+using SyncFramework.Playground.Components.Interfaces;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -13,5 +14,16 @@ namespace SyncFramework.Playground.EfCore
         public string Number { get; set; }
 
         public Person Person { get; set; }
+        IPerson IPhoneNumber.Person
+        {
+            get
+            {
+                return this.Person;
+            }
+            set
+            {
+                this.Person =(Person)value;
+            }
+        }
     }
 }

@@ -1,3 +1,4 @@
+using SyncFramework.Playground.Components.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -17,5 +18,7 @@ namespace SyncFramework.Playground.EfCore
 
 
         public ICollection<PhoneNumber> PhoneNumbers { get; } = new List<PhoneNumber>();
+
+        ICollection<IPhoneNumber> IPerson.PhoneNumbers => PhoneNumbers.Cast<IPhoneNumber>().ToList();
     }
 }

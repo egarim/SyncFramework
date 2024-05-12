@@ -46,6 +46,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SyncFramework.Playground", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIT.Data.Sync.Xpo.DeltaStore.Tests", "BIT.Data.Sync.Xpo.DeltaStore.Tests\BIT.Data.Sync.Xpo.DeltaStore.Tests.csproj", "{BA758AB3-97DA-4F4E-A851-E3DF28357824}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncFramework.Playground.Components", "SyncFramework.Playground.Components\SyncFramework.Playground.Components.csproj", "{70874E0A-4E70-4F90-B6C4-C168143E901D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,6 +133,12 @@ Global
 		{BA758AB3-97DA-4F4E-A851-E3DF28357824}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BA758AB3-97DA-4F4E-A851-E3DF28357824}.ReleaseProduction|Any CPU.ActiveCfg = Release|Any CPU
 		{BA758AB3-97DA-4F4E-A851-E3DF28357824}.ReleaseProduction|Any CPU.Build.0 = Release|Any CPU
+		{70874E0A-4E70-4F90-B6C4-C168143E901D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70874E0A-4E70-4F90-B6C4-C168143E901D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70874E0A-4E70-4F90-B6C4-C168143E901D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70874E0A-4E70-4F90-B6C4-C168143E901D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70874E0A-4E70-4F90-B6C4-C168143E901D}.ReleaseProduction|Any CPU.ActiveCfg = Release|Any CPU
+		{70874E0A-4E70-4F90-B6C4-C168143E901D}.ReleaseProduction|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -147,6 +155,7 @@ Global
 		{FD80FF17-9917-42C9-AD0B-FA79CF328C48} = {48E9D6A4-FE8C-4C3E-902C-93A4DCE4D686}
 		{8715A9DB-76CC-4327-A77C-231C3572F20E} = {434F52BC-B630-459E-83D1-EFA042F88C7E}
 		{BA758AB3-97DA-4F4E-A851-E3DF28357824} = {F659BA38-A2DD-41E9-83E1-2F9658400833}
+		{70874E0A-4E70-4F90-B6C4-C168143E901D} = {434F52BC-B630-459E-83D1-EFA042F88C7E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DE69D0C-01EA-425A-B43E-10A131088EFC}

@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
+using SyncFramework.Playground.Components;
+using SyncFramework.Playground.Components.Interfaces;
 using SyncFramework.Playground.EfCore;
 using System;
 using System.Text;

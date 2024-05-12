@@ -1,7 +1,7 @@
 ﻿using Microsoft.JSInterop;
 using System.IO.Compression;
 
-namespace SyncFramework.Playground
+namespace SyncFramework.Playground.Components
 {
     public static class FileUtil
     {

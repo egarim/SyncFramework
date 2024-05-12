@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+	<TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="BlazorComponentBus" Version="2.2.0" />
+		<PackageReference Include="Bogus" Version="34.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.8" PrivateAssets="all" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="MudBlazor" Version="6.6.0" />
+		<ProjectReference Include="..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
+		<ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Pomelo.MySql\BIT.Data.Sync.EfCore.Pomelo.MySql.csproj" />
+		<ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Sqlite\BIT.Data.Sync.EfCore.Sqlite.csproj" />
+		<ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore.SqlServer\BIT.Data.Sync.EfCore.SqlServer.csproj" />
+		<ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
+		<ProjectReference Include="..\EntityFrameworkCore\NBIT.Data.Sync.EfCore.Npgsql\BIT.Data.Sync.EfCore.Npgsql.csproj" />
+	</ItemGroup>
+</Project>

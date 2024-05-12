@@ -9,7 +9,7 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Web;
 
-namespace SyncFramework.Playground
+namespace SyncFramework.Playground.Components
 {
     public class FakeHandler : HttpMessageHandler
     {

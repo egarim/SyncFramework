@@ -10,13 +10,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using MudBlazor;
+using SyncFramework.Playground.Components;
+using SyncFramework.Playground.Components.Interfaces;
 using SyncFramework.Playground.EfCore;
 using SyncFramework.Playground.Shared;
 using System;
 using System.Net.Http;
 using System.Security.Principal;
 using static MudBlazor.CategoryTypes;
-using Person = SyncFramework.Playground.EfCore.Person;
 
 namespace SyncFramework.Playground.Pages
 {

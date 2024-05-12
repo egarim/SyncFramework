@@ -1,12 +1,12 @@
 using System;
 
-namespace SyncFramework.Playground.EfCore
+namespace SyncFramework.Playground.Components.Interfaces
 {
     public interface IPerson
     {
         string FirstName { get; set; }
         Guid Id { get; set; }
         string LastName { get; set; }
-        ICollection<PhoneNumber> PhoneNumbers { get; }
+        ICollection<IPhoneNumber> PhoneNumbers { get; }
     }
 }
