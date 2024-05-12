@@ -58,7 +58,7 @@ namespace BIT.EfCore.Sync
             cancellationToken.ThrowIfCancellationRequested();
             var CurrentDeltaIndex = await DeltaDbContext.EFSyncStatus.FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
             if (CurrentDeltaIndex == null)
-                return string.Empty;
+                return await this.SequenceService.GetFirstIndexValue();
             else
                 return CurrentDeltaIndex.LastProcessedDelta;
         }
@@ -102,7 +102,7 @@ namespace BIT.EfCore.Sync
             cancellationToken.ThrowIfCancellationRequested();
             var CurrentDeltaIndex = await DeltaDbContext.EFSyncStatus.FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
             if (CurrentDeltaIndex == null)
-                return string.Empty;
+                return await this.SequenceService.GetFirstIndexValue();
             else
                 return CurrentDeltaIndex.LastPushedDelta;
         }
@@ -164,7 +164,6 @@ namespace BIT.EfCore.Sync
         public override async Task<bool> CanRestoreDatabaseAsync(string identity, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            //return await DeltaDbContext.EFSyncStatus.AnyAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
             return await DeltaDbContext.EFSyncStatus.AnyAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
         }
     }

@@ -21,5 +21,9 @@ namespace BIT.Data.Sync
             return await GenerateNextSequenceAsync(sequencePrefixStrategy.GetDefaultPrefix());
         }
 
+        public virtual Task<string> GetFirstIndexValue()
+        {
+            return Task.FromResult("-1");
+        }
     }
 }

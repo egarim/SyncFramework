@@ -18,7 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var LastDeltaIndex = await instance.DeltaStore.GetLastProcessedDeltaAsync(instance.Identity, cancellationToken).ConfigureAwait(false);
             //TODO review functionality CanRestoreDatabaseAsync
             if (!statusExists)
-                return await instance.SyncFrameworkClient.FetchAsync(LastDeltaIndex, string.Empty, cancellationToken).ConfigureAwait(false);
+                return await instance.SyncFrameworkClient.FetchAsync(LastDeltaIndex, instance.Identity, cancellationToken).ConfigureAwait(false);
 
             return await instance.SyncFrameworkClient.FetchAsync(LastDeltaIndex, instance.Identity, cancellationToken).ConfigureAwait(false);
         }
