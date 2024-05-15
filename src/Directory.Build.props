@@ -9,24 +9,19 @@
 
 	<PropertyGroup Label="BIT.Data.Sync">
 		<BitDataSyncNetStandardVersion>net6.0</BitDataSyncNetStandardVersion>
-		<BitDataSyncNugetVersion>1.0.11</BitDataSyncNugetVersion>
+		<BitDataSyncNugetVersion>1.0.12</BitDataSyncNugetVersion>
 	</PropertyGroup>
 	
-	<PropertyGroup Label="BIT.Data.Sync.Xpo.DeltaStore">
-		<BitDataSyncXpoDeltaStoreNugetVersion>1.0.7</BitDataSyncXpoDeltaStoreNugetVersion>
-		<XpoVersion>23.1.3</XpoVersion>
-	</PropertyGroup>
-
 	<PropertyGroup Label="BIT.Data.Sync.EfCore">
-		<EfCoreTargetFramework>net6.0</EfCoreTargetFramework>
-		<EfCoreNugetVersion>7.0.3.2</EfCoreNugetVersion>
-		<EfCoreVersion>7.0.3</EfCoreVersion>
+		<EfCoreTargetFramework>net8.0</EfCoreTargetFramework>
+		<EfCoreNugetVersion>8.0.2.1</EfCoreNugetVersion>
+		<EfCoreVersion>8.0.2</EfCoreVersion>
 	</PropertyGroup>
 	
 	<PropertyGroup Label="BIT.Data.Sync.EfCore.ProvidersVersion">
-		<EfCorePostgresVersion>7.0.3</EfCorePostgresVersion>
-		<EfCorePomeloMysqlVersion>7.0.0</EfCorePomeloMysqlVersion>
-		<EfCoreSqliteVersion>7.0.3</EfCoreSqliteVersion>
-		<EfCoreSqlServerVersion>7.0.3</EfCoreSqlServerVersion>
+		<EfCorePostgresVersion>8.0.4</EfCorePostgresVersion>
+		<EfCorePomeloMysqlVersion>8.0.2</EfCorePomeloMysqlVersion>
+		<EfCoreSqliteVersion>8.0.5</EfCoreSqliteVersion>
+		<EfCoreSqlServerVersion>8.0.5</EfCoreSqlServerVersion>
 	</PropertyGroup>
 </Project>

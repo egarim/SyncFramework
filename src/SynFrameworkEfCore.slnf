@@ -1,0 +1,16 @@
+{
+  "solution": {
+    "path": "All.sln",
+    "projects": [
+      "BIT.Data.Sync.AspNetCore\\BIT.Data.Sync.AspNetCore.csproj",
+      "BIT.Data.Sync\\BIT.Data.Sync.csproj",
+      "EntityFrameworkCore\\BIT.Data.Sync.EfCore.Pomelo.MySql\\BIT.Data.Sync.EfCore.Pomelo.MySql.csproj",
+      "EntityFrameworkCore\\BIT.Data.Sync.EfCore.SqlServer\\BIT.Data.Sync.EfCore.SqlServer.csproj",
+      "EntityFrameworkCore\\BIT.Data.Sync.EfCore.Sqlite\\BIT.Data.Sync.EfCore.Sqlite.csproj",
+      "EntityFrameworkCore\\BIT.Data.Sync.EfCore\\BIT.Data.Sync.EfCore.csproj",
+      "EntityFrameworkCore\\NBIT.Data.Sync.EfCore.Npgsql\\BIT.Data.Sync.EfCore.Npgsql.csproj",
+      "Tests\\BIT.Data.Sync.EfCore.Tests\\BIT.Data.Sync.EfCore.Tests.csproj",
+      "Tests\\BIT.Data.Sync.Tests\\BIT.Data.Sync.Tests.csproj"
+    ]
+  }
+}
