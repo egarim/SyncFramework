@@ -209,6 +209,7 @@ namespace BIT.Data.Sync.EfCore.Tests
                 await Node_C_Context.PullAsync();
 
                 //Expected 4 for each node
+               
                 int A_Actual = Node_A_Context.Blogs.Count();
                 int B_Actual = Node_B_Context.Blogs.Count();
                 int C_Actual = Node_C_Context.Blogs.Count();
@@ -228,6 +229,9 @@ namespace BIT.Data.Sync.EfCore.Tests
                 await Node_C_Context.PushAsync();
 
                 //Expected 5 for each node
+
+              
+
                 A_Actual = Node_A_Context.Blogs.Count();
                 B_Actual = Node_B_Context.Blogs.Count();
                 C_Actual = Node_C_Context.Blogs.Count();
@@ -251,6 +255,8 @@ namespace BIT.Data.Sync.EfCore.Tests
                 var NodeABlogs = Node_A_Context.Blogs.ToList();
                 var NodeBBlogs = Node_B_Context.Blogs.ToList();
                 var NodeCBlogs = Node_C_Context.Blogs.ToList();
+
+            
 
                 A_Actual = Node_A_Context.Blogs.Count();
                 B_Actual = Node_B_Context.Blogs.Count();

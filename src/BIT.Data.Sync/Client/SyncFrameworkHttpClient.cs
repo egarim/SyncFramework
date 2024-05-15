@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -15,7 +16,9 @@ namespace BIT.Data.Sync.Client
   
     public class SyncFrameworkHttpClient : ISyncFrameworkClient
     {
+        private const string PostRequestUri = "/Sync/Push";
         HttpClient _httpClient;
+        string requestUri;
         public string ServerNodeId { get; }
         public SyncFrameworkHttpClient(HttpClient httpClient,string serverNodeId)
         {
@@ -47,12 +50,16 @@ namespace BIT.Data.Sync.Client
             string jsonDeltas = sr.ReadToEnd();
 
             var data = new StringContent(jsonDeltas, Encoding.UTF8, "application/json");
-            await _httpClient.PostAsync("/Sync/Push", data, cancellationToken).ConfigureAwait(false);
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                DebugRequests(PostRequestUri);
+            }
+            await _httpClient.PostAsync(PostRequestUri, data, cancellationToken).ConfigureAwait(false);
 
         }
         public virtual async Task<List<Delta>> FetchAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
-            if(startIndex == null)
+            if (startIndex == null)
                 startIndex = "";
 
 
@@ -66,7 +73,11 @@ namespace BIT.Data.Sync.Client
                 query[CurrentParam.Key] = CurrentParam.Value;
             }
 
-            string requestUri = $"/Sync/Fetch?{query}";
+            requestUri = $"/Sync/Fetch?{query}";
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                DebugRequests(requestUri);
+            }
             var response = await _httpClient.GetStringAsync(requestUri).ConfigureAwait(false);
 
             using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(response)))
@@ -78,8 +89,12 @@ namespace BIT.Data.Sync.Client
                 return Deltas;
             }
 
-          
 
+
+        }
+        void DebugRequests(string Uri)
+        {
+            Debug.WriteLine($"{this._httpClient.BaseAddress}/{Uri}");
         }
 
     }

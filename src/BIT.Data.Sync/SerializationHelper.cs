@@ -7,8 +7,16 @@ using System.Text;
 
 namespace BIT.Data.Sync
 {
+    /// <summary>
+    /// Provides methods for compressing, decompressing, serializing, and deserializing data, and creating deltas.
+    /// </summary>
     public static class SerializationHelper
     {
+        /// <summary>
+        /// Compresses a byte array.
+        /// </summary>
+        /// <param name="data">The data to compress.</param>
+        /// <returns>The compressed data.</returns>
         public static byte[] CompressCore(byte[] data)
         {
             using (var compressedStream = new MemoryStream())
@@ -19,6 +27,11 @@ namespace BIT.Data.Sync
                 return compressedStream.ToArray();
             }
         }
+        /// <summary>
+        /// Decompresses a byte array.
+        /// </summary>
+        /// <param name="data">The data to decompress.</param>
+        /// <returns>The decompressed data.</returns>
         public static byte[] DecompressCore(byte[] data)
         {
             using (var compressedStream = new MemoryStream(data))
@@ -29,7 +42,11 @@ namespace BIT.Data.Sync
                 return resultStream.ToArray();
             }
         }
-
+        /// <summary>
+        /// Serializes an object into a byte array.
+        /// </summary>
+        /// <param name="Instance">The object to serialize.</param>
+        /// <returns>The serialized object.</returns>
         public static byte[] SerializeCore(object Instance)
         {
 
@@ -48,6 +65,12 @@ namespace BIT.Data.Sync
             return bytes;
            
         }
+        /// <summary>
+        /// Deserializes a byte array into an object of type T.
+        /// </summary>
+        /// <typeparam name="T">The type of the object.</typeparam>
+        /// <param name="Data">The byte array to deserialize.</param>
+        /// <returns>The deserialized object.</returns>
         public static T DeserializeCore<T>(byte[] Data)
         {
             string str = Encoding.UTF8.GetString(Data);
@@ -61,7 +84,12 @@ namespace BIT.Data.Sync
 
             }
         }
-
+        /// <summary>
+        /// Creates a new delta with the specified identity and operations.
+        /// </summary>
+        /// <param name="Identity">The identity of the delta.</param>
+        /// <param name="Operations">The operations of the delta.</param>
+        /// <returns>The created delta.</returns>
         public static IDelta CreateDeltaCore(string Identity, object Operations)
         {
             DateTime now = DateTime.Now;

@@ -9,7 +9,7 @@
 
 	<PropertyGroup Label="BIT.Data.Sync">
 		<BitDataSyncNetStandardVersion>net6.0</BitDataSyncNetStandardVersion>
-		<BitDataSyncNugetVersion>1.0.10</BitDataSyncNugetVersion>
+		<BitDataSyncNugetVersion>1.0.11</BitDataSyncNugetVersion>
 	</PropertyGroup>
 	
 	<PropertyGroup Label="BIT.Data.Sync.Xpo.DeltaStore">
