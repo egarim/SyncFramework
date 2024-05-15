@@ -19,6 +19,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using BIT.Data.Sync.EfCore.Pomelo.MySql;
+using Npgsql;
+using MySqlConnector;
+using Microsoft.Data.SqlClient;
+using System.IO;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BIT.Data.Sync.EfCore.Tests
 {
@@ -37,7 +42,111 @@ namespace BIT.Data.Sync.EfCore.Tests
         string MySQLSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestCnx), EnvironmentVariableTarget.User);
         string MySQLSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
 
+        void DropMysql(string Cnx)
+        {
+            try
+            {
+                ConnectionStringParserService connectionStringParserService = new ConnectionStringParserService(Cnx);
+                string DatabaseName = connectionStringParserService.GetPartByName("Database");
+                connectionStringParserService.RemovePartByName("Database");
 
+                using (var connection = new MySqlConnection(Cnx))
+                {
+                    connection.Open();
+
+                    using (var cmd = new MySqlCommand())
+                    {
+                        cmd.Connection = connection;
+
+
+                        cmd.CommandText = $"DROP DATABASE IF EXISTS {DatabaseName}";
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                
+            }
+          
+        }
+        void DropPostgres(string Cnx)
+        {
+
+            try
+            {
+                ConnectionStringParserService connectionStringParserService = new ConnectionStringParserService(Cnx);
+                string DatabaseName = connectionStringParserService.GetPartByName("Database");
+                connectionStringParserService.RemovePartByName("Database");
+
+
+
+                Cnx = connectionStringParserService.GetConnectionString();
+                using (var connection = new NpgsqlConnection(Cnx))
+                {
+                    connection.Open();
+
+                    using (var cmd = new NpgsqlCommand())
+                    {
+                        cmd.Connection = connection;
+
+
+                        cmd.CommandText = $"DROP DATABASE IF EXISTS \"{DatabaseName}\"";
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+               
+            }
+        }
+        void DropSqlServer(string Cnx)
+        {
+           
+            try
+            {
+                ConnectionStringParserService connectionStringParserService = new ConnectionStringParserService(Cnx);
+                string DatabaseName = connectionStringParserService.GetPartByName("Initial Catalog");
+                connectionStringParserService.RemovePartByName("Initial Catalog");
+
+                // Connect to the "master" database to drop the database
+                connectionStringParserService.UpdatePartByName("Initial Catalog", "master");
+                Cnx = connectionStringParserService.GetConnectionString();
+
+                using (var connection = new SqlConnection(Cnx))
+                {
+                    connection.Open();
+
+                    using (var cmd = new SqlCommand())
+                    {
+                        cmd.Connection = connection;
+
+                        cmd.CommandText = $"ALTER DATABASE {DatabaseName} SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE {DatabaseName};";
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Handle exception
+            }
+
+        }
+        void DropSQLite(string Cnx)
+        {
+            ConnectionStringParserService connectionStringParserService = new ConnectionStringParserService(Cnx);
+            string DatabaseName = connectionStringParserService.GetPartByName("Data Source");
+            connectionStringParserService.RemovePartByName("Data Source");
+            if(File.Exists(DatabaseName))
+            {
+                File.Delete(DatabaseName);
+            }
+
+           
+        }
         TestClientFactory HttpClientFactory;
         [SetUp()]
   
@@ -77,6 +186,18 @@ namespace BIT.Data.Sync.EfCore.Tests
         {
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
+
+            DropPostgres(PostgresSyncFrameworkTestCnx);
+            DropPostgres(PostgresSyncFrameworkTestDeltaCnx);
+
+            DropMysql(MySQLSyncFrameworkTestCnx);
+            DropMysql(MySQLSyncFrameworkTestDeltaCnx);
+
+            DropSqlServer(SqlServerSyncFrameworkTestCnx);
+            DropSqlServer(SqlServerSyncFrameworkTestDeltaCnx);
+
+            DropSQLite(SQLiteSyncFrameworkTestCnx);
+            DropSQLite(SQLiteSyncFrameworkTestDeltaCnx);
 
             var MasterHttpClient = HttpClientFactory.CreateClient("Master");
             var Node_A_HttpClient = HttpClientFactory.CreateClient("Node A");
