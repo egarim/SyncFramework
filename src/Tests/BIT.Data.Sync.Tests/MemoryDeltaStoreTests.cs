@@ -76,5 +76,6 @@ namespace BIT.Data.Sync.Tests
             Assert.AreEqual(0, await memoryDeltaStore.GetDeltaCountAsync(string.Empty, ""));
 
         }
+        //TODO add test for GetLastProcessedDeltaAsync check the it should never be "" it should be the same as sequence service GetMinValue
     }
 }

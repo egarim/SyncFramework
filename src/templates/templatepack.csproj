@@ -1,28 +1,32 @@
-﻿ <Project Sdk="Microsoft.NET.Sdk"> 
-   <PropertyGroup> 
-     <PackageType>Template</PackageType> 
-     <PackageVersion>$(BitDataSyncNugetVersion)</PackageVersion> 
-     <PackageId>BIT.Data.Sync.Templates</PackageId> 
-     <Title>SyncFramework Templates</Title> 
-     <Authors>Jose Manuel Ojeda Melgar</Authors> 
-     <Description>Templates to use when creating an application for Adatum Corporation.</Description> 
-     <PackageTags>dotnet-new;templates;SyncFramework;EfCore;DevExpres.Xpo</PackageTags> 
-     <TargetFramework>netstandard2.0</TargetFramework> 
-     <IncludeContentInPack>true</IncludeContentInPack> 
-     <IncludeBuildOutput>false</IncludeBuildOutput> 
-     <ContentTargetFolders>content</ContentTargetFolders> 
-     <NoWarn>$(NoWarn);NU5128</NoWarn> 
-     <NoDefaultExcludes>true</NoDefaultExcludes> 
-	 <LangVersion>latest</LangVersion> 
-   </PropertyGroup> 
-   <ItemGroup>
-	  <None Include="..\..\README.md" Link="README.md" Pack="true" PackagePath="\" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		
+		<Title>SyncFramework Templates</Title>
+		<Authors>Jose Manuel Ojeda Melgar</Authors>
+		<Description>Templates to use when creating an application for Adatum Corporation.</Description>
+		<PackageTags>dotnet-new;templates;SyncFramework;EfCore;DevExpres.Xpo</PackageTags>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<IncludeContentInPack>true</IncludeContentInPack>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<ContentTargetFolders>content</ContentTargetFolders>
+		<NoWarn>$(NoWarn);NU5128</NoWarn>
+		<NoDefaultExcludes>true</NoDefaultExcludes>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\..\README.md" Link="README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
-   <ItemGroup> 
-     <Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" /> 
-	 <Compile Remove="**\*" />
-   </ItemGroup> 
-   <Target Name="CopyPackage" AfterTargets="Pack"> 
-	 <Copy SourceFiles="bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" /> 
-   </Target> 
- </Project> 
+	<ItemGroup>
+		<Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
+		<Compile Remove="**\*" />
+	</ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+		<PackageType>Template</PackageType>
+		<PackageId>BIT.Data.Sync.Templates</PackageId>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageVersion>$(BitDataSyncNugetVersion)</PackageVersion>
+	</PropertyGroup>
+	<Target Name="CopyPackage" AfterTargets="Pack">
+		<Copy SourceFiles="bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" />
+	</Target>
+</Project>

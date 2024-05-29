@@ -59,6 +59,8 @@ namespace BIT.EfCore.Sync
             var CurrentDeltaIndex = await DeltaDbContext.EFSyncStatus.FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
             if (CurrentDeltaIndex == null)
                 return await this.SequenceService.GetFirstIndexValue();
+            if (CurrentDeltaIndex.LastProcessedDelta==default)
+                return await this.SequenceService.GetFirstIndexValue();
             else
                 return CurrentDeltaIndex.LastProcessedDelta;
         }
