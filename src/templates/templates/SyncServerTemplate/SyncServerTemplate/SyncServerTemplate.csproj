@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BIT.Data.Sync.AspNetCore" Version="1.0.2" />
+    <PackageReference Include="BIT.Data.Sync.AspNetCore" Version="1.0.13" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 

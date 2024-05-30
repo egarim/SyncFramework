@@ -9,12 +9,12 @@
 
 	<PropertyGroup Label="BIT.Data.Sync">
 		<BitDataSyncNetStandardVersion>net6.0</BitDataSyncNetStandardVersion>
-		<BitDataSyncNugetVersion>1.0.12</BitDataSyncNugetVersion>
+		<BitDataSyncNugetVersion>1.0.13</BitDataSyncNugetVersion>
 	</PropertyGroup>
 	
 	<PropertyGroup Label="BIT.Data.Sync.EfCore">
 		<EfCoreTargetFramework>net8.0</EfCoreTargetFramework>
-		<EfCoreNugetVersion>8.0.2.2</EfCoreNugetVersion>
+		<EfCoreNugetVersion>8.0.2.3</EfCoreNugetVersion>
 		<EfCoreVersion>8.0.2</EfCoreVersion>
 	</PropertyGroup>
 	
