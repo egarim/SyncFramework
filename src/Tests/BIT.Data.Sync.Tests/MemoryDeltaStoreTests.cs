@@ -76,6 +76,30 @@ namespace BIT.Data.Sync.Tests
             Assert.AreEqual(0, await memoryDeltaStore.GetDeltaCountAsync(string.Empty, ""));
 
         }
+        [Test]
+        public async Task TestSavingAndSavedEvent_Test()
+        {
+            MemoryDeltaStore memoryDeltaStore = new MemoryDeltaStore();
+
+            var DeltaHello = memoryDeltaStore.CreateDelta("A", "Hello");
+            bool DeltaSavingEventRaised = false;
+            bool DeltaSavedEventRaised = false;
+            memoryDeltaStore.SavingDelta += (sender, e) =>
+            {
+                DeltaSavingEventRaised = true;
+                Debug.WriteLine("DeltaSavingEvent");
+            };
+            memoryDeltaStore.SavedDelta += (sender, e) =>
+            {
+                DeltaSavedEventRaised = true;
+                Debug.WriteLine("DeltaSavedEvent");
+            };
+            await memoryDeltaStore.SaveDeltasAsync(new List<IDelta>() { DeltaHello });
+
+          
+            Assert.IsTrue((DeltaSavingEventRaised==true) && (DeltaSavedEventRaised == true));
+
+        }
         //TODO add test for GetLastProcessedDeltaAsync check the it should never be "" it should be the same as sequence service GetMinValue
     }
 }

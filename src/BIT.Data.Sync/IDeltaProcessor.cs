@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,5 +22,14 @@ namespace BIT.Data.Sync
         /// Gets the sequence service used by the delta processor.
         /// </summary>
         ISequenceService SequenceService { get; }
+
+        /// <summary>
+        /// Occurs before a delta is process to the store.
+        /// </summary>
+        event EventHandler<ProcessingDeltaEventArgs> ProcessingDelta;
+        /// <summary>
+        /// Occurs after a delta has been process to the store.
+        /// </summary>
+        event EventHandler<ProcessDeltaBaseEventArgs> ProcessedDelta;
     }
 }

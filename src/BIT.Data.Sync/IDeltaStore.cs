@@ -103,5 +103,15 @@ namespace BIT.Data.Sync
         /// Gets the sequence service used by the delta store.
         /// </summary>
         ISequenceService SequenceService { get; }
+
+
+        /// <summary>
+        /// Occurs before a delta is saved to the store.
+        /// </summary>
+        event EventHandler<SavingDeltaEventArgs> SavingDelta;
+        /// <summary>
+        /// Occurs after a delta has been saved to the store.
+        /// </summary>
+        event EventHandler<SaveDeltaBaseEventArgs> SavedDelta;
     }
 }

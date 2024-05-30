@@ -41,15 +41,31 @@ namespace BIT.EfCore.Sync
      
         public async override Task SaveDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+       
             foreach (IDelta delta in deltas)
             {
-                await SetDeltaIndex(delta);
-                EfDelta entity = new EfDelta(delta);
-               
-                DeltaDbContext.Deltas.Add(entity);
+
+                // Create an instance of the custom EventArgs
+                var SavingEventArgs = new SavingDeltaEventArgs(delta);
+
+                // Raise the event
+                OnDeltaSavingDelta(SavingEventArgs);
+
+                // Check if the event handling should be canceled
+                if (!SavingEventArgs.Handled)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await SetDeltaIndex(delta);
+                    EfDelta entity = new EfDelta(delta);
+
+                    DeltaDbContext.Deltas.Add(entity);
+                    await DeltaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                    SaveDeltaBaseEventArgs saveDeltaBaseEventArgs = new SaveDeltaBaseEventArgs(delta);
+                    OnDeltaSavedDelta(saveDeltaBaseEventArgs);  
+                }
+             
             }
-            await DeltaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            
 
         }
         public override async Task<string> GetLastProcessedDeltaAsync(string identity, CancellationToken cancellationToken = default)

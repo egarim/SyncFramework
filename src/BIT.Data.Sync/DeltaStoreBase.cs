@@ -9,6 +9,19 @@ namespace BIT.Data.Sync
     public abstract class DeltaStoreBase : IDeltaStore
     {
         protected ISequenceService sequenceService;
+
+        public event EventHandler<SavingDeltaEventArgs> SavingDelta;
+        public event EventHandler<SaveDeltaBaseEventArgs> SavedDelta;
+       
+        protected virtual void OnDeltaSavingDelta(SavingDeltaEventArgs e)
+        {
+            
+            SavingDelta?.Invoke(this, e);
+        }
+        protected virtual void OnDeltaSavedDelta(SaveDeltaBaseEventArgs e)
+        {
+            SavedDelta?.Invoke(this, e);
+        }
         public ISequenceService SequenceService => sequenceService;
 
         public DeltaStoreBase(ISequenceService sequenceService)

@@ -36,11 +36,22 @@ namespace BIT.Data.Sync.Imp
             cancellationToken.ThrowIfCancellationRequested();
             foreach (IDelta delta in deltas)
             {
-                await SetDeltaIndex(delta);
-                cancellationToken.ThrowIfCancellationRequested();
-                Delta item = new Delta(delta);
-                item.Index = delta.Index;
-                Deltas.Add(item);
+                var SavingEventArgs = new SavingDeltaEventArgs(delta);
+
+                // Raise the event
+                OnDeltaSavingDelta(SavingEventArgs);
+
+                // Check if the event handling should be canceled
+                if (!SavingEventArgs.Handled)
+                {
+                    await SetDeltaIndex(delta);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    Delta item = new Delta(delta);
+                    item.Index = delta.Index;
+                    Deltas.Add(item);
+                    SaveDeltaBaseEventArgs saveDeltaBaseEventArgs = new SaveDeltaBaseEventArgs(delta);
+                    OnDeltaSavedDelta(saveDeltaBaseEventArgs);
+                }
             }
            
         }
