@@ -112,6 +112,6 @@ namespace BIT.Data.Sync
         /// <summary>
         /// Occurs after a delta has been saved to the store.
         /// </summary>
-        event EventHandler<SaveDeltaBaseEventArgs> SavedDelta;
+        event EventHandler<SavedDeltaEventArgs> SavedDelta;
     }
 }

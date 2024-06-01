@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,28 @@ namespace BIT.Data.Sync
         /// The sequence service used by the delta processor.
         /// </summary>
         private readonly ISequenceService sequenceService;
+       
+
+        public event EventHandler<ProcessingDeltaEventArgs> ProcessingDelta;
+        public event EventHandler<ProcessDeltaBaseEventArgs> ProcessedDelta;
+
+        /// <summary>
+        /// Raises the ProcessingDelta event.
+        /// </summary>
+        /// <param name="e"></param>
+        protected virtual void OnProcessingDelta(ProcessingDeltaEventArgs e)
+        {
+
+             ProcessingDelta?.Invoke(this, e);
+        }
+        /// <summary>
+        /// Raises the ProcessedDelta event.
+        /// </summary>
+        /// <param name="e"></param>
+        protected virtual void OnProcessedDelta(ProcessDeltaBaseEventArgs e)
+        {
+            ProcessedDelta?.Invoke(this, e);
+        }
 
         /// <summary>
         /// Gets the sequence service used by the delta processor.

@@ -1,9 +1,19 @@
 ﻿
 using System;
+using System.Collections.Generic;
 
 namespace BIT.Data.Sync
 {
-    public class SaveDeltaBaseEventArgs : EventArgs
+    public abstract class SyncEventBase: EventArgs
+    {
+        
+        protected SyncEventBase() {
+
+            Data=new Dictionary<string, object>();
+        }
+        public Dictionary<string,Object> Data { get; set; }
+    }
+    public class SaveDeltaBaseEventArgs : SyncEventBase
     {
         public IDelta Delta { get; set; }
 
@@ -12,6 +22,16 @@ namespace BIT.Data.Sync
             Delta = delta;
         }
     }
+    public class SavedDeltaEventArgs : SaveDeltaBaseEventArgs
+    {
+        public SavedDeltaEventArgs(IDelta delta) : base(delta)
+        {
+           
+        }
+
+    
+    }
+
     public class SavingDeltaEventArgs: SaveDeltaBaseEventArgs
     {
         public SavingDeltaEventArgs(IDelta delta) : base(delta)
@@ -31,7 +51,7 @@ namespace BIT.Data.Sync
         public bool Handled { get; set; }
     }
 
-    public class ProcessDeltaBaseEventArgs : EventArgs
+    public class ProcessDeltaBaseEventArgs : SyncEventBase
     {
         public IDelta Delta { get; set; }
 

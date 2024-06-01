@@ -11,14 +11,14 @@ namespace BIT.Data.Sync
         protected ISequenceService sequenceService;
 
         public event EventHandler<SavingDeltaEventArgs> SavingDelta;
-        public event EventHandler<SaveDeltaBaseEventArgs> SavedDelta;
+        public event EventHandler<SavedDeltaEventArgs> SavedDelta;
        
-        protected virtual void OnDeltaSavingDelta(SavingDeltaEventArgs e)
+        protected virtual void OnSavingDelta(SavingDeltaEventArgs e)
         {
             
             SavingDelta?.Invoke(this, e);
         }
-        protected virtual void OnDeltaSavedDelta(SaveDeltaBaseEventArgs e)
+        protected virtual void OnSavedDelta(SavedDeltaEventArgs e)
         {
             SavedDelta?.Invoke(this, e);
         }

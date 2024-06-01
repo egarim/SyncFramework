@@ -39,7 +39,7 @@ namespace BIT.Data.Sync.Imp
                 var SavingEventArgs = new SavingDeltaEventArgs(delta);
 
                 // Raise the event
-                OnDeltaSavingDelta(SavingEventArgs);
+                OnSavingDelta(SavingEventArgs);
 
                 // Check if the event handling should be canceled
                 if (!SavingEventArgs.Handled)
@@ -49,8 +49,8 @@ namespace BIT.Data.Sync.Imp
                     Delta item = new Delta(delta);
                     item.Index = delta.Index;
                     Deltas.Add(item);
-                    SaveDeltaBaseEventArgs saveDeltaBaseEventArgs = new SaveDeltaBaseEventArgs(delta);
-                    OnDeltaSavedDelta(saveDeltaBaseEventArgs);
+                    SavedDeltaEventArgs saveDeltaBaseEventArgs = new SavedDeltaEventArgs(delta);
+                    OnSavedDelta(saveDeltaBaseEventArgs);
                 }
             }
            

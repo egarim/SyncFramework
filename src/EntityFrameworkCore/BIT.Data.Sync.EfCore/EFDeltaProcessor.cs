@@ -143,30 +143,43 @@ namespace BIT.Data.Sync.EfCore
             Debug.WriteLine($"CurrentDbEngine:{CurrentDbEngine}");
             foreach (IDelta delta in Deltas)
             {
-                List<ModificationCommandData> ModificationsData = this.GetDeltaOperations<List<ModificationCommandData>>(delta);
-                if (System.Diagnostics.Debugger.IsAttached)
+
+                var processingDeltaEventArgs = new ProcessingDeltaEventArgs(delta);
+
+                // Raise the event
+                OnProcessingDelta(processingDeltaEventArgs);
+
+                // Check if the event handling should be canceled
+                if (!processingDeltaEventArgs.Handled)
                 {
-                    WriteModificationsDataToDebugConsole(ModificationsData);
-                }
-                foreach (ModificationCommandData modificationCommandData in ModificationsData)
-                {
-                    
-                    IDbCommand dbCommand = CreateDbCommand(CurrentDbEngine, delta, dbConnection, modificationCommandData);
-                    
-                    if(dbConnection.State!= ConnectionState.Open)
+                    List<ModificationCommandData> ModificationsData = this.GetDeltaOperations<List<ModificationCommandData>>(delta);
+                    if (System.Diagnostics.Debugger.IsAttached)
                     {
-                        dbConnection.Open();
+                        WriteModificationsDataToDebugConsole(ModificationsData);
                     }
+                    foreach (ModificationCommandData modificationCommandData in ModificationsData)
+                    {
 
-                    Debug.WriteLine($"Command:{dbCommand.CommandText}--{delta.Identity}");
-                    var dbCommandAsync = dbCommand as DbCommand;
-                    if (dbCommandAsync != null)
-                        await dbCommandAsync.ExecuteNonQueryAsync().ConfigureAwait(false);
-                    else
-                        dbCommand.ExecuteNonQuery();
-                  
+                        IDbCommand dbCommand = CreateDbCommand(CurrentDbEngine, delta, dbConnection, modificationCommandData);
 
+                        if (dbConnection.State != ConnectionState.Open)
+                        {
+                            dbConnection.Open();
+                        }
+
+                        Debug.WriteLine($"Command:{dbCommand.CommandText}--{delta.Identity}");
+                        var dbCommandAsync = dbCommand as DbCommand;
+                        if (dbCommandAsync != null)
+                            await dbCommandAsync.ExecuteNonQueryAsync().ConfigureAwait(false);
+                        else
+                            dbCommand.ExecuteNonQuery();
+
+
+                        ProcessDeltaBaseEventArgs saveDeltaBaseEventArgs = new ProcessDeltaBaseEventArgs(delta);
+                        OnProcessedDelta(saveDeltaBaseEventArgs);
+                    }
                 }
+               
             }
 
 

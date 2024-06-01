@@ -39,8 +39,9 @@ namespace BIT.Data.Sync.Client
             foreach (IDelta delta in Deltas)
             {
                 ToSerialize.Add(new Delta(delta));
+                cancellationToken.ThrowIfCancellationRequested();
             }
-            cancellationToken.ThrowIfCancellationRequested();
+            
 
             DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(List<Delta>));
             MemoryStream msObj = new MemoryStream();
