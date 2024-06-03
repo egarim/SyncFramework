@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -105,13 +104,6 @@ namespace BIT.Data.Sync
         ISequenceService SequenceService { get; }
 
 
-        /// <summary>
-        /// Occurs before a delta is saved to the store.
-        /// </summary>
-        event EventHandler<SavingDeltaEventArgs> SavingDelta;
-        /// <summary>
-        /// Occurs after a delta has been saved to the store.
-        /// </summary>
-        event EventHandler<SavedDeltaEventArgs> SavedDelta;
+      
     }
 }

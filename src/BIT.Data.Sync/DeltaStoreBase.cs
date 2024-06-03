@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BIT.Data.Sync
 {
-    public abstract class DeltaStoreBase : IDeltaStore
+    public abstract class DeltaStoreBase : IDeltaStore, IDeltaStoreWithEvents
     {
         protected ISequenceService sequenceService;
 

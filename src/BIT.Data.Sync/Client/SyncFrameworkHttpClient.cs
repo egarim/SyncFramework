@@ -16,7 +16,10 @@ namespace BIT.Data.Sync.Client
   
     public class SyncFrameworkHttpClient : ISyncFrameworkClient
     {
-        private const string PostRequestUri = "/Sync/Push";
+        private const string PushRequestUri = "/Sync/Push";
+        private const string FetchRequestUri = "/Sync/Fetch?";
+        private const string FetchOperationUri = "/Sync/FetchOperation?";
+        private const string PushOperationRequestUri = "/Sync/PushOperation";
         HttpClient _httpClient;
         string requestUri;
         public string ServerNodeId { get; }
@@ -34,14 +37,19 @@ namespace BIT.Data.Sync.Client
         }
         public virtual async Task PushAsync(IEnumerable<IDelta> Deltas, CancellationToken cancellationToken  = default)
         {
+            await PushCore(Deltas, cancellationToken).ConfigureAwait(false);
 
+        }
+
+        private async Task<HttpResponseMessage> PushCore(IEnumerable<IDelta> Deltas, CancellationToken cancellationToken)
+        {
             List<Delta> ToSerialize = new List<Delta>();
             foreach (IDelta delta in Deltas)
             {
                 ToSerialize.Add(new Delta(delta));
                 cancellationToken.ThrowIfCancellationRequested();
             }
-            
+
 
             DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(List<Delta>));
             MemoryStream msObj = new MemoryStream();
@@ -53,12 +61,30 @@ namespace BIT.Data.Sync.Client
             var data = new StringContent(jsonDeltas, Encoding.UTF8, "application/json");
             if (System.Diagnostics.Debugger.IsAttached)
             {
-                DebugRequests(PostRequestUri);
+                DebugRequests(PushRequestUri);
             }
-            await _httpClient.PostAsync(PostRequestUri, data, cancellationToken).ConfigureAwait(false);
+
+            return await _httpClient.PostAsync(PushRequestUri, data, cancellationToken).ConfigureAwait(false);
+        }
+
+        public virtual async Task<List<Delta>> FetchAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
+        {
+            string response = await FetchCore(startIndex, identity,FetchRequestUri,cancellationToken).ConfigureAwait(false);
+
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(response)))
+            {
+
+                DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(List<Delta>));
+                List<Delta> Deltas = (List<Delta>)deserialized.ReadObject(ms);
+
+                return Deltas;
+            }
+
+
 
         }
-        public virtual async Task<List<Delta>> FetchAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
+
+        private async Task<string> FetchCore(string startIndex, string identity,string EndPoint ,CancellationToken cancellationToken)
         {
             if (startIndex == null)
                 startIndex = "";
@@ -74,29 +100,41 @@ namespace BIT.Data.Sync.Client
                 query[CurrentParam.Key] = CurrentParam.Value;
             }
 
-            requestUri = $"/Sync/Fetch?{query}";
+            requestUri = $"{EndPoint}{query}";
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 DebugRequests(requestUri);
             }
+
+
             var response = await _httpClient.GetStringAsync(requestUri).ConfigureAwait(false);
-
-            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(response)))
-            {
-
-                DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(List<Delta>));
-                List<Delta> Deltas = (List<Delta>)deserialized.ReadObject(ms);
-
-                return Deltas;
-            }
-
-
-
+            return response;
         }
+  
+
         void DebugRequests(string Uri)
         {
             Debug.WriteLine($"{this._httpClient.BaseAddress}/{Uri}");
         }
 
+        public async Task<FetchOperationResponse> FetchOperationAsync(string startIndex, string identity, CancellationToken cancellationToken)
+        {
+            string response = await FetchCore(startIndex, identity, FetchOperationUri, cancellationToken).ConfigureAwait(false);
+
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(response)))
+            {
+
+                DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(FetchOperationResponse));
+                FetchOperationResponse Response = (FetchOperationResponse)deserialized.ReadObject(ms);
+
+                return Response;
+            }
+
+        }
+
+        public Task<PushOperationResponse> PushOperationAsync(IEnumerable<IDelta> Deltas, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

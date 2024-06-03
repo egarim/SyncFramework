@@ -9,5 +9,8 @@ namespace BIT.Data.Sync.Client
     {
         Task<List<Delta>> FetchAsync(string startIndex, string identity, CancellationToken cancellationToken);
         Task PushAsync(IEnumerable<IDelta> Deltas, CancellationToken cancellationToken);
+
+        Task<FetchOperationResponse> FetchOperationAsync(string startIndex, string identity, CancellationToken cancellationToken);
+        Task<PushOperationResponse> PushOperationAsync(IEnumerable<IDelta> Deltas, CancellationToken cancellationToken);
     }
 }

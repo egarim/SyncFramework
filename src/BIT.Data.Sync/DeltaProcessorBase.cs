@@ -9,7 +9,7 @@ namespace BIT.Data.Sync
     /// <summary>
     /// Base class for delta processors. This class implements the IDeltaProcessor interface and provides a basic implementation.
     /// </summary>
-    public abstract class DeltaProcessorBase : IDeltaProcessor
+    public abstract class DeltaProcessorBase : IDeltaProcessor, IDeltaProcessorWithEvents
     {
         /// <summary>
         /// The sequence service used by the delta processor.
