@@ -65,6 +65,33 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
 
             await Master.PushAsync();
         }
-        
+        [Test]
+        public async Task NodeNotFoundTest()
+        {
+            //0 - Get the network client connected to the API controller exposed by the test infrastructure
+            var httpclient = this.GetTestClientFactory().CreateClient("TestClient");
+
+
+            string NodeId = "Custom";
+
+           
+            ISyncFrameworkClient syncFrameworkClient = new SyncFrameworkHttpClient(httpclient, NodeId);
+
+            //1 - Create the master database
+            SimpleDatabase Master = new SimpleDatabase("Master", syncFrameworkClient);
+
+            //2- Create data and save it on the master
+            SimpleDatabaseRecord Hello = new SimpleDatabaseRecord() { Key = Guid.NewGuid(), Text = "Hello" };
+            SimpleDatabaseRecord World = new SimpleDatabaseRecord() { Key = Guid.NewGuid(), Text = "World" };
+
+            await Master.Add(Hello);
+            await Master.Add(World);
+            var Result=await Master.PushAsync();
+        }
+
+    
+
     }
+
+   
 }

@@ -322,7 +322,8 @@ namespace BIT.Data.Sync.EfCore.Tests
                 MasterContext.Add(NpgsqlBlog);
                 MasterContext.Add(PomeloMySqlBlog);
                 await MasterContext.SaveChangesAsync();
-                await MasterContext.PushAsync();
+                var Master_Push_Result=await MasterContext.PushAsync();
+                Assert.IsTrue(Master_Push_Result.Success);
 
 
                 await Node_A_Context.PullAsync();
@@ -341,17 +342,21 @@ namespace BIT.Data.Sync.EfCore.Tests
 
 
                 await Node_A_Context.SaveChangesAsync();
-                await Node_A_Context.PushAsync();
+                var Node_A_Push= await Node_A_Context.PushAsync();
+                Assert.IsTrue(Node_A_Push.Success);
 
                 await Node_B_Context.SaveChangesAsync();
-                await Node_B_Context.PushAsync();
+                var Node_B_Push = await Node_B_Context.PushAsync();
+                Assert.IsTrue(Node_B_Push.Success);
 
                 await Node_C_Context.SaveChangesAsync();
-                await Node_C_Context.PushAsync();
-
+                var Node_C_Push = await Node_C_Context.PushAsync();
+                Assert.IsTrue(Node_C_Push.Success);
+                
+                
                 //Expected 5 for each node
 
-              
+
 
                 A_Actual = Node_A_Context.Blogs.Count();
                 B_Actual = Node_B_Context.Blogs.Count();

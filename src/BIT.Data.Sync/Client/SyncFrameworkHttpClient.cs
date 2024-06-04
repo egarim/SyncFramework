@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -35,10 +36,25 @@ namespace BIT.Data.Sync.Client
         {
            
         }
-        public virtual async Task PushAsync(IEnumerable<IDelta> Deltas, CancellationToken cancellationToken  = default)
+        public virtual async Task<PushOperationResponse> PushAsync(IEnumerable<IDelta> Deltas, CancellationToken cancellationToken  = default)
         {
-            await PushCore(Deltas, cancellationToken).ConfigureAwait(false);
+            PushOperationResponse pushOperationResponse = null;
+            HttpResponseMessage httpResponseMessage = await PushCore(Deltas, cancellationToken).ConfigureAwait(false);
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                string content = await httpResponseMessage.Content.ReadAsStringAsync();
+                using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(content)))
+                {
 
+                    DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(PushOperationResponse));
+                    pushOperationResponse = (PushOperationResponse)deserialized.ReadObject(ms);
+                }
+                
+               
+                //pushOperationResponse= JsonSerializer.Deserialize<PushOperationResponse>(content);
+
+            }
+            return pushOperationResponse;
         }
 
         private async Task<HttpResponseMessage> PushCore(IEnumerable<IDelta> Deltas, CancellationToken cancellationToken)
@@ -127,7 +143,6 @@ namespace BIT.Data.Sync.Client
 
                 DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(FetchOperationResponse));
                 FetchOperationResponse Response = (FetchOperationResponse)deserialized.ReadObject(ms);
-
                 return Response;
             }
 

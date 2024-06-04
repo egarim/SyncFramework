@@ -75,7 +75,12 @@ namespace BIT.Data.Sync.Server
 
         private ISyncServerNode GetNode(string NodeId)
         {
-            return Nodes.FirstOrDefault(node => node.NodeId == NodeId);
+            ISyncServerNode syncServerNode = Nodes.FirstOrDefault(node => node.NodeId == NodeId);
+            if(syncServerNode==null)
+            {
+                throw new NodeNotFoundException(NodeId);
+            }
+            return syncServerNode;
         }
 
         public Task SaveDeltasAsync(string nodeId, IEnumerable<IDelta> deltas, CancellationToken cancellationToken)

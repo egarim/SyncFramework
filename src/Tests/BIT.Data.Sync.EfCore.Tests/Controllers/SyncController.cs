@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Diagnostics;
 using BIT.Data.Sync.AspNetCore.Controllers;
+using BIT.Data.Sync.Client;
 
 namespace BIT.Data.Sync.EfCore.Tests.Controllers
 {
@@ -27,7 +28,7 @@ namespace BIT.Data.Sync.EfCore.Tests.Controllers
         {
             return base.Fetch(startIndex, identity);
         }
-        public override Task Push()
+        public override Task<string> Push()
         {
             return base.Push();
         }       

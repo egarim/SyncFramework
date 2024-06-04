@@ -34,17 +34,20 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
         }
-        public static async Task PushAsync(this ISyncClientNode instance, CancellationToken cancellationToken = default)
+        public static async Task<PushOperationResponse> PushAsync(this ISyncClientNode instance, CancellationToken cancellationToken = default)
         {
+            PushOperationResponse Response = null;
             cancellationToken.ThrowIfCancellationRequested();
             var LastPushedDelta = await instance.DeltaStore.GetLastPushedDeltaAsync(instance.Identity, cancellationToken).ConfigureAwait(false);
             var Deltas = await instance.DeltaStore.GetDeltasByIdentityAsync( LastPushedDelta, instance.Identity, cancellationToken).ConfigureAwait(false);
             if (Deltas.Any())
             {
                 var Max = Deltas.Max(d => d.Index);
-                await instance.SyncFrameworkClient.PushAsync(Deltas, cancellationToken).ConfigureAwait(false);
-                await instance.DeltaStore.SetLastPushedDeltaAsync(Max, instance.Identity, cancellationToken).ConfigureAwait(false);
+                Response = await instance.SyncFrameworkClient.PushAsync(Deltas, cancellationToken).ConfigureAwait(false);
+                if(Response.Success)
+                    await instance.DeltaStore.SetLastPushedDeltaAsync(Max, instance.Identity, cancellationToken).ConfigureAwait(false);
             }
+            return Response;
 
 
 
