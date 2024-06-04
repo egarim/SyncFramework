@@ -34,5 +34,9 @@ namespace BIT.Data.Sync.Tests.Controllers
         {
             return base.Push();
         }
+        public override Task<bool> RegisterNode()
+        {
+            return base.RegisterNode();
+        }
     }
 }

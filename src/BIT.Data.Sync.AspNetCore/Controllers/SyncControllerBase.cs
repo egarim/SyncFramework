@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
+
 namespace BIT.Data.Sync.AspNetCore.Controllers
 {
     
@@ -91,6 +92,31 @@ namespace BIT.Data.Sync.AspNetCore.Controllers
             return jsonDeltas;
 
         }
+        [HttpPost("RegisterNode")]
+        public virtual async Task<bool> RegisterNode()
+        {
+            var stream = new StreamReader(this.Request.Body);
+            var body = await stream.ReadToEndAsync();
 
-    }
+            RegisterNodeRequest Request = null;
+
+
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(body)))
+            {
+                 
+
+             
+
+                DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(RegisterNodeRequest));
+                Request = (RegisterNodeRequest)deserialized.ReadObject(ms);
+             
+            
+
+            }
+
+            return _SyncServer.RegisterNodeAsync(Request);
+        }
+
+
+        }
 }

@@ -17,21 +17,25 @@ namespace BIT.Data.Sync.Server
     }
     public class SyncServer : ISyncServer
     {
-
-
-        IEnumerable<ISyncServerNode> _Nodes;
-       
+        public SyncServer(IEnumerable<ISyncServerNode> nodes, Func<RegisterNodeRequest, ISyncServerNode> registerNodeRequest)
+        {
+            Nodes.AddRange(nodes);
+            RegisterNodeFunction = registerNodeRequest;
+        }
+        public SyncServer()
+        {
+            Nodes = new List<ISyncServerNode>();
+        }
         public SyncServer(params ISyncServerNode[] Nodes)
         {
-            this._Nodes = Nodes;
+            this.Nodes.AddRange(Nodes);
         }
         public SyncServer(SynServerNodeList Nodes)
         {
-            this._Nodes = Nodes;
+            this.Nodes = Nodes;
         }
-        public IEnumerable<ISyncServerNode> Nodes => _Nodes;
-
-       
+        public List<ISyncServerNode> Nodes { get; } = new List<ISyncServerNode>();
+        public Func<RegisterNodeRequest, ISyncServerNode> RegisterNodeFunction { get; set; }
 
         public async Task<IEnumerable<IDelta>> GetDeltasAsync(string NodeId, string startIndex, CancellationToken cancellationToken)
         {
@@ -85,6 +89,25 @@ namespace BIT.Data.Sync.Server
                 return Node.SaveDeltasAsync(deltas, cancellationToken);
             }
             return Task.CompletedTask;
+        }
+        /// <summary>
+        ///  Register a node to the server
+        /// </summary>
+        /// <param name="serverNode"></param>
+        /// <returns>True if success otherwise false</returns>
+        public bool RegisterNodeAsync(ISyncServerNode serverNode)
+        {
+            if(this.Nodes.Contains(serverNode)==false)
+            {
+                this.Nodes.Add(serverNode);
+                return true;
+            }
+            return false;
+        }
+
+        public bool RegisterNodeAsync(RegisterNodeRequest registerNodeRequest)
+        {
+           return RegisterNodeAsync(this.RegisterNodeFunction(registerNodeRequest));
         }
     }
    

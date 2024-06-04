@@ -8,7 +8,7 @@ namespace BIT.Data.Sync.Server
 {
     public interface ISyncServer
     {
-        IEnumerable<ISyncServerNode> Nodes { get; }
+        List<ISyncServerNode> Nodes { get; }
         /// <summary>
         /// The function will fetch all the deltas that are greater than current <paramref name="startIndex"/>
         /// </summary>
@@ -28,6 +28,22 @@ namespace BIT.Data.Sync.Server
         Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string nodeId, string startIndex, string identity, CancellationToken cancellationToken);
         Task ProcessDeltasAsync(string Name, IEnumerable<IDelta> deltas, CancellationToken cancellationToken);
         Task SaveDeltasAsync(string name, IEnumerable<IDelta> deltas, CancellationToken cancellationToken);
+        /// <summary>
+        ///  Register a node to the server
+        /// </summary>
+        /// <param name="serverNode"></param>
+        /// <returns>True if success otherwise false</returns>
+        bool  RegisterNodeAsync(ISyncServerNode serverNode);
+        /// <summary>
+        /// Register a node to the server
+        /// </summary>
+        /// <param name="registerNodeRequest"></param>
+        /// <returns>True if success otherwise false</returns>
+        bool RegisterNodeAsync(RegisterNodeRequest registerNodeRequest);
+        /// <summary>
+        /// Function used to spin up a new server node
+        /// </summary>
+        Func<RegisterNodeRequest, ISyncServerNode> RegisterNodeFunction { get;  }
     }
     
     
