@@ -64,6 +64,7 @@ namespace BIT.Data.Sync.Client
                 DebugRequests(PushRequestUri);
             }
 
+
             return await _httpClient.PostAsync(PushRequestUri, data, cancellationToken).ConfigureAwait(false);
         }
 
