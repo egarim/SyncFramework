@@ -7,35 +7,50 @@ using System.Threading.Tasks;
 
 namespace BIT.Data.Sync.Server
 {
-    public class SynServerNodeList:List<ISyncServerNode>
+    public class SyncServerNodeList:List<ISyncServerNode>
     {
         
-        public SynServerNodeList()
+        public SyncServerNodeList()
         {
             
         }
     }
-    public class SyncServer : ISyncServer
+    public interface IInfoServer
     {
-        public SyncServer(IEnumerable<ISyncServerNode> nodes, Func<RegisterNodeRequest, ISyncServerNode> registerNodeRequest)
+        
+    }
+    public class SyncServer : ISyncServer, ISyncServerWithEvents
+    {
+        public SyncServer(IEnumerable<ISyncServerNode> nodes, Func<RegisterNodeRequest, ISyncServerNode> registerNodeRequest,IInfoServer infoServer)
         {
             Nodes.AddRange(nodes);
+            foreach (ISyncServerNode syncServerNode in Nodes)
+            {
+                RegisterDeltaProcessorEvents(syncServerNode as IDeltaProcessorWithEvents, syncServerNode);
+                RegisterDeltaStoreEvents(syncServerNode as IDeltaStoreWithEvents, syncServerNode);
+            }
             RegisterNodeFunction = registerNodeRequest;
         }
-        public SyncServer()
+        public SyncServer(params ISyncServerNode[] Nodes) : this(Nodes, null, null)
         {
-            Nodes = new List<ISyncServerNode>();
+
         }
-        public SyncServer(params ISyncServerNode[] Nodes)
+        public SyncServer(SyncServerNodeList Nodes) : this(Nodes.ToArray(), null, null)
         {
-            this.Nodes.AddRange(Nodes);
+
         }
-        public SyncServer(SynServerNodeList Nodes)
+        protected SyncServer()
         {
-            this.Nodes = Nodes;
+         
         }
+   
         public List<ISyncServerNode> Nodes { get; } = new List<ISyncServerNode>();
         public Func<RegisterNodeRequest, ISyncServerNode> RegisterNodeFunction { get; set; }
+
+        public event EventHandler<SyncServerSavingDeltaEventArgs> SavingDelta;
+        public event EventHandler<SyncServerSavedDeltaEventArgs> SavedDelta;
+        public event EventHandler<SyncServerProcessingDeltaEventArgs> ProcessingDelta;
+        public event EventHandler<SyncServerProcessDeltaBaseEventArgs> ProcessedDelta;
 
         public async Task<IEnumerable<IDelta>> GetDeltasAsync(string NodeId, string startIndex, CancellationToken cancellationToken)
         {
@@ -43,7 +58,7 @@ namespace BIT.Data.Sync.Server
             ISyncServerNode Node = GetNode(NodeId);
             if (Node != null)
             {
-                return await Node.GetDeltasAsync(startIndex,null, cancellationToken).ConfigureAwait(false);
+                return await Node.GetDeltasFromOtherNodes(startIndex,null, cancellationToken).ConfigureAwait(false);
             }
 
             IEnumerable<IDelta> result = new List<IDelta>();
@@ -56,7 +71,7 @@ namespace BIT.Data.Sync.Server
             ISyncServerNode Node = GetNode(nodeId);
             if (Node != null)
             {
-                return await Node.GetDeltasAsync(startIndex, identity, cancellationToken).ConfigureAwait(false);
+                return await Node.GetDeltasFromOtherNodes(startIndex, identity, cancellationToken).ConfigureAwait(false);
             }
             IEnumerable<IDelta> result = new List<IDelta>();
             return result;
@@ -105,11 +120,53 @@ namespace BIT.Data.Sync.Server
             if(this.Nodes.Contains(serverNode)==false)
             {
                 this.Nodes.Add(serverNode);
+                IDeltaStoreWithEvents deltaStoreWithEvents = serverNode as IDeltaStoreWithEvents;
+                if (deltaStoreWithEvents != null)
+                {
+                    RegisterDeltaStoreEvents(deltaStoreWithEvents, serverNode);
+                }
+                IDeltaProcessorWithEvents deltaProcessorWithEvents = serverNode as IDeltaProcessorWithEvents;
+                if (deltaProcessorWithEvents != null)
+                {
+                    RegisterDeltaProcessorEvents(deltaProcessorWithEvents, serverNode);
+                }
                 return true;
             }
             return false;
         }
 
+        private void RegisterDeltaProcessorEvents(IDeltaProcessorWithEvents deltaProcessorWithEvents,ISyncServerNode syncServerNode)
+        {
+            if(deltaProcessorWithEvents==null)
+            {
+                return;
+            }
+            deltaProcessorWithEvents.ProcessingDelta += (sender, e) => {
+                ProcessingDelta?.Invoke(sender, new SyncServerProcessingDeltaEventArgs(e.Delta, syncServerNode));
+            };
+            deltaProcessorWithEvents.ProcessedDelta += (sender, e) => {
+                ProcessedDelta?.Invoke(sender, new SyncServerProcessDeltaBaseEventArgs(e.Delta, syncServerNode));
+            };  
+
+        }
+
+        private void RegisterDeltaStoreEvents(IDeltaStoreWithEvents deltaStoreWithEvents, ISyncServerNode syncServerNode)
+        {
+            if(deltaStoreWithEvents==null)
+            {
+                return;
+            }   
+            deltaStoreWithEvents.SavingDelta += (sender, e) => {
+                SavingDelta?.Invoke(sender, new SyncServerSavingDeltaEventArgs(e.Delta, syncServerNode));
+            };
+            deltaStoreWithEvents.SavedDelta += (sender, e) => {
+                SavedDelta?.Invoke(sender, new SyncServerSavedDeltaEventArgs(e.Delta, syncServerNode));
+            };
+
+           
+        }
+
+   
         public bool RegisterNodeAsync(RegisterNodeRequest registerNodeRequest)
         {
            return RegisterNodeAsync(this.RegisterNodeFunction(registerNodeRequest));

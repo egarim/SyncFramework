@@ -45,6 +45,4 @@ namespace BIT.Data.Sync.Server
         /// </summary>
         Func<RegisterNodeRequest, ISyncServerNode> RegisterNodeFunction { get;  }
     }
-    
-    
 }

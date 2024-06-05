@@ -17,10 +17,12 @@ namespace BIT.Data.Sync.Server
         /// <param name="identity"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<IEnumerable<IDelta>> GetDeltasAsync(string startIndex, string identity, CancellationToken cancellationToken);
+        Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string startIndex, string identity, CancellationToken cancellationToken);
         
         Task ProcessDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken);
-    }
 
-    
+      
+    }
+  
+
 }
