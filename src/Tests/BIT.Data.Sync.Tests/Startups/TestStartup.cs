@@ -18,7 +18,7 @@ namespace BIT.Data.Sync.Tests.Startups
         {
             Configuration = configuration;
         }
-
+        public static string STR_MemoryDeltaStore1 = "MemoryDeltaStore1";
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -27,7 +27,7 @@ namespace BIT.Data.Sync.Tests.Startups
             services.AddControllers();
 
 
-            services.AddSyncServerWithMemoryNode("MemoryDeltaStore1", RegisterNewNode);
+            services.AddSyncServerWithMemoryNode(STR_MemoryDeltaStore1, RegisterNewNode);
             
 
         }

@@ -11,7 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class ISyncClientNodeExtensions
     {
 
-        public static async Task<List<Delta>> FetchAsync(this ISyncClientNode instance, CancellationToken cancellationToken = default)
+        public static async Task<FetchOperationResponse> FetchAsync(this ISyncClientNode instance, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var statusExists = await instance.DeltaStore.CanRestoreDatabaseAsync(instance.Identity, cancellationToken);
@@ -22,16 +22,17 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return await instance.SyncFrameworkClient.FetchAsync(LastDeltaIndex, instance.Identity, cancellationToken).ConfigureAwait(false);
         }
-        public static async Task PullAsync(this ISyncClientNode instance, CancellationToken cancellationToken = default)
+        public static async Task<FetchOperationResponse> PullAsync(this ISyncClientNode instance, CancellationToken cancellationToken = default)
         {            
             cancellationToken.ThrowIfCancellationRequested();
-            var Deltas = await instance.FetchAsync(cancellationToken).ConfigureAwait(false);
-            if (Deltas.Any())
+            var Response = await instance.FetchAsync(cancellationToken).ConfigureAwait(false);
+            if (Response.Deltas.Any())
             {
-                await instance.DeltaProcessor.ProcessDeltasAsync(Deltas, cancellationToken).ConfigureAwait(false);
-                string index = Deltas.Max(d => d.Index);
+                await instance.DeltaProcessor.ProcessDeltasAsync(Response.Deltas, cancellationToken).ConfigureAwait(false);
+                string index = Response.Deltas.Max(d => d.Index);
                 await instance.DeltaStore.SetLastProcessedDeltaAsync(index, instance.Identity, cancellationToken).ConfigureAwait(false);
             }
+            return Response;
 
         }
         public static async Task<PushOperationResponse> PushAsync(this ISyncClientNode instance, CancellationToken cancellationToken = default)

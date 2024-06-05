@@ -12,6 +12,7 @@ namespace BIT.Data.Sync.EfCore.Tests.Startups
 {
     public class TestStartup
     {
+        public static string STR_MemoryDeltaStore1 = "MemoryDeltaStore1";
         public TestStartup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -30,7 +31,7 @@ namespace BIT.Data.Sync.EfCore.Tests.Startups
             //services.AddSingleton<ISyncServer>(new SyncServer(syncServerNode));
 
             ////HACK or you can use the extension method AddSyncServerWithMemoryNode
-            services.AddSyncServerWithMemoryNode("MemoryDeltaStore1");
+            services.AddSyncServerWithMemoryNode(STR_MemoryDeltaStore1);
 
         }
 

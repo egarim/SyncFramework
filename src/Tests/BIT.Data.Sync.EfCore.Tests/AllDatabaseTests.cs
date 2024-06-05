@@ -67,9 +67,9 @@ namespace BIT.Data.Sync.EfCore.Tests
             catch (Exception)
             {
 
-                
+
             }
-          
+
         }
         void DropPostgres(string Cnx)
         {
@@ -100,12 +100,12 @@ namespace BIT.Data.Sync.EfCore.Tests
             catch (Exception)
             {
 
-               
+
             }
         }
         void DropSqlServer(string Cnx)
         {
-           
+
             try
             {
                 ConnectionStringParserService connectionStringParserService = new ConnectionStringParserService(Cnx);
@@ -140,29 +140,29 @@ namespace BIT.Data.Sync.EfCore.Tests
             ConnectionStringParserService connectionStringParserService = new ConnectionStringParserService(Cnx);
             string DatabaseName = connectionStringParserService.GetPartByName("Data Source");
             connectionStringParserService.RemovePartByName("Data Source");
-            if(File.Exists(DatabaseName))
+            if (File.Exists(DatabaseName))
             {
                 File.Delete(DatabaseName);
             }
 
-           
+
         }
         TestClientFactory HttpClientFactory;
         [SetUp()]
-  
+
         public override void Setup()
         {
 
             serverVersion = new MySqlServerVersion(new Version(8, 0, 31));
 
-          
+
 
             base.Setup();
             HttpClientFactory = this.GetTestClientFactory();
 
-          
 
-          
+
+
 
             masterContextOptionBuilder.UseSqlServer(SqlServerSyncFrameworkTestCnx);
             node_AContextOptionBuilder.UseSqlite(SQLiteSyncFrameworkTestCnx);
@@ -262,7 +262,7 @@ namespace BIT.Data.Sync.EfCore.Tests
 
 
             //you can also use the extension method for specific providers
-            ServiceCollectionNode_C.AddSyncFrameworkForMysql(MySQLSyncFrameworkTestDeltaCnx,serverVersion, Node_C_HttpClient, "MemoryDeltaStore1", "Node C", additionalDeltaGenerators);
+            ServiceCollectionNode_C.AddSyncFrameworkForMysql(MySQLSyncFrameworkTestDeltaCnx, serverVersion, Node_C_HttpClient, "MemoryDeltaStore1", "Node C", additionalDeltaGenerators);
 
 
             YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
@@ -290,7 +290,7 @@ namespace BIT.Data.Sync.EfCore.Tests
             var _providerNode_B = ServiceCollectionNode_B.BuildServiceProvider();
             var _providerNode_C = ServiceCollectionNode_C.BuildServiceProvider();
 
-         
+
 
 
 
@@ -322,16 +322,16 @@ namespace BIT.Data.Sync.EfCore.Tests
                 MasterContext.Add(NpgsqlBlog);
                 MasterContext.Add(PomeloMySqlBlog);
                 await MasterContext.SaveChangesAsync();
-                var Master_Push_Result=await MasterContext.PushAsync();
+                var Master_Push_Result = await MasterContext.PushAsync();
                 Assert.IsTrue(Master_Push_Result.Success);
 
 
-                await Node_A_Context.PullAsync();
-                await Node_B_Context.PullAsync();
-                await Node_C_Context.PullAsync();
+                var Node_A_Pull_Results = await Node_A_Context.PullAsync();
+                var Node_B_Pull_Results = await Node_B_Context.PullAsync();
+                var Node_C_Pull_Results = await Node_C_Context.PullAsync();
 
                 //Expected 4 for each node
-               
+
                 int A_Actual = Node_A_Context.Blogs.Count();
                 int B_Actual = Node_B_Context.Blogs.Count();
                 int C_Actual = Node_C_Context.Blogs.Count();
@@ -342,7 +342,7 @@ namespace BIT.Data.Sync.EfCore.Tests
 
 
                 await Node_A_Context.SaveChangesAsync();
-                var Node_A_Push= await Node_A_Context.PushAsync();
+                var Node_A_Push = await Node_A_Context.PushAsync();
                 Assert.IsTrue(Node_A_Push.Success);
 
                 await Node_B_Context.SaveChangesAsync();
@@ -352,8 +352,8 @@ namespace BIT.Data.Sync.EfCore.Tests
                 await Node_C_Context.SaveChangesAsync();
                 var Node_C_Push = await Node_C_Context.PushAsync();
                 Assert.IsTrue(Node_C_Push.Success);
-                
-                
+
+
                 //Expected 5 for each node
 
 
@@ -370,7 +370,7 @@ namespace BIT.Data.Sync.EfCore.Tests
                 Assert.AreEqual(7, count);
 
 
-                var NodeAFetchedDeltas= await Node_A_Context.FetchAsync();
+                var NodeAFetchedDeltas = await Node_A_Context.FetchAsync();
                 var NodeBFetchedDeltas = await Node_B_Context.FetchAsync();
                 var NodeCFetchedDeltas = await Node_C_Context.FetchAsync();
 
@@ -382,7 +382,7 @@ namespace BIT.Data.Sync.EfCore.Tests
                 var NodeBBlogs = Node_B_Context.Blogs.ToList();
                 var NodeCBlogs = Node_C_Context.Blogs.ToList();
 
-            
+
 
                 A_Actual = Node_A_Context.Blogs.Count();
                 B_Actual = Node_B_Context.Blogs.Count();

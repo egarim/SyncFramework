@@ -30,6 +30,10 @@ namespace BIT.Data.Sync.Client
     }
     public class FetchOperationResponse : SyncServerResponseBase
     {
+        public FetchOperationResponse()
+        {
+            Deltas = new List<Delta>(); 
+        }
         public List<Delta> Deltas { get; set; }
     }
 }

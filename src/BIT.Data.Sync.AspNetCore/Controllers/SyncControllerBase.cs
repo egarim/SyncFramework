@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using BIT.Data.Sync.Client;
+using System.Text.RegularExpressions;
 
 
 namespace BIT.Data.Sync.AspNetCore.Controllers
@@ -92,7 +93,7 @@ namespace BIT.Data.Sync.AspNetCore.Controllers
         [HttpGet("Fetch")]
         public virtual async Task<string> Fetch(string startIndex, string identity)
         {
-
+            FetchOperationResponse fetchOperationResponse = new FetchOperationResponse();
             try
             {
                
@@ -112,40 +113,61 @@ namespace BIT.Data.Sync.AspNetCore.Controllers
                 else
                     enumerable = await _SyncServer.GetDeltasFromOtherNodes(NodeId, startIndex, identity, new CancellationToken());
 
-                List<Delta> toSerialize = new List<Delta>();
+                //List<Delta> toSerialize = new List<Delta>();
+                //foreach (IDelta delta in enumerable)
+                //{
+                //    toSerialize.Add(new Delta(delta));
+                //}
                 foreach (IDelta delta in enumerable)
                 {
-                    toSerialize.Add(new Delta(delta));
+                    fetchOperationResponse.Deltas.Add(new Delta(delta));
                 }
-                DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(List<Delta>));
-                MemoryStream msObj = new MemoryStream();
-                js.WriteObject(msObj, toSerialize);
-                msObj.Position = 0;
-                StreamReader sr = new StreamReader(msObj);
-                string jsonDeltas = sr.ReadToEnd();
-                return jsonDeltas;
+
+                fetchOperationResponse.Success = true;
+               
             }
             catch (NodeNotFoundException argEx)
             {
-                _logger.LogError(argEx, "An argument null exception occurred.");
+                SetException(fetchOperationResponse, argEx, "An argument null exception occurred.");
             }
             catch (ArgumentNullException argEx)
             {
-                _logger.LogError(argEx, "An argument null exception occurred.");
+                SetException(fetchOperationResponse, argEx, "An argument null exception occurred.");
             }
-            catch (InvalidOperationException invOpEx)
+            catch (InvalidOperationException argEx)
             {
-                _logger.LogError(invOpEx, "An invalid operation exception occurred.");
+            
+                SetException(fetchOperationResponse, argEx, "An invalid operation exception occurred.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unknown exception occurred.");
+                SetException(fetchOperationResponse, ex, "An unknown exception occurred.");
             }
-            return "";
+            string fetchResponse = CreateFetchResponse(fetchOperationResponse);
+            return fetchResponse;
 
-            
+
 
         }
+
+        protected virtual void SetException(FetchOperationResponse fetchOperationResponse, Exception argEx, string anargumentnullexceptionoccurred)
+        {
+            fetchOperationResponse.Success = false;
+            fetchOperationResponse.Message = argEx.Message;
+            _logger.LogError(argEx, anargumentnullexceptionoccurred);
+        }
+
+        protected virtual string CreateFetchResponse(FetchOperationResponse fetchOperationResponse)
+        {
+            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(FetchOperationResponse));
+            MemoryStream msObj = new MemoryStream();
+            js.WriteObject(msObj, fetchOperationResponse);
+            msObj.Position = 0;
+            StreamReader sr = new StreamReader(msObj);
+            string fetchResponse = sr.ReadToEnd();
+            return fetchResponse;
+        }
+
         [HttpPost("RegisterNode")]
         public virtual async Task<bool> RegisterNode()
         {
