@@ -178,12 +178,6 @@ namespace BIT.EfCore.Sync
                 await DeltaDbContext.SaveChangesAsync(cancellationToken);
             }
         }
-
-        public override async Task<bool> CanRestoreDatabaseAsync(string identity, CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            return await DeltaDbContext.EFSyncStatus.AnyAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
-        }
     }
 
 

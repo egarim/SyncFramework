@@ -43,7 +43,7 @@ namespace BIT.Data.Sync.AspNetCore.Controllers
             PushOperationResponse pushOperationResponse = new PushOperationResponse();
             try
             {
-                //TODO handle NodeNotFoundException and create the right response 
+               
                 string NodeId = GetHeader("NodeId");
                 var stream = new StreamReader(this.Request.Body);
                 var body = await stream.ReadToEndAsync();

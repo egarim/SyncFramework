@@ -134,17 +134,7 @@ namespace BIT.Data.Sync.Imp
            _syncStatus.Remove(identity);
             return Task.CompletedTask;
         }
-
-        public override Task<bool> CanRestoreDatabaseAsync(string identity, CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (!_syncStatus.ContainsKey(identity))
-            {
-                return Task.FromResult(false);                
-            }
-            var status = _syncStatus[identity];
-            return Task.FromResult(status != null);
-        }
+      
 
 
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously

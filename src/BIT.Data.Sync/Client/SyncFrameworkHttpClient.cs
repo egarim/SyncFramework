@@ -19,8 +19,7 @@ namespace BIT.Data.Sync.Client
     {
         private const string PushRequestUri = "/Sync/Push";
         private const string FetchRequestUri = "/Sync/Fetch?";
-        private const string FetchOperationUri = "/Sync/FetchOperation?";
-        private const string PushOperationRequestUri = "/Sync/PushOperation";
+
         HttpClient _httpClient;
         string requestUri;
         public string ServerNodeId { get; }
@@ -29,7 +28,6 @@ namespace BIT.Data.Sync.Client
 
             _httpClient = httpClient;
             _httpClient.DefaultRequestHeaders.Add("NodeId", serverNodeId);
-
             this.ServerNodeId = serverNodeId;
         }
         public SyncFrameworkHttpClient(string BaseAddress, string NodeId) : this(new HttpClient() { BaseAddress = new Uri(BaseAddress) }, NodeId)

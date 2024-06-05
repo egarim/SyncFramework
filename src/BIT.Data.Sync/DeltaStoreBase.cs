@@ -61,7 +61,7 @@ namespace BIT.Data.Sync
 
         public abstract Task ResetDeltasStatusAsync(string identity, CancellationToken cancellationToken=default);
 
-        public abstract Task<bool> CanRestoreDatabaseAsync(string identity, CancellationToken cancellationToken);
+    
 
     
     }
