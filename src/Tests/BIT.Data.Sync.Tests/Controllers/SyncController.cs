@@ -1,5 +1,4 @@
-﻿using BIT.Data.Sync;
-using BIT.Data.Sync.Server;
+﻿using BIT.Data.Sync.Server;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,6 +12,7 @@ using System.Linq;
 using System.Diagnostics;
 using BIT.Data.Sync.AspNetCore.Controllers;
 using BIT.Data.Sync.Client;
+using BIT.Data.Sync.EventArgs;
 
 namespace BIT.Data.Sync.Tests.Controllers
 {

@@ -1,5 +1,6 @@
 ﻿using BIT.Data.Sync;
 using BIT.Data.Sync.EfCore.Data;
+using BIT.Data.Sync.EventArgs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;

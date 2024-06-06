@@ -1,4 +1,10 @@
-﻿## version BIT.Data.Sync 1.0.12 
+﻿## Version 2.0.0
+- Added `ISyncServerWithEvents` Interface.
+- Added `ISyncServerNodeWithEvents` Interface.
+- Added `IDeltaStoreWithEvents` Interface.
+- Added `IDeltaProcessorWithEvents` Interface.
+- 
+## version BIT.Data.Sync 1.0.12 
 
 - Changed the version of the EF Core packages as shown below:
 - EfCorePostgresVersion: 8.0.4

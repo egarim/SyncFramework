@@ -1,5 +1,6 @@
 ﻿
 using System;
+using BIT.Data.Sync.EventArgs;
 
 namespace BIT.Data.Sync.Server
 {
