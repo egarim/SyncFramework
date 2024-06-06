@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace BIT.Data.Sync.EventArgs
 {
-    public abstract class SyncEventBase : EventArgs
+    public abstract class BaseSyncEvent : System.EventArgs
     {
 
-        protected SyncEventBase()
+        protected BaseSyncEvent()
         {
 
             Data = new Dictionary<string, object>();

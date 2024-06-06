@@ -30,7 +30,7 @@ namespace BIT.Data.Sync.Tests.Controllers
             }
         }
 
-        private void ServerWithEvents_SavingDelta(object sender, SyncServerSavingDeltaEventArgs e)
+        private void ServerWithEvents_SavingDelta(object sender, ServerSavingDeltaEventArgs e)
         {
            Debug.WriteLine($"Saving Delta {e.Delta.Index}");
         }

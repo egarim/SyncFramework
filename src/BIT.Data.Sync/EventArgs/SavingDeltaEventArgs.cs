@@ -2,7 +2,7 @@
 
 namespace BIT.Data.Sync.EventArgs
 {
-    public class SavingDeltaEventArgs : SaveDeltaBaseEventArgs
+    public class SavingDeltaEventArgs : BaseSaveDeltaEventArgs
     {
         public SavingDeltaEventArgs(IDelta delta) : base(delta)
         {

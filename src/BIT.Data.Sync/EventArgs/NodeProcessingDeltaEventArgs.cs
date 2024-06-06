@@ -8,9 +8,9 @@ namespace BIT.Data.Sync.EventArgs
         public NodeProcessingDeltaEventArgs(IDelta delta, ISyncServerNode node, ProcessingDeltaEventArgs processingDeltaEventArgs) : base(delta)
         {
             Node = node;
-            this.processingDeltaEventArgs = processingDeltaEventArgs;
+            this.ProcessingDeltaArgs = processingDeltaEventArgs;
         }
         public ISyncServerNode Node { get; set; }
-        public ProcessingDeltaEventArgs processingDeltaEventArgs { get; set; }
+        public ProcessingDeltaEventArgs ProcessingDeltaArgs { get; set; }
     }
 }

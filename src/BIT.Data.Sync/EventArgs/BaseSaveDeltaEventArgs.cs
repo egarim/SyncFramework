@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace BIT.Data.Sync.EventArgs
 {
-    public class SaveDeltaBaseEventArgs : SyncEventBase
+    public class BaseSaveDeltaEventArgs : BaseSyncEvent
     {
         public IDelta Delta { get; set; }
 
-        public SaveDeltaBaseEventArgs(IDelta delta)
+        public BaseSaveDeltaEventArgs(IDelta delta)
         {
             Delta = delta;
         }

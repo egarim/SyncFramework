@@ -6,10 +6,10 @@ namespace BIT.Data.Sync.Server
 {
     public interface ISyncServerWithEvents
     {
-        event EventHandler<SyncServerSavingDeltaEventArgs> SavingDelta;
-        event EventHandler<SyncServerSavedDeltaEventArgs> SavedDelta;
-        event EventHandler<SyncServerProcessingDeltaEventArgs> ProcessingDelta;
-        event EventHandler<SyncServerProcessDeltaBaseEventArgs> ProcessedDelta;
+        event EventHandler<ServerSavingDeltaEventArgs> SavingDelta;
+        event EventHandler<ServerSavedDeltaEventArgs> SavedDelta;
+        event EventHandler<ServerProcessingDeltaEventArgs> ProcessingDelta;
+        event EventHandler<ServerProcessedDeltaEventArgs> ProcessedDelta;
 
     }
 }

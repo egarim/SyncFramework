@@ -2,11 +2,11 @@
 
 namespace BIT.Data.Sync.EventArgs
 {
-    public class ProcessDeltaBaseEventArgs : SyncEventBase
+    public class BaseProcessedDeltaEventArgs : BaseSyncEvent
     {
         public IDelta Delta { get; set; }
 
-        public ProcessDeltaBaseEventArgs(IDelta delta)
+        public BaseProcessedDeltaEventArgs(IDelta delta)
         {
             Delta = delta;
         }

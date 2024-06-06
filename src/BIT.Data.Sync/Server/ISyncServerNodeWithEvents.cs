@@ -9,6 +9,6 @@ namespace BIT.Data.Sync.Server
         event EventHandler<NodeSavingDeltaEventArgs> SavingDelta;
         event EventHandler<NodeSavedDeltaEventArgs> SavedDelta;
         event EventHandler<NodeProcessingDeltaEventArgs> ProcessingDelta;
-        event EventHandler<NodeProcessDeltaBaseEventArgs> ProcessedDelta;
+        event EventHandler<NodeProcessedDeltaEventArgs> ProcessedDelta;
     }
 }

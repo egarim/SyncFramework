@@ -48,10 +48,10 @@ namespace BIT.Data.Sync.Server
         public List<ISyncServerNode> Nodes { get; } = new List<ISyncServerNode>();
         public Func<RegisterNodeRequest, ISyncServerNode> RegisterNodeFunction { get; set; }
 
-        public event EventHandler<SyncServerSavingDeltaEventArgs> SavingDelta;
-        public event EventHandler<SyncServerSavedDeltaEventArgs> SavedDelta;
-        public event EventHandler<SyncServerProcessingDeltaEventArgs> ProcessingDelta;
-        public event EventHandler<SyncServerProcessDeltaBaseEventArgs> ProcessedDelta;
+        public event EventHandler<ServerSavingDeltaEventArgs> SavingDelta;
+        public event EventHandler<ServerSavedDeltaEventArgs> SavedDelta;
+        public event EventHandler<ServerProcessingDeltaEventArgs> ProcessingDelta;
+        public event EventHandler<ServerProcessedDeltaEventArgs> ProcessedDelta;
 
         public async Task<IEnumerable<IDelta>> GetDeltasAsync(string NodeId, string startIndex, CancellationToken cancellationToken)
         {
@@ -143,10 +143,10 @@ namespace BIT.Data.Sync.Server
                 return;
             }
             deltaProcessorWithEvents.ProcessingDelta += (sender, e) => {
-                ProcessingDelta?.Invoke(sender, new SyncServerProcessingDeltaEventArgs(e.Delta, syncServerNode));
+                ProcessingDelta?.Invoke(sender, new ServerProcessingDeltaEventArgs(e.Delta, syncServerNode));
             };
             deltaProcessorWithEvents.ProcessedDelta += (sender, e) => {
-                ProcessedDelta?.Invoke(sender, new SyncServerProcessDeltaBaseEventArgs(e.Delta, syncServerNode));
+                ProcessedDelta?.Invoke(sender, new ServerProcessedDeltaEventArgs(e.Delta, syncServerNode));
             };  
 
         }
@@ -158,10 +158,10 @@ namespace BIT.Data.Sync.Server
                 return;
             }   
             deltaStoreWithEvents.SavingDelta += (sender, e) => {
-                SavingDelta?.Invoke(sender, new SyncServerSavingDeltaEventArgs(e.Delta, syncServerNode));
+                SavingDelta?.Invoke(sender, new ServerSavingDeltaEventArgs(e.Delta, syncServerNode));
             };
             deltaStoreWithEvents.SavedDelta += (sender, e) => {
-                SavedDelta?.Invoke(sender, new SyncServerSavedDeltaEventArgs(e.Delta, syncServerNode));
+                SavedDelta?.Invoke(sender, new ServerSavedDeltaEventArgs(e.Delta, syncServerNode));
             };
 
            

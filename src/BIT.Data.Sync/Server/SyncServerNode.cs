@@ -26,7 +26,7 @@ namespace BIT.Data.Sync.Server
             if (deltaProcessorWithEvents != null)
             {
                 deltaProcessorWithEvents.ProcessingDelta += (sender, e) => ProcessingDelta?.Invoke(sender, new NodeProcessingDeltaEventArgs(e.Delta,this, e));
-                deltaProcessorWithEvents.ProcessedDelta += (sender, e) => ProcessedDelta?.Invoke(sender, new NodeProcessDeltaBaseEventArgs(e.Delta,this,e));
+                deltaProcessorWithEvents.ProcessedDelta += (sender, e) => ProcessedDelta?.Invoke(sender, new NodeProcessedDeltaEventArgs(e.Delta,this,e));
             }
             this.NodeId = nodeId;
         }
@@ -36,7 +36,7 @@ namespace BIT.Data.Sync.Server
         public event EventHandler<NodeSavingDeltaEventArgs> SavingDelta;
         public event EventHandler<NodeSavedDeltaEventArgs> SavedDelta;
         public event EventHandler<NodeProcessingDeltaEventArgs> ProcessingDelta;
-        public event EventHandler<NodeProcessDeltaBaseEventArgs> ProcessedDelta;
+        public event EventHandler<NodeProcessedDeltaEventArgs> ProcessedDelta;
 
         public virtual Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string startIndex, string identity, CancellationToken cancellationToken)
         {
