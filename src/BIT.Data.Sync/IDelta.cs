@@ -8,6 +8,7 @@ namespace BIT.Data.Sync
     /// </summary>
     public interface IDelta
     {
+        string DeltaId { get; }
         DateTime Date { get; set; }
        double Epoch { get; set; }
         /// <summary>

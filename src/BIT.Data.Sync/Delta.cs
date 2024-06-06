@@ -5,6 +5,9 @@ using System.Security.Permissions;
 
 namespace BIT.Data.Sync
 {
+
+    //TODO unify constructors
+
     /// <summary>
     /// An implementation of the IDelta interface, this class is primarily used for serialization and transportation purposes.
     /// </summary>
@@ -17,6 +20,7 @@ namespace BIT.Data.Sync
         /// </summary>
         public Delta()
         {
+            this.DeltaId = Guid.NewGuid().ToString();
         }
 
         /// <summary>
@@ -24,7 +28,7 @@ namespace BIT.Data.Sync
         /// </summary>
         /// <param name="identity">The identity of the delta.</param>
         /// <param name="operation">The operation of the delta.</param>
-        public Delta(string identity, byte[] operation)
+        public Delta(string identity, byte[] operation):this()
         {
             Identity = identity;
             Operation = operation;
@@ -34,12 +38,13 @@ namespace BIT.Data.Sync
         /// Constructor that initializes the properties based on an existing IDelta instance.
         /// </summary>
         /// <param name="Delta">The existing IDelta instance.</param>
-        public Delta(IDelta Delta)
+        public Delta(IDelta Delta) : this()
         {
             Identity = Delta.Identity;
             Index = Delta.Index;
             Operation = Delta.Operation;
             Epoch = Delta.Epoch;
+            DeltaId = Delta.DeltaId;
         }
 
         /// <summary>
@@ -84,5 +89,10 @@ namespace BIT.Data.Sync
         /// </summary>
         [DataMember]
         public virtual double Epoch { get; set; }
+        /// <summary>
+        /// The id of the delta
+        /// </summary>
+        [DataMember]
+        public string DeltaId { get; set; }
     }
 }

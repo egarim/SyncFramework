@@ -23,7 +23,16 @@ namespace BIT.Data.Sync.Tests.Controllers
     {
         public SyncController(ILogger<SyncControllerBase> logger, ISyncServer SyncServer) : base(logger, SyncServer)
         {
+            var ServerWithEvents= SyncServer as ISyncServerWithEvents;
+            if (ServerWithEvents != null)
+            {
+                ServerWithEvents.SavingDelta += ServerWithEvents_SavingDelta; ;
+            }
+        }
 
+        private void ServerWithEvents_SavingDelta(object sender, SyncServerSavingDeltaEventArgs e)
+        {
+           Debug.WriteLine($"Saving Delta {e.Delta.Index}");
         }
 
         public override Task<string> Fetch(string startIndex, string identity)
