@@ -19,7 +19,7 @@ namespace BIT.Data.Sync
        
 
         public event EventHandler<ProcessingDeltaEventArgs> ProcessingDelta;
-        public event EventHandler<BaseProcessedDeltaEventArgs> ProcessedDelta;
+        public event EventHandler<ProcessedDeltaEventArgs> ProcessedDelta;
 
         /// <summary>
         /// Raises the ProcessingDelta event.
@@ -34,7 +34,7 @@ namespace BIT.Data.Sync
         /// Raises the ProcessedDelta event.
         /// </summary>
         /// <param name="e"></param>
-        protected virtual void OnProcessedDelta(BaseProcessedDeltaEventArgs e)
+        protected virtual void OnProcessedDelta(ProcessedDeltaEventArgs e)
         {
             ProcessedDelta?.Invoke(this, e);
         }

@@ -15,6 +15,6 @@ namespace BIT.Data.Sync
         /// <summary>
         /// Occurs after a delta has been process to the store.
         /// </summary>
-        event EventHandler<BaseProcessedDeltaEventArgs> ProcessedDelta;
+        event EventHandler<ProcessedDeltaEventArgs> ProcessedDelta;
     }
 }

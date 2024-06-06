@@ -175,8 +175,8 @@ namespace BIT.Data.Sync.EfCore
                             dbCommand.ExecuteNonQuery();
 
 
-                        BaseProcessedDeltaEventArgs saveDeltaBaseEventArgs = new BaseProcessedDeltaEventArgs(delta);
-                        OnProcessedDelta(saveDeltaBaseEventArgs);
+                        ProcessedDeltaEventArgs args = new ProcessedDeltaEventArgs(delta);
+                        OnProcessedDelta(args);
                     }
                 }
                

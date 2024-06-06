@@ -43,6 +43,6 @@ namespace BIT.Data.Sync.Server
         /// <summary>
         /// Function used to spin up a new server node
         /// </summary>
-        Func<RegisterNodeRequest, ISyncServerNode> RegisterNodeFunction { get;  }
+        Func<RegisterNodeRequest, ISyncServerNode> RegisterNodeFunction { get; set; }
     }
 }
