@@ -30,27 +30,27 @@ namespace BIT.Data.Sync.Imp
                 OnProcessingDelta(processingDeltaEventArgs);
 
                 // Check if the event handling should be canceled
-                if (processingDeltaEventArgs.Handled)
+                if (!processingDeltaEventArgs.CustomHandled)
                 {
-                    return Task.CompletedTask;
+                    var Modification = this.GetDeltaOperations<SimpleDatabaseModification>(delta);
+                    switch (Modification.Operation)
+                    {
+                        case OperationType.Add:
+                            this._CurrentData.Add(Modification.Record);
+                            break;
+                        case OperationType.Delete:
+                            var ObjectToDelete = this._CurrentData.FirstOrDefault(x => x.Key == Modification.Record.Key);
+                            this._CurrentData.Remove(ObjectToDelete);
+                            break;
+                        case OperationType.Update:
+                            var ObjectToUpdate = this._CurrentData.FirstOrDefault(x => x.Key == Modification.Record.Key);
+                            var Index = this._CurrentData.IndexOf(ObjectToUpdate);
+                            this._CurrentData[Index] = Modification.Record;
+                            break;
+                    }
                 }
-                var Modification= this.GetDeltaOperations<SimpleDatabaseModification>(delta);
-                switch (Modification.Operation)
-                {
-                    case OperationType.Add:
-                        this._CurrentData.Add(Modification.Record);
-                        break;
-                    case OperationType.Delete:
-                        var ObjectToDelete=  this._CurrentData.FirstOrDefault(x=>x.Key==Modification.Record.Key);
-                        this._CurrentData.Remove(ObjectToDelete);
-                        break;
-                    case OperationType.Update:
-                        var ObjectToUpdate = this._CurrentData.FirstOrDefault(x => x.Key == Modification.Record.Key);
-                        var Index= this._CurrentData.IndexOf(ObjectToUpdate);
-                        this._CurrentData[Index] = Modification.Record;
-                        break;
-                }
-                OnProcessedDelta(new ProcessedDeltaEventArgs(delta));
+              
+                OnProcessedDelta(new ProcessedDeltaEventArgs(delta, processingDeltaEventArgs.CustomHandled));
                 
             }
             return Task.CompletedTask;

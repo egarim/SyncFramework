@@ -18,25 +18,25 @@ namespace BIT.Data.Sync.Server
             IDeltaStoreWithEvents deltaStoreWithEvents = deltaStore as IDeltaStoreWithEvents;
             if (deltaStoreWithEvents != null)
             {
-                deltaStoreWithEvents.SavingDelta += (sender, e) => SavingDelta?.Invoke(sender,new NodeSavingDeltaEventArgs(e.Delta,this,e));
-                deltaStoreWithEvents.SavedDelta += (sender, e) => SavedDelta?.Invoke(sender, new NodeSavedDeltaEventArgs(e.Delta, this, e));
+                deltaStoreWithEvents.SavingDelta += (sender, e) => NodeSavingDelta?.Invoke(sender,new NodeSavingDeltaEventArgs(this,e));
+                deltaStoreWithEvents.SavedDelta += (sender, e) => NodeSavedDelta?.Invoke(sender, new NodeSavedDeltaEventArgs(this, e));
             }      
             this.deltaProcessor = deltaProcessor;
             IDeltaProcessorWithEvents deltaProcessorWithEvents = deltaProcessor as IDeltaProcessorWithEvents;
             if (deltaProcessorWithEvents != null)
             {
-                deltaProcessorWithEvents.ProcessingDelta += (sender, e) => ProcessingDelta?.Invoke(sender, new NodeProcessingDeltaEventArgs(e.Delta,this, e));
-                deltaProcessorWithEvents.ProcessedDelta += (sender, e) => ProcessedDelta?.Invoke(sender, new NodeProcessedDeltaEventArgs(e.Delta,this,e));
+                deltaProcessorWithEvents.ProcessingDelta += (sender, e) => NodeProcessingDelta?.Invoke(sender, new NodeProcessingDeltaEventArgs(this, e));
+                deltaProcessorWithEvents.ProcessedDelta += (sender, e) => NodeProcessedDelta?.Invoke(sender, new NodeProcessedDeltaEventArgs(this,e));
             }
             this.NodeId = nodeId;
         }
 
         public string NodeId { get; set; }
 
-        public event EventHandler<NodeSavingDeltaEventArgs> SavingDelta;
-        public event EventHandler<NodeSavedDeltaEventArgs> SavedDelta;
-        public event EventHandler<NodeProcessingDeltaEventArgs> ProcessingDelta;
-        public event EventHandler<NodeProcessedDeltaEventArgs> ProcessedDelta;
+        public event EventHandler<NodeSavingDeltaEventArgs> NodeSavingDelta;
+        public event EventHandler<NodeSavedDeltaEventArgs> NodeSavedDelta;
+        public event EventHandler<NodeProcessingDeltaEventArgs> NodeProcessingDelta;
+        public event EventHandler<NodeProcessedDeltaEventArgs> NodeProcessedDelta;
 
         public virtual Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string startIndex, string identity, CancellationToken cancellationToken)
         {

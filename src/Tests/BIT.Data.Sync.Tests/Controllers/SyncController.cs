@@ -26,13 +26,13 @@ namespace BIT.Data.Sync.Tests.Controllers
             var ServerWithEvents= SyncServer as ISyncServerWithEvents;
             if (ServerWithEvents != null)
             {
-                ServerWithEvents.SavingDelta += ServerWithEvents_SavingDelta; ;
+                ServerWithEvents.ServerSavingDelta += ServerWithEvents_SavingDelta; ;
             }
         }
 
         private void ServerWithEvents_SavingDelta(object sender, ServerSavingDeltaEventArgs e)
         {
-           Debug.WriteLine($"Saving Delta {e.Delta.Index}");
+           Debug.WriteLine($"Saving Delta {e.NodeSavingArgs.SavingDeltaArgs.Delta.Index}");
         }
 
         public override Task<string> Fetch(string startIndex, string identity)

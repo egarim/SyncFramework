@@ -43,16 +43,17 @@ namespace BIT.Data.Sync.Imp
                 OnSavingDelta(SavingEventArgs);
 
                 // Check if the event handling should be canceled
-                if (!SavingEventArgs.Handled)
+                if (!SavingEventArgs.CustomHandled)
                 {
                     await SetDeltaIndex(delta);
                     cancellationToken.ThrowIfCancellationRequested();
                     Delta item = new Delta(delta);
                     item.Index = delta.Index;
                     Deltas.Add(item);
-                    SavedDeltaEventArgs saveDeltaBaseEventArgs = new SavedDeltaEventArgs(delta);
-                    OnSavedDelta(saveDeltaBaseEventArgs);
+                    
                 }
+                SavedDeltaEventArgs saveDeltaBaseEventArgs = new SavedDeltaEventArgs(delta, SavingEventArgs.CustomHandled);
+                OnSavedDelta(saveDeltaBaseEventArgs);
             }
            
         }

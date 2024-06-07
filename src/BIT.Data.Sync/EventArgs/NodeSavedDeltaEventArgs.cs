@@ -3,15 +3,15 @@ using System;
 
 namespace BIT.Data.Sync.EventArgs
 {
-    public class NodeSavedDeltaEventArgs : SavedDeltaEventArgs
+    public class NodeSavedDeltaEventArgs : BaseSyncEvent
     {
 
-        public NodeSavedDeltaEventArgs(IDelta delta, ISyncServerNode node, BaseSaveDeltaEventArgs saveDeltaBaseEventArgs) : base(delta)
+        public NodeSavedDeltaEventArgs(ISyncServerNode node, SavedDeltaEventArgs Args) 
         {
             Node = node;
-            this.SaveDeltaArgs = saveDeltaBaseEventArgs;
+            this.SaveDeltaArgs = Args;
         }
-        BaseSaveDeltaEventArgs SaveDeltaArgs { get; set; }
+        public SavedDeltaEventArgs SaveDeltaArgs { get; set; }
         public ISyncServerNode Node { get; set; }
     }
 }

@@ -3,12 +3,12 @@ using System;
 
 namespace BIT.Data.Sync.EventArgs
 {
-    public class NodeProcessingDeltaEventArgs : ProcessingDeltaEventArgs
+    public class NodeProcessingDeltaEventArgs : BaseSyncEvent
     {
-        public NodeProcessingDeltaEventArgs(IDelta delta, ISyncServerNode node, ProcessingDeltaEventArgs processingDeltaEventArgs) : base(delta)
+        public NodeProcessingDeltaEventArgs(ISyncServerNode node, ProcessingDeltaEventArgs Args) 
         {
             Node = node;
-            this.ProcessingDeltaArgs = processingDeltaEventArgs;
+            this.ProcessingDeltaArgs = Args;
         }
         public ISyncServerNode Node { get; set; }
         public ProcessingDeltaEventArgs ProcessingDeltaArgs { get; set; }

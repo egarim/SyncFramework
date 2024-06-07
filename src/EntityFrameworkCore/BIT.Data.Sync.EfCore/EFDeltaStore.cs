@@ -53,7 +53,7 @@ namespace BIT.EfCore.Sync
                 OnSavingDelta(SavingEventArgs);
 
                 // Check if the event handling should be canceled
-                if (!SavingEventArgs.Handled)
+                if (!SavingEventArgs.CustomHandled)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     await SetDeltaIndex(delta);
@@ -61,10 +61,10 @@ namespace BIT.EfCore.Sync
 
                     DeltaDbContext.Deltas.Add(entity);
                     await DeltaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-                    SavedDeltaEventArgs args = new SavedDeltaEventArgs(delta);
-                    OnSavedDelta(args);  
+                   
                 }
-             
+                SavedDeltaEventArgs args = new SavedDeltaEventArgs(delta, SavingEventArgs.CustomHandled);
+                OnSavedDelta(args);
             }
             
 

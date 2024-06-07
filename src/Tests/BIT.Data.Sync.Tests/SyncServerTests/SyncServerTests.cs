@@ -27,41 +27,34 @@ namespace BIT.Data.Sync.Tests.SyncServerTests
         [Test]
         public async Task ServerEvents()
         {
-            var NodeId="Node1";
-            ISyncServer server = new SyncServer();
-            server.RegisterNodeFunction =  (node) =>
-            {
-                string NodeId = node.Options.FirstOrDefault(k => k.Key == "NodeId").Value;
-                return new SyncServerNode(new MemoryDeltaStore(), new SimpleDatabaseDeltaProcessor(new List<SimpleDatabaseRecord>(),null), NodeId);
-            };
-            server.RegisterNodeAsync(new RegisterNodeRequest() { Options = new System.Collections.Generic.List<Option>() { new Option("NodeId", NodeId) } });
+            var NodeId = "Node1";
+            ISyncServer server = GetSyncServer(NodeId);
 
+            List<IDelta> list = GetDeltas();
 
-            List<IDelta> list = new List<IDelta>();
-            byte[] data = Encoding.UTF8.GetBytes("Test");
-            list.Add(SerializationHelper.CreateDeltaCore("Test",new SimpleDatabaseModification( OperationType.Add,new SimpleDatabaseRecord())));
             bool SavedDelta = false;
             bool SavingDelta = false;
             bool ProcessingDelta = false;
             bool ProcessedDelta = false;
+
             ISyncServerWithEvents ServerWithEvents = (ISyncServerWithEvents)server;
-            ServerWithEvents.SavingDelta += (sender, e) =>
+            ServerWithEvents.ServerSavingDelta += (sender, e) =>
             {
-                SavingDelta= true;
+                SavingDelta = true;
                 Debug.WriteLine("SavingDelta");
             };
-            ServerWithEvents.SavedDelta += (sender, e) =>
+            ServerWithEvents.ServerSavedDelta += (sender, e) =>
             {
                 SavedDelta = true;
                 Debug.WriteLine("SavedDelta");
             };
-            ServerWithEvents.ProcessingDelta += (sender, e) =>
+            ServerWithEvents.ServerProcessingDelta += (sender, e) =>
             {
+
                 ProcessingDelta = true;
-                e.Handled = true;
                 Debug.WriteLine("ProcessingDelta");
             };
-            ServerWithEvents.ProcessedDelta+= (sender, e) =>
+            ServerWithEvents.ServerProcessedDelta += (sender, e) =>
             {
                 ProcessedDelta = true;
                 Debug.WriteLine("ProcessedDelta");
@@ -76,8 +69,130 @@ namespace BIT.Data.Sync.Tests.SyncServerTests
             Assert.IsTrue(ProcessingDelta);
             Assert.IsTrue(ProcessedDelta);
         }
-      
-    
+        [Test]
+        public async Task CancelingDeltaSavingEvent()
+        {
+            var NodeId = "Node1";
+            ISyncServer server = GetSyncServer(NodeId);
+
+            List<IDelta> list = GetDeltas();
+
+
+            bool CustomHandled = false;
+
+
+            ISyncServerWithEvents ServerWithEvents = (ISyncServerWithEvents)server;
+            ServerWithEvents.ServerSavingDelta += (sender, e) =>
+            {
+                
+                e.NodeSavingArgs.SavingDeltaArgs.CustomHandled = true;
+                Debug.WriteLine("SavingDelta");
+            };
+            ServerWithEvents.ServerSavedDelta += (sender, e) =>
+            {
+                CustomHandled=e.NodeSavedArgs.SaveDeltaArgs.CustomHandled;  
+
+
+                Debug.WriteLine("SavedDelta");
+            };
+
+
+            await server.SaveDeltasAsync(NodeId, list, default);
+        
+
+            Assert.IsTrue(CustomHandled);
+     
+        }
+        [Test]
+        public async Task CustomHandlingServerSavingDelta()
+        {
+            var NodeId = "Node1";
+            ISyncServer server = GetSyncServer(NodeId);
+
+            List<IDelta> list = GetDeltas();
+
+
+            bool CustomHandled = false;
+
+
+            ISyncServerWithEvents ServerWithEvents = (ISyncServerWithEvents)server;
+            ServerWithEvents.ServerSavingDelta += (sender, e) =>
+            {
+              
+                e.NodeSavingArgs.SavingDeltaArgs.CustomHandled = true;
+                Debug.WriteLine("SavingDelta");
+            };
+            ServerWithEvents.ServerSavedDelta += (sender, e) =>
+            {
+                CustomHandled=e.NodeSavedArgs.SaveDeltaArgs.CustomHandled;
+
+
+                Debug.WriteLine("SavedDelta");
+            };
+
+
+
+            await server.SaveDeltasAsync(NodeId, list, default);
+
+
+            Assert.IsTrue(CustomHandled);
+
+        }
+        [Test]
+        public async Task CustomHandlingServerProcessingDelta()
+        {
+            var NodeId = "Node1";
+            ISyncServer server = GetSyncServer(NodeId);
+
+            List<IDelta> list = GetDeltas();
+
+
+            bool CustomHandled = false;
+
+
+            ISyncServerWithEvents ServerWithEvents = (ISyncServerWithEvents)server;
+            ServerWithEvents.ServerProcessingDelta += (sender, e) =>
+            {
+              
+                e.NodeProcessingArgs.ProcessingDeltaArgs.CustomHandled = true;
+                Debug.WriteLine(nameof(ServerWithEvents.ServerProcessingDelta));
+            };
+            ServerWithEvents.ServerProcessedDelta += (sender, e) =>
+            {
+                CustomHandled = e.NodeProcessedArgs.ProcessedDeltaArgs.CustomHandled;
+                Debug.WriteLine(nameof(ServerWithEvents.ServerProcessedDelta));
+
+            };
+
+
+
+            await server.ProcessDeltasAsync(NodeId, list, default);
+
+
+            Assert.IsTrue(CustomHandled);
+
+        }
+        private static List<IDelta> GetDeltas()
+        {
+            List<IDelta> list = new List<IDelta>();
+            byte[] data = Encoding.UTF8.GetBytes("Test");
+            list.Add(SerializationHelper.CreateDeltaCore("Test", new SimpleDatabaseModification(OperationType.Add, new SimpleDatabaseRecord())));
+            return list;
+        }
+
+        private static ISyncServer GetSyncServer(string NodeId)
+        {
+            ISyncServer server = new SyncServer();
+
+            server.RegisterNodeFunction = (node) =>
+            {
+                string ServerNodeId = node.Options.FirstOrDefault(k => k.Key == "NodeId").Value;
+                return new SyncServerNode(new MemoryDeltaStore(), new SimpleDatabaseDeltaProcessor(new List<SimpleDatabaseRecord>(), null), ServerNodeId);
+            };
+            server.RegisterNodeAsync(new RegisterNodeRequest() { Options = new System.Collections.Generic.List<Option>() { new Option("NodeId", NodeId) } });
+            return server;
+        }
+
 
     }
 

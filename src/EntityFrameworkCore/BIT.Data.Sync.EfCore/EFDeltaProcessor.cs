@@ -148,38 +148,44 @@ namespace BIT.Data.Sync.EfCore
 
                 // Raise the event
                 OnProcessingDelta(processingDeltaEventArgs);
-
+              
+              
                 // Check if the event handling should be canceled
-                if (!processingDeltaEventArgs.Handled)
+                if (processingDeltaEventArgs.CustomHandled)
                 {
-                    List<ModificationCommandData> ModificationsData = this.GetDeltaOperations<List<ModificationCommandData>>(delta);
-                    if (System.Diagnostics.Debugger.IsAttached)
-                    {
-                        WriteModificationsDataToDebugConsole(ModificationsData);
-                    }
-                    foreach (ModificationCommandData modificationCommandData in ModificationsData)
-                    {
-
-                        IDbCommand dbCommand = CreateDbCommand(CurrentDbEngine, delta, dbConnection, modificationCommandData);
-
-                        if (dbConnection.State != ConnectionState.Open)
-                        {
-                            dbConnection.Open();
-                        }
-
-                        Debug.WriteLine($"Command:{dbCommand.CommandText}--{delta.Identity}");
-                        var dbCommandAsync = dbCommand as DbCommand;
-                        if (dbCommandAsync != null)
-                            await dbCommandAsync.ExecuteNonQueryAsync().ConfigureAwait(false);
-                        else
-                            dbCommand.ExecuteNonQuery();
-
-
-                        ProcessedDeltaEventArgs args = new ProcessedDeltaEventArgs(delta);
-                        OnProcessedDelta(args);
-                    }
+                   
+                    ProcessedDeltaEventArgs args = new ProcessedDeltaEventArgs(delta, processingDeltaEventArgs.CustomHandled);
+                    OnProcessedDelta(args);
+                    continue;
                 }
-               
+
+                List<ModificationCommandData> ModificationsData = this.GetDeltaOperations<List<ModificationCommandData>>(delta);
+                if (System.Diagnostics.Debugger.IsAttached)
+                {
+                    WriteModificationsDataToDebugConsole(ModificationsData);
+                }
+                foreach (ModificationCommandData modificationCommandData in ModificationsData)
+                {
+
+                    IDbCommand dbCommand = CreateDbCommand(CurrentDbEngine, delta, dbConnection, modificationCommandData);
+
+                    if (dbConnection.State != ConnectionState.Open)
+                    {
+                        dbConnection.Open();
+                    }
+
+                    Debug.WriteLine($"Command:{dbCommand.CommandText}--{delta.Identity}");
+                    var dbCommandAsync = dbCommand as DbCommand;
+                    if (dbCommandAsync != null)
+                        await dbCommandAsync.ExecuteNonQueryAsync().ConfigureAwait(false);
+                    else
+                        dbCommand.ExecuteNonQuery();
+
+
+                    ProcessedDeltaEventArgs args = new ProcessedDeltaEventArgs(delta, processingDeltaEventArgs.CustomHandled);
+                    OnProcessedDelta(args);
+                }
+
             }
 
 
