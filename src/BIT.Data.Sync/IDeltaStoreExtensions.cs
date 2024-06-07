@@ -11,13 +11,13 @@ namespace BIT.Data.Sync
         /// Decompresses the operation of a delta and deserializes it into an object of type T.
         /// </summary>
         /// <typeparam name="T">The type of the object.</typeparam>
-        /// <param name="deltaStore">The delta store.</param>
+        /// <param name="deltaProcessor">The delta store.</param>
         /// <param name="delta">The delta.</param>
         /// <returns>The deserialized object.</returns>
-        public static T GetDeltaOperations<T>(this IDeltaProcessor deltaStore, IDelta delta)
+        public static T GetDeltaOperations<T>(this IDeltaProcessor deltaProcessor, IDelta delta)
         {
-            var Data = deltaStore.Decompress(delta.Operation);
-            return deltaStore.DeSerialize<T>(Data);
+            var Data = deltaProcessor.Decompress(delta.Operation);
+            return deltaProcessor.DeSerialize<T>(Data);
         }
         /// <summary>
         /// Decompresses the operation of a delta and deserializes it into an object of type T.
