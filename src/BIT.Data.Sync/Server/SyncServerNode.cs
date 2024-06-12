@@ -38,6 +38,11 @@ namespace BIT.Data.Sync.Server
         public event EventHandler<NodeProcessingDeltaEventArgs> NodeProcessingDelta;
         public event EventHandler<NodeProcessedDeltaEventArgs> NodeProcessedDelta;
 
+        public Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken)
+        {
+           return this.deltaStore?.GetDeltaAsync(deltaId, cancellationToken);
+        }
+
         public virtual Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string startIndex, string identity, CancellationToken cancellationToken)
         {
             if(string.IsNullOrEmpty(identity))

@@ -17,6 +17,16 @@ namespace BIT.Data.Sync.Server
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<IEnumerable<IDelta>> GetDeltasAsync(string nodeId, string startIndex, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// The function will fetch all the deltas that are greater than current <paramref name="startIndex"/>
+        /// </summary>
+        /// <param name="nodeId"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<IDelta> GetDeltaAsync(string nodeId, string deltaId, CancellationToken cancellationToken);
+
         /// <summary>
         /// The function will fetch all other node deltas that are greater than current <paramref name="startIndex"/>
         /// </summary>

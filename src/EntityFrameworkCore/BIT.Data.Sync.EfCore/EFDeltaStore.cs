@@ -179,6 +179,11 @@ namespace BIT.EfCore.Sync
                 await DeltaDbContext.SaveChangesAsync(cancellationToken);
             }
         }
+
+        public override Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken)
+        {
+           return DeltaDbContext.Deltas.FirstOrDefaultAsync(d => d.Index == deltaId).ContinueWith(t => (IDelta)t.Result);
+        }
     }
 
 

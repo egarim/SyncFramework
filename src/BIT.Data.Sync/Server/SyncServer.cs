@@ -161,6 +161,11 @@ namespace BIT.Data.Sync.Server
         {
            return RegisterNodeAsync(this.RegisterNodeFunction(registerNodeRequest));
         }
+
+        public Task<IDelta> GetDeltaAsync(string nodeId, string deltaId, CancellationToken cancellationToken)
+        {
+            return this.Nodes.Find(node => node.NodeId == nodeId).GetDeltaAsync(deltaId, cancellationToken);
+        }
     }
    
 

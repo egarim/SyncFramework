@@ -1,9 +1,16 @@
-﻿## Version 2.0.0
+﻿## Version 2.0.1-beta
+
+-IDeltaStore added Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken)
+-ISyncServer added Task<IDelta> GetDeltaAsync(string nodeId, string deltaId, CancellationToken cancellationToken)
+-ISyncServerNode added Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken)
+
+
+## Version 2.0.0-beta
 - Added `ISyncServerWithEvents` Interface.
 - Added `ISyncServerNodeWithEvents` Interface.
 - Added `IDeltaStoreWithEvents` Interface.
 - Added `IDeltaProcessorWithEvents` Interface.
-- 
+
 ## version BIT.Data.Sync 1.0.12 
 
 - Changed the version of the EF Core packages as shown below:

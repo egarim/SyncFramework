@@ -136,7 +136,12 @@ namespace BIT.Data.Sync.Imp
            _syncStatus.Remove(identity);
             return Task.CompletedTask;
         }
-      
+
+        public override Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken)
+        {
+            return Deltas.FirstOrDefault(Deltas => Deltas.Index == deltaId) as Task<IDelta>;
+        }
+
 
 
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously

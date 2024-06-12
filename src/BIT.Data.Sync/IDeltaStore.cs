@@ -96,7 +96,13 @@ namespace BIT.Data.Sync
         /// </summary>
         ISequenceService SequenceService { get; }
 
+        /// <summary>
+        /// The function will fetch all the deltas that are greater than current <paramref name="deltaId"/>
+        /// </summary>
+        /// <param name="deltaId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken);
 
-      
     }
 }
