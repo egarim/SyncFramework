@@ -28,17 +28,17 @@ namespace BIT.Data.Sync.Tests
 
             YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
             ServiceCollectionMaster.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
-           
+            
 
 
 
-            //ServiceCollectionMaster.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
+            ServiceCollectionMaster.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
             //ServiceCollectionNode_A.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
             //ServiceCollectionNode_B.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
             //ServiceCollectionNode_C.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
 
 
-            ServiceCollectionMaster.AddSingleton(typeof(ISequenceService), typeof(EfSequenceService));
+            //ServiceCollectionMaster.AddSingleton(typeof(ISequenceService), typeof(EfSequenceService));
           
 
 
@@ -48,7 +48,9 @@ namespace BIT.Data.Sync.Tests
             var options = new DbContextOptionsBuilder<DeltaDbContext>()
           .UseInMemoryDatabase(databaseName: nameof(SaveDeltasAsync_Test))
           .Options;
-          
+
+           
+
             IDeltaStore memoryDeltaStore = new EfDeltaStore(new DeltaDbContext(options));
             //IDeltaStore memoryDeltaStore = new MemoryDeltaStore(new List<IDelta>());
 
