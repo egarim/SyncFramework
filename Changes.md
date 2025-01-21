@@ -1,4 +1,10 @@
-﻿## version BIT.Data.Sync 1.0.12 
+﻿## version BIT.Data.Sync 1.0.14 
+- Changed Target to NET 9.
+
+## version BIT.Data.Sync 1.0.13 
+- Patch for compatibility with XPO Syncframework.
+
+## version BIT.Data.Sync 1.0.12 
 
 - Changed the version of the EF Core packages as shown below:
 - EfCorePostgresVersion: 8.0.4
