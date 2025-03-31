@@ -109,11 +109,11 @@ namespace BIT.Data.Sync.EfCore.Tests
             try
             {
                 ConnectionStringParserService connectionStringParserService = new ConnectionStringParserService(Cnx);
-                string DatabaseName = connectionStringParserService.GetPartByName("Initial Catalog");
-                connectionStringParserService.RemovePartByName("Initial Catalog");
+                string DatabaseName = connectionStringParserService.GetPartByName("Database");
+                connectionStringParserService.RemovePartByName("Database");
 
                 // Connect to the "master" database to drop the database
-                connectionStringParserService.UpdatePartByName("Initial Catalog", "master");
+                connectionStringParserService.UpdatePartByName("Database", "master");
                 Cnx = connectionStringParserService.GetConnectionString();
 
                 using (var connection = new SqlConnection(Cnx))
@@ -125,6 +125,7 @@ namespace BIT.Data.Sync.EfCore.Tests
                         cmd.Connection = connection;
 
                         cmd.CommandText = $"ALTER DATABASE {DatabaseName} SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE {DatabaseName};";
+
                         cmd.ExecuteNonQuery();
                     }
                 }
@@ -185,7 +186,7 @@ namespace BIT.Data.Sync.EfCore.Tests
         public async Task MainTest()
         {
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
+            EfDeltaStore.EnsureDeleted = true;
 
             DropPostgres(PostgresSyncFrameworkTestCnx);
             DropPostgres(PostgresSyncFrameworkTestDeltaCnx);
