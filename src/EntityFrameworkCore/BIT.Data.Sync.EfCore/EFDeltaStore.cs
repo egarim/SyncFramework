@@ -14,11 +14,18 @@ namespace BIT.EfCore.Sync
     public class EfDeltaStore : DeltaStoreBase
     {
         DeltaDbContext DeltaDbContext;
+        public static bool EnsureDeleted = false;
         public EfDeltaStore(DeltaDbContext DeltaDbContext):base(DeltaDbContext.GetService<ISequenceService>())
         {
             this.DeltaDbContext = DeltaDbContext;
             //HACK TEST remove the comment below to ensure a clean delta database for testing
-            //this.DeltaDbContext.Database.EnsureDeleted();
+            //HACK TEST
+            if(EnsureDeleted)
+            {
+                this.DeltaDbContext.Database.EnsureDeleted();
+            }
+              
+            
             this.DeltaDbContext.Database.EnsureCreated();
           
         }
