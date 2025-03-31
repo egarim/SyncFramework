@@ -29,18 +29,18 @@ namespace BIT.Data.Sync.EfCore.Tests
 {
     public class AllDatabaseTests : MultiServerBaseTest
     {
-        string SqlServerSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSyncFrameworkTestCnx), EnvironmentVariableTarget.Machine);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
-        string SqlServerSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.Machine);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
+        string SqlServerSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSyncFrameworkTestCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
+        string SqlServerSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);//@"Server=.\sqlexpress;Database=EfMaster;Trusted_Connection=True;";
 
 
-        string PostgresSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(PostgresSyncFrameworkTestCnx), EnvironmentVariableTarget.Machine);
-        string PostgresSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(PostgresSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.Machine);
+        string PostgresSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(PostgresSyncFrameworkTestCnx), EnvironmentVariableTarget.User);
+        string PostgresSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(PostgresSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
 
-        string SQLiteSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SQLiteSyncFrameworkTestCnx), EnvironmentVariableTarget.Machine);
-        string SQLiteSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(SQLiteSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.Machine);
+        string SQLiteSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SQLiteSyncFrameworkTestCnx), EnvironmentVariableTarget.User);
+        string SQLiteSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(SQLiteSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
 
-        string MySQLSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestCnx), EnvironmentVariableTarget.Machine);
-        string MySQLSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.Machine);
+        string MySQLSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestCnx), EnvironmentVariableTarget.User);
+        string MySQLSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
 
         void DropMysql(string Cnx)
         {
@@ -186,15 +186,14 @@ namespace BIT.Data.Sync.EfCore.Tests
         {
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
+            DropSqlServer(SqlServerSyncFrameworkTestCnx);
+            DropSqlServer(SqlServerSyncFrameworkTestDeltaCnx);
 
             DropPostgres(PostgresSyncFrameworkTestCnx);
             DropPostgres(PostgresSyncFrameworkTestDeltaCnx);
 
             DropMysql(MySQLSyncFrameworkTestCnx);
             DropMysql(MySQLSyncFrameworkTestDeltaCnx);
-
-            DropSqlServer(SqlServerSyncFrameworkTestCnx);
-            DropSqlServer(SqlServerSyncFrameworkTestDeltaCnx);
 
             DropSQLite(SQLiteSyncFrameworkTestCnx);
             DropSQLite(SQLiteSyncFrameworkTestDeltaCnx);
