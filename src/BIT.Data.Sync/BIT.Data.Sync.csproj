@@ -21,9 +21,15 @@
 	<!--Nuget Generation Section End-->
 	<!--Nuget Reference Section Start-->
 	<!--NugetProject ReferencesSection End-->
+	<!--<Target Name="CopyPackage" AfterTargets="Pack">
+		<Copy SourceFiles="bin\$(Configuration)\$(PackageId).$(Version).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" />
+	</Target>-->
+
+	<!--NugetProject ReferencesSection End-->
 	<Target Name="CopyPackage" AfterTargets="Pack">
 		<Copy SourceFiles="bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" />
 	</Target>
+
 	<ItemGroup>
 	  <None Include="..\..\README.md" Link="README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
