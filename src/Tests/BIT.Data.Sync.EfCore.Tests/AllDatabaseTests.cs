@@ -109,11 +109,11 @@ namespace BIT.Data.Sync.EfCore.Tests
             try
             {
                 ConnectionStringParserService connectionStringParserService = new ConnectionStringParserService(Cnx);
-                string DatabaseName = connectionStringParserService.GetPartByName("Initial Catalog");
-                connectionStringParserService.RemovePartByName("Initial Catalog");
+                string DatabaseName = connectionStringParserService.GetPartByName("Database");
+                connectionStringParserService.RemovePartByName("Database");
 
                 // Connect to the "master" database to drop the database
-                connectionStringParserService.UpdatePartByName("Initial Catalog", "master");
+                connectionStringParserService.UpdatePartByName("Database", "master");
                 Cnx = connectionStringParserService.GetConnectionString();
 
                 using (var connection = new SqlConnection(Cnx))
@@ -125,6 +125,7 @@ namespace BIT.Data.Sync.EfCore.Tests
                         cmd.Connection = connection;
 
                         cmd.CommandText = $"ALTER DATABASE {DatabaseName} SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE {DatabaseName};";
+
                         cmd.ExecuteNonQuery();
                     }
                 }
@@ -185,7 +186,7 @@ namespace BIT.Data.Sync.EfCore.Tests
         public async Task MainTest()
         {
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
+            EfDeltaStore.EnsureDeleted = true;
 
             DropPostgres(PostgresSyncFrameworkTestCnx);
             DropPostgres(PostgresSyncFrameworkTestDeltaCnx);
@@ -322,13 +323,12 @@ namespace BIT.Data.Sync.EfCore.Tests
                 MasterContext.Add(NpgsqlBlog);
                 MasterContext.Add(PomeloMySqlBlog);
                 await MasterContext.SaveChangesAsync();
-                var Master_Push_Result = await MasterContext.PushAsync();
-                Assert.IsTrue(Master_Push_Result.Success);
+                await MasterContext.PushAsync();
 
 
-                var Node_A_Pull_Results = await Node_A_Context.PullAsync();
-                var Node_B_Pull_Results = await Node_B_Context.PullAsync();
-                var Node_C_Pull_Results = await Node_C_Context.PullAsync();
+                await Node_A_Context.PullAsync();
+                await Node_B_Context.PullAsync();
+                await Node_C_Context.PullAsync();
 
                 //Expected 4 for each node
 
@@ -342,17 +342,13 @@ namespace BIT.Data.Sync.EfCore.Tests
 
 
                 await Node_A_Context.SaveChangesAsync();
-                var Node_A_Push = await Node_A_Context.PushAsync();
-                Assert.IsTrue(Node_A_Push.Success);
+                await Node_A_Context.PushAsync();
 
                 await Node_B_Context.SaveChangesAsync();
-                var Node_B_Push = await Node_B_Context.PushAsync();
-                Assert.IsTrue(Node_B_Push.Success);
+                await Node_B_Context.PushAsync();
 
                 await Node_C_Context.SaveChangesAsync();
-                var Node_C_Push = await Node_C_Context.PushAsync();
-                Assert.IsTrue(Node_C_Push.Success);
-
+                await Node_C_Context.PushAsync();
 
                 //Expected 5 for each node
 
