@@ -27,6 +27,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 string index = Response.Deltas.Max(d => d.Index);
                 await instance.DeltaStore.SetLastProcessedDeltaAsync(index, instance.Identity, cancellationToken).ConfigureAwait(false);
             }
+            Response.Success = true; 
             return Response;
 
         }

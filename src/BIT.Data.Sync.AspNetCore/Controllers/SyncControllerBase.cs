@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using BIT.Data.Sync.Client;
 using System.Text.RegularExpressions;
+using System.Text.Json;
 
 
 namespace BIT.Data.Sync.AspNetCore.Controllers
@@ -168,24 +169,60 @@ namespace BIT.Data.Sync.AspNetCore.Controllers
             return fetchResponse;
         }
 
+        //[HttpPost("RegisterNode")]
+        //public virtual async Task<bool> RegisterNode()
+        //{
+        //    var stream = new StreamReader(this.Request.Body);
+        //    var body = await stream.ReadToEndAsync();
+
+        //    RegisterNodeRequest Request = null;
+
+
+        //    using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(body)))
+        //    {
+        //        DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(RegisterNodeRequest));
+        //        Request = (RegisterNodeRequest)deserialized.ReadObject(ms);
+
+        //    }
+        //    return _SyncServer.RegisterNodeAsync(Request);
+        //}
+
         [HttpPost("RegisterNode")]
-        public virtual async Task<bool> RegisterNode()
+        public virtual async Task<IActionResult> RegisterNode()
         {
-            var stream = new StreamReader(this.Request.Body);
+            using var stream = new StreamReader(this.Request.Body);
             var body = await stream.ReadToEndAsync();
 
-            RegisterNodeRequest Request = null;
+            RegisterNodeRequest request = null;
 
-
-            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(body)))
+            try
             {
-                DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(RegisterNodeRequest));
-                Request = (RegisterNodeRequest)deserialized.ReadObject(ms);
-
+                request = JsonSerializer.Deserialize<RegisterNodeRequest>(body);
             }
-            return _SyncServer.RegisterNodeAsync(Request);
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to deserialize RegisterNodeRequest.");
+                return BadRequest("Invalid request format.");
+            }
+
+            if (request == null)
+            {
+                return BadRequest("Request cannot be null.");
+            }
+
+            bool result = _SyncServer.RegisterNodeAsync(request);
+
+            if (result)
+            {
+                return Ok();
+            }
+            else
+            {
+                return StatusCode(500, "Failed to register node.");
+            }
         }
 
 
-        }
+
+    }
 }

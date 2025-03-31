@@ -44,9 +44,9 @@ namespace BIT.Data.Sync.Tests.Controllers
         {
             return base.Push();
         }
-        public override Task<bool> RegisterNode()
+        public virtual async Task<IActionResult> RegisterNode()
         {
-            return base.RegisterNode();
+            return await base.RegisterNode();
         }
     }
 }

@@ -77,7 +77,13 @@ namespace BIT.Data.Sync.Imp
 
         public override async Task<string> GetLastProcessedDeltaAsync(string identity, CancellationToken cancellationToken = default)
         {
-            return _syncStatus[identity].LastProcessedDelta;
+
+            if(_syncStatus.ContainsKey(identity))
+            {
+                return _syncStatus[identity].LastProcessedDelta;
+            }
+
+            return string.Empty;
         }
 
         public override async Task SetLastProcessedDeltaAsync(string Index, string identity, CancellationToken cancellationToken = default)
