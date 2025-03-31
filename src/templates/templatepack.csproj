@@ -12,6 +12,7 @@
 		<NoWarn>$(NoWarn);NU5128</NoWarn>
 		<NoDefaultExcludes>true</NoDefaultExcludes>
 		<LangVersion>latest</LangVersion>
+		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="..\..\README.md" Link="README.md" Pack="true" PackagePath="\" />
@@ -25,6 +26,12 @@
 		<PackageId>BIT.Data.Sync.Templates</PackageId>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageVersion>$(BitDataSyncNugetVersion)</PackageVersion>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+	  <PackageType>Template</PackageType>
+	  <PackageId>BIT.Data.Sync.Templates</PackageId>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <PackageVersion>$(BitDataSyncNugetVersion)</PackageVersion>
 	</PropertyGroup>
 	<Target Name="CopyPackage" AfterTargets="Pack">
 		<Copy SourceFiles="bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" />
