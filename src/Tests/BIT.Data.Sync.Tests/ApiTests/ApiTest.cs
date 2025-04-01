@@ -119,6 +119,52 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
 
         }
         [Test]
+        public async Task PushResultWhenNothingToPush()
+        {
+            // 0 - Get the network client connected to the API controller exposed by the test infrastructure
+            var httpclient = this.GetTestClientFactory().CreateClient("TestClient");
+            string NodeId = TestStartup.STR_MemoryDeltaStore1;
+            ISyncFrameworkClient syncFrameworkClient = new SyncFrameworkHttpClient(httpclient, NodeId);
+
+            // 1 - Create a database with no data to push
+            SimpleDatabase emptyDatabase = new SimpleDatabase("EmptyPush", syncFrameworkClient);
+
+            // 2 - Push without adding any records (nothing to push)
+            var Result = await emptyDatabase.PushAsync();
+
+            // 3 - Verify the result
+            Assert.IsTrue(Result.Success, "Push operation should succeed even when nothing to push");
+            Assert.AreEqual("Nothing to send", Result.Message, "Message should indicate nothing to send");
+        }
+
+        [Test]
+        public async Task PullResultWhenNothingToPull()
+        {
+            // 0 - Get the network client connected to the API controller exposed by the test infrastructure
+            var httpclient = this.GetTestClientFactory().CreateClient("TestClient");
+            string NodeId = TestStartup.STR_MemoryDeltaStore1;
+            ISyncFrameworkClient syncFrameworkClient = new SyncFrameworkHttpClient(httpclient, NodeId);
+
+            // 1 - Create a database 
+            SimpleDatabase database = new SimpleDatabase("EmptyPull", syncFrameworkClient);
+
+            // 2 - Add data and push it to the server to set a last processed delta
+            SimpleDatabaseRecord testRecord = new SimpleDatabaseRecord() { Key = Guid.NewGuid(), Text = "Test" };
+            await database.Add(testRecord);
+            await database.PushAsync();
+
+            // 3 - Pull once to process any deltas and set the last processed delta
+            await database.PullAsync();
+
+            // 4 - Pull again when there are no new deltas to process
+            var Result = await database.PullAsync();
+
+            // 5 - Verify the result
+            Assert.IsTrue(Result.Success, "Pull operation should succeed even when nothing to pull");
+            Assert.AreEqual("Nothing to receive", Result.Message, "Message should indicate nothing to receive");
+        }
+
+        [Test]
         public async Task NodeNotFoundTest()
         {
             //0 - Get the network client connected to the API controller exposed by the test infrastructure
