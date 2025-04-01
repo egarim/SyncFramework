@@ -77,7 +77,7 @@ namespace BIT.Data.Sync
             {
                 Date = now,
                 Identity = Identity,
-
+                Index = "-1", // Generate a new unique index for the delta 
                 Operation = SerializationHelper.CompressCore(SerializationHelper.SerializeCore(Operations)),
             
             };

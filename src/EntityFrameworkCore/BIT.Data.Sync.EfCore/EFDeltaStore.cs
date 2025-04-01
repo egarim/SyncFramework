@@ -18,6 +18,7 @@ namespace BIT.EfCore.Sync
 
         public static bool EnsureDeleted { get; set; }
         DeltaDbContext DeltaDbContext;
+        [Obsolete("use the constructor with DbContextOptionsBuilder or DeltaDbContext directly instead. This constructor is for testing purposes only and may be removed in future versions.",true)]
         public EfDeltaStore(DeltaDbContext DeltaDbContext):base(DeltaDbContext.GetService<ISequenceService>())
         {
             this.DeltaDbContext = DeltaDbContext;
@@ -31,11 +32,24 @@ namespace BIT.EfCore.Sync
             this.DeltaDbContext.Database.EnsureCreated();
           
         }
-        public EfDeltaStore(DbContextOptionsBuilder<DeltaDbContext> dbContextOptionsBuilder):this(new DeltaDbContext(dbContextOptionsBuilder.Options))
+        public EfDeltaStore(DeltaDbContext DeltaDbContext, ISequenceService sequenceService) : base(sequenceService)
         {
+            this.DeltaDbContext = DeltaDbContext;
+            //HACK TEST remove the comment below to ensure a clean delta database for testing
+
+            if (EnsureDeleted)
+            {
+                this.DeltaDbContext.Database.EnsureDeleted();
+            }
+
+            this.DeltaDbContext.Database.EnsureCreated();
+
+        }
+        //public EfDeltaStore(DbContextOptionsBuilder<DeltaDbContext> dbContextOptionsBuilder):this(new DeltaDbContext(dbContextOptionsBuilder.Options))
+        //{
            
             
-        }
+        //}
 
 
         //TODO clean up later, constructor not needed

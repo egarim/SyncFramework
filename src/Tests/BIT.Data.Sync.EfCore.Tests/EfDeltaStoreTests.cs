@@ -27,44 +27,22 @@ namespace BIT.Data.Sync.Tests
         public async Task SaveDeltasAsync_Test()
         {
 
-        //        ailed: BIT.Data.Sync.Tests.EfDeltaStoreTests.SaveDeltasAsync_Test
-        //  System.InvalidOperationException : Unable to resolve service for type 'BIT.Data.Sync.ISequenceService'.This is often because no database provider has been configured for this DbContext.A provider can be configured by overriding the 'DbContext.OnConfiguring' method or by using 'AddDbContext' on the application service provider.If 'AddDbContext' is used, then also ensure that your DbContext type accepts a DbContextOptions<TContext> object in its constructor and passes it to the base constructor for DbContext.
-        //  System.InvalidOperationException : Unable to resolve service for type 'BIT.Data.Sync.ISequenceService'.This is often because no database provider has been configured for this DbContext.A provider can be configured by overriding the 'DbContext.OnConfiguring' method or by using 'AddDbContext' on the application service provider.If 'AddDbContext' is used, then also ensure that your DbContext type accepts a DbContextOptions<TContext> object in its constructor and passes it to the base constructor for DbContext.
-        //EntityFrameworkCore\BIT.Data.Sync.EfCore\EFDeltaStore.cs(21, 0) : BIT.EfCore.Sync.EfDeltaStore..ctor(DeltaDbContext DeltaDbContext)
-        //Tests\BIT.Data.Sync.EfCore.Tests\EfDeltaStoreTests.cs(52, 0) : BIT.Data.Sync.Tests.EfDeltaStoreTests.SaveDeltasAsync_Test()
-        // Summary: Passed: 3, Failed: 1, Ignored: 0
+            var options = new DbContextOptionsBuilder<DeltaDbContext>()
+                        .UseInMemoryDatabase(databaseName: nameof(SaveDeltasAsync_Test))
+                        .Options;
 
-
-            ServiceCollection ServiceCollectionMaster = new ServiceCollection();
-
-            YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
-            ServiceCollectionMaster.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
+            DeltaDbContext deltaDbContext = new(options);
            
 
+            YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
+            EfSequenceService sequenceService = new EfSequenceService(implementationInstance, deltaDbContext);
+
+        
 
 
-            //ServiceCollectionMaster.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
-            //ServiceCollectionNode_A.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
-            //ServiceCollectionNode_B.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
-            //ServiceCollectionNode_C.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
 
-
-            ServiceCollectionMaster.AddSingleton(typeof(ISequenceService), typeof(EfSequenceService));
-          
-
-
-            var _providerMaster = ServiceCollectionMaster.BuildServiceProvider();
-          
-
-            var options = new DbContextOptionsBuilder<DeltaDbContext>()
-          .UseInMemoryDatabase(databaseName: nameof(SaveDeltasAsync_Test))
-          .Options;
-
-         
-
-            IDeltaStore memoryDeltaStore = new EfDeltaStore(new DeltaDbContext(options));
-            //IDeltaStore memoryDeltaStore = new MemoryDeltaStore(new List<IDelta>());
-
+            IDeltaStore memoryDeltaStore = new EfDeltaStore(deltaDbContext, sequenceService);
+        
             var  DeltaHello=  memoryDeltaStore.CreateDelta("A", "Hello");
 
             await memoryDeltaStore.SaveDeltasAsync(new List<IDelta>(){ DeltaHello },default);
@@ -76,7 +54,20 @@ namespace BIT.Data.Sync.Tests
         [Test]
         public async Task SetAndGetLastProcessedDelta_Test()
         {
-            IDeltaStore memoryDeltaStore = new MemoryDeltaStore(new List<IDelta>());
+
+
+            var options = new DbContextOptionsBuilder<DeltaDbContext>()
+                        .UseInMemoryDatabase(databaseName: nameof(SaveDeltasAsync_Test))
+                        .Options;
+
+            DeltaDbContext deltaDbContext = new(options);
+
+
+            YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
+            EfSequenceService sequenceService = new EfSequenceService(implementationInstance, deltaDbContext);
+
+
+            IDeltaStore memoryDeltaStore = new EfDeltaStore(deltaDbContext, sequenceService);
 
             var DeltaHello = memoryDeltaStore.CreateDelta("A", "Hello");
 
@@ -90,7 +81,18 @@ namespace BIT.Data.Sync.Tests
         [Test]
         public async Task GetDeltasAsync_Test()
         {
-            IDeltaStore memoryDeltaStore = new MemoryDeltaStore(new List<IDelta>());
+            var options = new DbContextOptionsBuilder<DeltaDbContext>()
+                                   .UseInMemoryDatabase(databaseName: nameof(SaveDeltasAsync_Test))
+                                   .Options;
+
+            DeltaDbContext deltaDbContext = new(options);
+
+
+            YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
+            EfSequenceService sequenceService = new EfSequenceService(implementationInstance, deltaDbContext);
+
+
+            IDeltaStore memoryDeltaStore = new EfDeltaStore(deltaDbContext, sequenceService);
 
             var DeltaHello = memoryDeltaStore.CreateDelta("A", "Hello");
             var DeltaWorld = memoryDeltaStore.CreateDelta("A", "World");
@@ -103,6 +105,9 @@ namespace BIT.Data.Sync.Tests
 
             Assert.NotNull(DeltasFromStore.FirstOrDefault(d=>d.Index==DeltaHello.Index));
             Assert.NotNull(DeltasFromStore.FirstOrDefault(d => d.Index == DeltaWorld.Index));
+
+       
+         
         }
         [Test]
         public async Task PurgeDeltasAsync_Test()
@@ -117,6 +122,6 @@ namespace BIT.Data.Sync.Tests
             Assert.AreEqual(0, await memoryDeltaStore.GetDeltaCountAsync(string.Empty, ""));
 
         }
-        //TODO add test for GetLastProcessedDeltaAsync check the it should never be "" it should be the same as sequence service GetMinValue
+       
     }
 }
