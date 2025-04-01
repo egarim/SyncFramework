@@ -27,6 +27,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 string index = Response.Deltas.Max(d => d.Index);
                 await instance.DeltaStore.SetLastProcessedDeltaAsync(index, instance.Identity, cancellationToken).ConfigureAwait(false);
             }
+            {
+                Response.Message = "Nothing to receive";
+            }
             Response.Success = true; 
             return Response;
 
@@ -43,6 +46,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 Response = await instance.SyncFrameworkClient.PushAsync(Deltas, cancellationToken).ConfigureAwait(false);
                 if(Response.Success)
                     await instance.DeltaStore.SetLastPushedDeltaAsync(Max, instance.Identity, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                Response = new PushOperationResponse();
+                Response.Success = true;
+                Response.Message = "Nothing to send";
             }
             return Response;
 
