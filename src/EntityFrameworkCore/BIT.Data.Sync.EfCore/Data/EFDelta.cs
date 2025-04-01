@@ -29,6 +29,8 @@ namespace BIT.Data.Sync.EfCore.Data
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key, Column(Order = 0)]
         public Guid Oid { get; set; }
+
+     
     }
 
 }

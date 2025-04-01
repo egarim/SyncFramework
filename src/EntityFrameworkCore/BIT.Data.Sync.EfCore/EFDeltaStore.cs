@@ -1,5 +1,6 @@
 ﻿using BIT.Data.Sync;
 using BIT.Data.Sync.EfCore.Data;
+using BIT.Data.Sync.EventArgs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
@@ -13,19 +14,20 @@ namespace BIT.EfCore.Sync
 {
     public class EfDeltaStore : DeltaStoreBase
     {
+
+
+        public static bool EnsureDeleted { get; set; }
         DeltaDbContext DeltaDbContext;
-        public static bool EnsureDeleted = false;
         public EfDeltaStore(DeltaDbContext DeltaDbContext):base(DeltaDbContext.GetService<ISequenceService>())
         {
             this.DeltaDbContext = DeltaDbContext;
             //HACK TEST remove the comment below to ensure a clean delta database for testing
-            //HACK TEST
+            
             if(EnsureDeleted)
             {
                 this.DeltaDbContext.Database.EnsureDeleted();
             }
-              
-            
+           
             this.DeltaDbContext.Database.EnsureCreated();
           
         }
@@ -48,15 +50,31 @@ namespace BIT.EfCore.Sync
      
         public async override Task SaveDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+       
             foreach (IDelta delta in deltas)
             {
-                await SetDeltaIndex(delta);
-                EfDelta entity = new EfDelta(delta);
-               
-                DeltaDbContext.Deltas.Add(entity);
+
+                // Create an instance of the custom EventArgs
+                var SavingEventArgs = new SavingDeltaEventArgs(delta);
+
+                // Raise the event
+                OnSavingDelta(SavingEventArgs);
+
+                // Check if the event handling should be canceled
+                if (!SavingEventArgs.CustomHandled)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await SetDeltaIndex(delta);
+                    EfDelta entity = new EfDelta(delta);
+
+                    DeltaDbContext.Deltas.Add(entity);
+                    await DeltaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                   
+                }
+                SavedDeltaEventArgs args = new SavedDeltaEventArgs(delta, SavingEventArgs.CustomHandled);
+                OnSavedDelta(args);
             }
-            await DeltaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            
 
         }
         public override async Task<string> GetLastProcessedDeltaAsync(string identity, CancellationToken cancellationToken = default)
@@ -170,10 +188,9 @@ namespace BIT.EfCore.Sync
             }
         }
 
-        public override async Task<bool> CanRestoreDatabaseAsync(string identity, CancellationToken cancellationToken)
+        public override Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            return await DeltaDbContext.EFSyncStatus.AnyAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
+           return DeltaDbContext.Deltas.FirstOrDefaultAsync(d => d.Index == deltaId).ContinueWith(t => (IDelta)t.Result);
         }
     }
 

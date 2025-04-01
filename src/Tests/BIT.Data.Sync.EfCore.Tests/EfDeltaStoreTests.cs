@@ -1,13 +1,15 @@
-using NUnit.Framework;
-using System.Collections.Generic;
-using System.Diagnostics;
 using BIT.Data.Sync.Imp;
-using System.Threading.Tasks;
-using System;
-using System.Linq;
 using BIT.EfCore.Sync;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Linq;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BIT.Data.Sync.Tests
 {
@@ -24,21 +26,30 @@ namespace BIT.Data.Sync.Tests
         [Test]
         public async Task SaveDeltasAsync_Test()
         {
+
+        //        ailed: BIT.Data.Sync.Tests.EfDeltaStoreTests.SaveDeltasAsync_Test
+        //  System.InvalidOperationException : Unable to resolve service for type 'BIT.Data.Sync.ISequenceService'.This is often because no database provider has been configured for this DbContext.A provider can be configured by overriding the 'DbContext.OnConfiguring' method or by using 'AddDbContext' on the application service provider.If 'AddDbContext' is used, then also ensure that your DbContext type accepts a DbContextOptions<TContext> object in its constructor and passes it to the base constructor for DbContext.
+        //  System.InvalidOperationException : Unable to resolve service for type 'BIT.Data.Sync.ISequenceService'.This is often because no database provider has been configured for this DbContext.A provider can be configured by overriding the 'DbContext.OnConfiguring' method or by using 'AddDbContext' on the application service provider.If 'AddDbContext' is used, then also ensure that your DbContext type accepts a DbContextOptions<TContext> object in its constructor and passes it to the base constructor for DbContext.
+        //EntityFrameworkCore\BIT.Data.Sync.EfCore\EFDeltaStore.cs(21, 0) : BIT.EfCore.Sync.EfDeltaStore..ctor(DeltaDbContext DeltaDbContext)
+        //Tests\BIT.Data.Sync.EfCore.Tests\EfDeltaStoreTests.cs(52, 0) : BIT.Data.Sync.Tests.EfDeltaStoreTests.SaveDeltasAsync_Test()
+        // Summary: Passed: 3, Failed: 1, Ignored: 0
+
+
             ServiceCollection ServiceCollectionMaster = new ServiceCollection();
 
             YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
             ServiceCollectionMaster.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
-            
+           
 
 
 
-            ServiceCollectionMaster.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
+            //ServiceCollectionMaster.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
             //ServiceCollectionNode_A.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
             //ServiceCollectionNode_B.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
             //ServiceCollectionNode_C.AddSingleton(typeof(ISequenceService), typeof(MemorySequenceService));
 
 
-            //ServiceCollectionMaster.AddSingleton(typeof(ISequenceService), typeof(EfSequenceService));
+            ServiceCollectionMaster.AddSingleton(typeof(ISequenceService), typeof(EfSequenceService));
           
 
 
@@ -49,7 +60,7 @@ namespace BIT.Data.Sync.Tests
           .UseInMemoryDatabase(databaseName: nameof(SaveDeltasAsync_Test))
           .Options;
 
-           
+         
 
             IDeltaStore memoryDeltaStore = new EfDeltaStore(new DeltaDbContext(options));
             //IDeltaStore memoryDeltaStore = new MemoryDeltaStore(new List<IDelta>());

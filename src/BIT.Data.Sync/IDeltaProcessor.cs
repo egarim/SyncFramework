@@ -21,5 +21,7 @@ namespace BIT.Data.Sync
         /// Gets the sequence service used by the delta processor.
         /// </summary>
         ISequenceService SequenceService { get; }
+
+    
     }
 }

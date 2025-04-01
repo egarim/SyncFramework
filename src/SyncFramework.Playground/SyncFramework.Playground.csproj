@@ -6,6 +6,7 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 	<!--<PropertyGroup>
 		<RunAOTCompilation>true</RunAOTCompilation>

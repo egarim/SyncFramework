@@ -1,5 +1,4 @@
-﻿using BIT.Data.Sync;
-using BIT.Data.Sync.Server;
+﻿using BIT.Data.Sync.Server;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,6 +11,8 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Diagnostics;
 using BIT.Data.Sync.AspNetCore.Controllers;
+using BIT.Data.Sync.Client;
+using BIT.Data.Sync.EventArgs;
 
 namespace BIT.Data.Sync.Tests.Controllers
 {
@@ -22,7 +23,16 @@ namespace BIT.Data.Sync.Tests.Controllers
     {
         public SyncController(ILogger<SyncControllerBase> logger, ISyncServer SyncServer) : base(logger, SyncServer)
         {
+            var ServerWithEvents= SyncServer as ISyncServerWithEvents;
+            if (ServerWithEvents != null)
+            {
+                ServerWithEvents.ServerSavingDelta += ServerWithEvents_SavingDelta; ;
+            }
+        }
 
+        private void ServerWithEvents_SavingDelta(object sender, ServerSavingDeltaEventArgs e)
+        {
+           Debug.WriteLine($"Saving Delta {e.NodeSavingArgs.SavingDeltaArgs.Delta.Index}");
         }
 
         public override Task<string> Fetch(string startIndex, string identity)
@@ -30,9 +40,13 @@ namespace BIT.Data.Sync.Tests.Controllers
             return base.Fetch(startIndex, identity);
         }
 
-        public override Task Push()
+        public override Task<string> Push()
         {
             return base.Push();
+        }
+        public virtual async Task<IActionResult> RegisterNode()
+        {
+            return await base.RegisterNode();
         }
     }
 }

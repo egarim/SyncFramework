@@ -1,5 +1,5 @@
-﻿using BIT.Data.Sync;
-using BIT.Data.Sync.EfCore.Data;
+﻿using BIT.Data.Sync.EfCore.Data;
+using BIT.Data.Sync.EventArgs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Update;
@@ -143,6 +143,22 @@ namespace BIT.Data.Sync.EfCore
             Debug.WriteLine($"CurrentDbEngine:{CurrentDbEngine}");
             foreach (IDelta delta in Deltas)
             {
+
+                var processingDeltaEventArgs = new ProcessingDeltaEventArgs(delta);
+
+                // Raise the event
+                OnProcessingDelta(processingDeltaEventArgs);
+              
+              
+                // Check if the event handling should be canceled
+                if (processingDeltaEventArgs.CustomHandled)
+                {
+                   
+                    ProcessedDeltaEventArgs args = new ProcessedDeltaEventArgs(delta, processingDeltaEventArgs.CustomHandled);
+                    OnProcessedDelta(args);
+                    continue;
+                }
+
                 List<ModificationCommandData> ModificationsData = this.GetDeltaOperations<List<ModificationCommandData>>(delta);
                 if (System.Diagnostics.Debugger.IsAttached)
                 {
@@ -150,10 +166,10 @@ namespace BIT.Data.Sync.EfCore
                 }
                 foreach (ModificationCommandData modificationCommandData in ModificationsData)
                 {
-                    
+
                     IDbCommand dbCommand = CreateDbCommand(CurrentDbEngine, delta, dbConnection, modificationCommandData);
-                    
-                    if(dbConnection.State!= ConnectionState.Open)
+
+                    if (dbConnection.State != ConnectionState.Open)
                     {
                         dbConnection.Open();
                     }
@@ -164,9 +180,12 @@ namespace BIT.Data.Sync.EfCore
                         await dbCommandAsync.ExecuteNonQueryAsync().ConfigureAwait(false);
                     else
                         dbCommand.ExecuteNonQuery();
-                  
 
+
+                    ProcessedDeltaEventArgs args = new ProcessedDeltaEventArgs(delta, processingDeltaEventArgs.CustomHandled);
+                    OnProcessedDelta(args);
                 }
+
             }
 
 

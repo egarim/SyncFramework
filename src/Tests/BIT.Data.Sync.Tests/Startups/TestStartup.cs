@@ -7,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 
 namespace BIT.Data.Sync.Tests.Startups
 {
@@ -16,7 +18,7 @@ namespace BIT.Data.Sync.Tests.Startups
         {
             Configuration = configuration;
         }
-
+        public static string STR_MemoryDeltaStore1 = "MemoryDeltaStore1";
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -25,11 +27,15 @@ namespace BIT.Data.Sync.Tests.Startups
             services.AddControllers();
 
 
-            services.AddSyncServerWithMemoryNode("MemoryDeltaStore1");
+            services.AddSyncServerWithMemoryNode(STR_MemoryDeltaStore1, RegisterNewNode);
             
 
         }
-
+        ISyncServerNode RegisterNewNode(RegisterNodeRequest request)
+        {
+            string NodeId= request.Options.FirstOrDefault(k=>k.Key== "NodeId").Value;
+            return new SyncServerNode(new MemoryDeltaStore(), null, NodeId);
+        }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {

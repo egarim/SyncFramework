@@ -3,12 +3,26 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using BIT.Data.Sync.EventArgs;
 
 namespace BIT.Data.Sync
 {
-    public abstract class DeltaStoreBase : IDeltaStore
+    public abstract class DeltaStoreBase : IDeltaStore, IDeltaStoreWithEvents
     {
         protected ISequenceService sequenceService;
+
+        public event EventHandler<SavingDeltaEventArgs> SavingDelta;
+        public event EventHandler<SavedDeltaEventArgs> SavedDelta;
+       
+        protected virtual void OnSavingDelta(SavingDeltaEventArgs e)
+        {
+            
+            SavingDelta?.Invoke(this, e);
+        }
+        protected virtual void OnSavedDelta(SavedDeltaEventArgs e)
+        {
+            SavedDelta?.Invoke(this, e);
+        }
         public ISequenceService SequenceService => sequenceService;
 
         public DeltaStoreBase(ISequenceService sequenceService)
@@ -48,8 +62,7 @@ namespace BIT.Data.Sync
 
         public abstract Task ResetDeltasStatusAsync(string identity, CancellationToken cancellationToken=default);
 
-        public abstract Task<bool> CanRestoreDatabaseAsync(string identity, CancellationToken cancellationToken);
-
-    
+        public abstract Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken);
+      
     }
 }

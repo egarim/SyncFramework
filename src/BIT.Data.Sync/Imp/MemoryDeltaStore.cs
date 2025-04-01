@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BIT.Data.Sync.EventArgs;
 
 namespace BIT.Data.Sync.Imp
 {
@@ -36,11 +37,23 @@ namespace BIT.Data.Sync.Imp
             cancellationToken.ThrowIfCancellationRequested();
             foreach (IDelta delta in deltas)
             {
-                await SetDeltaIndex(delta);
-                cancellationToken.ThrowIfCancellationRequested();
-                Delta item = new Delta(delta);
-                item.Index = delta.Index;
-                Deltas.Add(item);
+                var SavingEventArgs = new SavingDeltaEventArgs(delta);
+
+                // Raise the event
+                OnSavingDelta(SavingEventArgs);
+
+                // Check if the event handling should be canceled
+                if (!SavingEventArgs.CustomHandled)
+                {
+                    await SetDeltaIndex(delta);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    Delta item = new Delta(delta);
+                    item.Index = delta.Index;
+                    Deltas.Add(item);
+                    
+                }
+                SavedDeltaEventArgs saveDeltaBaseEventArgs = new SavedDeltaEventArgs(delta, SavingEventArgs.CustomHandled);
+                OnSavedDelta(saveDeltaBaseEventArgs);
             }
            
         }
@@ -64,7 +77,13 @@ namespace BIT.Data.Sync.Imp
 
         public override async Task<string> GetLastProcessedDeltaAsync(string identity, CancellationToken cancellationToken = default)
         {
-            return _syncStatus[identity].LastProcessedDelta;
+
+            if(_syncStatus.ContainsKey(identity))
+            {
+                return _syncStatus[identity].LastProcessedDelta;
+            }
+
+            return string.Empty;
         }
 
         public override async Task SetLastProcessedDeltaAsync(string Index, string identity, CancellationToken cancellationToken = default)
@@ -124,16 +143,11 @@ namespace BIT.Data.Sync.Imp
             return Task.CompletedTask;
         }
 
-        public override Task<bool> CanRestoreDatabaseAsync(string identity, CancellationToken cancellationToken)
+        public override Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (!_syncStatus.ContainsKey(identity))
-            {
-                return Task.FromResult(false);                
-            }
-            var status = _syncStatus[identity];
-            return Task.FromResult(status != null);
+            return Deltas.FirstOrDefault(Deltas => Deltas.Index == deltaId) as Task<IDelta>;
         }
+
 
 
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously

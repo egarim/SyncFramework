@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -49,13 +48,6 @@ namespace BIT.Data.Sync
         /// <returns>The count of deltas.</returns>
         Task<int> GetDeltaCountAsync(string startIndex, string identity, CancellationToken cancellationToken);
         /// <summary>
-        /// Checks if there is delta status exists.
-        /// </summary>
-        /// <param name="identity">The identity of the deltas.</param>
-        /// <param name="cancellationToken">A cancellation token.</param>
-        /// <returns>A boolean indicating whether a delta status exists.</returns>
-        Task<bool> CanRestoreDatabaseAsync(string identity, CancellationToken cancellationToken);
-        /// <summary>
         /// Gets the index of the last delta processed by this data object.
         /// </summary>
         /// <param name="identity">The identity of the deltas.</param>
@@ -103,5 +95,14 @@ namespace BIT.Data.Sync
         /// Gets the sequence service used by the delta store.
         /// </summary>
         ISequenceService SequenceService { get; }
+
+        /// <summary>
+        /// The function will fetch all the deltas that are greater than current <paramref name="deltaId"/>
+        /// </summary>
+        /// <param name="deltaId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken);
+
     }
 }
