@@ -21,16 +21,19 @@ namespace Microsoft.Extensions.DependencyInjection
         {            
             cancellationToken.ThrowIfCancellationRequested();
             var Response = await instance.FetchAsync(cancellationToken).ConfigureAwait(false);
-            if (Response.Deltas.Any())
+          
+            if (Response.Success && Response.Deltas.Any())
             {
                 await instance.DeltaProcessor.ProcessDeltasAsync(Response.Deltas, cancellationToken).ConfigureAwait(false);
                 string index = Response.Deltas.Max(d => d.Index);
                 await instance.DeltaStore.SetLastProcessedDeltaAsync(index, instance.Identity, cancellationToken).ConfigureAwait(false);
+                Response.Message= $"Received {Response.Deltas.Count()} deltas";
             }
+            if(!Response.Deltas.Any())
             {
                 Response.Message = "Nothing to receive";
             }
-            Response.Success = true; 
+
             return Response;
 
         }

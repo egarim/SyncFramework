@@ -119,6 +119,83 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
 
         }
         [Test]
+        public async Task WrongUrlTest_ForFetch()
+        {
+            // Arrange: Create an HttpClient with an invalid BaseAddress.
+            var httpclient = new HttpClient();
+            httpclient.BaseAddress = new Uri("http://localhost:12345/invalid");
+            httpclient.Timeout = TimeSpan.FromSeconds(3);
+            string NodeId = TestStartup.STR_MemoryDeltaStore1;
+            ISyncFrameworkClient syncFrameworkClient = new SyncFrameworkHttpClient(httpclient, NodeId);
+
+            // Act & Assert: Call FetchAsync directly.
+            try
+            {
+                var fetchResponse = await syncFrameworkClient.FetchAsync(string.Empty, NodeId,default);
+                // If no exception was thrown, the response should indicate failure.
+                Assert.IsFalse(fetchResponse.Success, "Fetch operation should not succeed with an invalid URL.");
+            }
+            catch (HttpRequestException ex)
+            {
+                // Expected exception due to wrong URL.
+                Assert.Pass("FetchAsync threw the expected HttpRequestException: " + ex.Message);
+            }
+        }
+
+        [Test]
+        public async Task WrongUrlTest_ForPull()
+        {
+            // Arrange: Create an HttpClient with an invalid BaseAddress.
+            var httpclient = new HttpClient();
+            httpclient.BaseAddress = new Uri("http://localhost:12345/invalid");
+            httpclient.Timeout = TimeSpan.FromSeconds(1);
+            string NodeId = TestStartup.STR_MemoryDeltaStore1;
+            ISyncFrameworkClient syncFrameworkClient = new SyncFrameworkHttpClient(httpclient, NodeId);
+
+            // Create a database instance using the misconfigured client.
+            SimpleDatabase db = new SimpleDatabase("Master", syncFrameworkClient);
+
+            // Act & Assert: Call PullAsync.
+            try
+            {
+                var result = await db.PullAsync();
+                Assert.IsFalse(result.Success, "Pull operation should not succeed with an invalid URL.");
+            }
+            catch (HttpRequestException ex)
+            {
+                // Expected exception due to wrong URL.
+                Assert.Pass("PullAsync threw the expected HttpRequestException: " + ex.Message);
+            }
+        }
+
+        [Test]
+        public async Task WrongUrlTest_OverrideBaseAddress()
+        {
+            // Arrange: Create a client via the factory and override its BaseAddress.
+            var httpclient = new HttpClient();//this.GetTestClientFactory().CreateClient("TestClient");
+            httpclient.BaseAddress = new Uri("http://localhost:12345/invalid");
+            httpclient.Timeout = TimeSpan.FromSeconds(3);
+            string NodeId = TestStartup.STR_MemoryDeltaStore1;
+            ISyncFrameworkClient syncFrameworkClient = new SyncFrameworkHttpClient(httpclient, NodeId);
+
+            // Create a sample database and add a record to push.
+            SimpleDatabase Master = new SimpleDatabase("Master", syncFrameworkClient);
+            SimpleDatabaseRecord record = new SimpleDatabaseRecord() { Key = Guid.NewGuid(), Text = "Test" };
+            await Master.Add(record);
+
+            // Act & Assert: Expect failure from a push with the wrong URL.
+            try
+            {
+                var result = await Master.PushAsync();
+                Assert.IsFalse(result.Success, "Push operation should not succeed with an invalid URL.");
+            }
+            catch (Exception ex)
+            {
+                Assert.Pass("PushAsync threw the expected HttpRequestException: " + ex.Message);
+            }
+        }
+
+        [Test]
         public async Task PushResultWhenNothingToPush()
         {
             // 0 - Get the network client connected to the API controller exposed by the test infrastructure
@@ -154,7 +231,7 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
             await database.PushAsync();
 
             // 3 - Pull once to process any deltas and set the last processed delta
-            await database.PullAsync();
+            var pullrResult= await database.PullAsync();
 
             // 4 - Pull again when there are no new deltas to process
             var Result = await database.PullAsync();

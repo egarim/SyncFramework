@@ -37,22 +37,34 @@ namespace BIT.Data.Sync.Client
         public virtual async Task<PushOperationResponse> PushAsync(IEnumerable<IDelta> Deltas, CancellationToken cancellationToken = default)
         {
             PushOperationResponse pushOperationResponse = null;
-            HttpResponseMessage httpResponseMessage = await PushCore(Deltas, cancellationToken).ConfigureAwait(false);
-            if (httpResponseMessage.IsSuccessStatusCode)
+            try
             {
-                string content = await httpResponseMessage.Content.ReadAsStringAsync();
-                using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(content)))
+                HttpResponseMessage httpResponseMessage = await PushCore(Deltas, cancellationToken).ConfigureAwait(false);
+                if (httpResponseMessage.IsSuccessStatusCode)
                 {
+                    string content = await httpResponseMessage.Content.ReadAsStringAsync();
+                    using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(content)))
+                    {
 
-                    DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(PushOperationResponse));
-                    pushOperationResponse = (PushOperationResponse)deserialized.ReadObject(ms);
+                        DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(PushOperationResponse));
+                        pushOperationResponse = (PushOperationResponse)deserialized.ReadObject(ms);
+                    }
+
+
+                    //pushOperationResponse= JsonSerializer.Deserialize<PushOperationResponse>(content);
+
                 }
-
-
-                //pushOperationResponse= JsonSerializer.Deserialize<PushOperationResponse>(content);
-
+                return pushOperationResponse;
             }
-            return pushOperationResponse;
+            catch (Exception ex)
+            {
+
+                pushOperationResponse = new PushOperationResponse();
+                pushOperationResponse.Success = false;
+                pushOperationResponse.Message = $"An error occurred while pushing deltas to the server.{ex.Message}";
+                return pushOperationResponse;
+            }
+           
         }
 
         private async Task<HttpResponseMessage> PushCore(IEnumerable<IDelta> Deltas, CancellationToken cancellationToken)
@@ -84,18 +96,30 @@ namespace BIT.Data.Sync.Client
 
         public virtual async Task<FetchOperationResponse> FetchAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
-            string responseString = await FetchCore(startIndex, identity, FetchRequestUri, cancellationToken).ConfigureAwait(false);
+            try
+            {
+                string responseString = await FetchCore(startIndex, identity, FetchRequestUri, cancellationToken).ConfigureAwait(false);
 
-            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(responseString)))
+                using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(responseString)))
+                {
+
+
+                    DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(FetchOperationResponse));
+                    FetchOperationResponse response = (FetchOperationResponse)deserialized.ReadObject(ms);
+
+                    return response;
+                }
+
+            }
+            catch (Exception ex)
             {
 
-
-                DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(FetchOperationResponse));
-                FetchOperationResponse response = (FetchOperationResponse)deserialized.ReadObject(ms);
-
-                return response;
+                FetchOperationResponse fetchOperationResponse = new FetchOperationResponse();
+                fetchOperationResponse.Success = false;
+                fetchOperationResponse.Message = $"An error occurred while fetching deltas from the server: {ex.Message}";
+                return fetchOperationResponse;
             }
-
+          
 
 
         }

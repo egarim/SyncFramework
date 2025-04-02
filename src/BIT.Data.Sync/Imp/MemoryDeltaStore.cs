@@ -80,12 +80,25 @@ namespace BIT.Data.Sync.Imp
 
             if(_syncStatus.ContainsKey(identity))
             {
-                return _syncStatus[identity].LastProcessedDelta;
+                var test= _syncStatus[identity].LastProcessedDelta;
+                return test;
             }
 
-            return string.Empty;
+            return "-1";
         }
+        public async override Task SetLastPushedDeltaAsync(string Index, string identity, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!_syncStatus.ContainsKey(identity))
+            {
+                _syncStatus.Add(identity, new SyncStatus());
+            }
+               
+            _syncStatus[identity].LastPushedDelta = Index;
+            _syncStatus[identity].LastProcessedDelta = Index;
 
+
+        }
         public override async Task SetLastProcessedDeltaAsync(string Index, string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -97,9 +110,6 @@ namespace BIT.Data.Sync.Imp
             {
                 _syncStatus.Add(identity, new SyncStatus() { LastProcessedDelta = Index, LastPushedDelta = Index });
             }
-        
-            
-
 
         }
 
@@ -111,15 +121,7 @@ namespace BIT.Data.Sync.Imp
             return _syncStatus[identity].LastPushedDelta;
         }
 
-        public async override Task SetLastPushedDeltaAsync(string Index, string identity, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (!_syncStatus.ContainsKey(identity))
-                _syncStatus.Add(identity, new SyncStatus());
-            _syncStatus[identity].LastPushedDelta = Index;
 
-
-        }
 
         public async override Task<int> GetDeltaCountAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
         {

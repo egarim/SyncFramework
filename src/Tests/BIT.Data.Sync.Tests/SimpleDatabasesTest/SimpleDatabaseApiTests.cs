@@ -72,9 +72,9 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
                 await B_Database.PushAsync();
 
                 //8 - Pull deltas from server
-                await Master.PullAsync();
-                await A_Database.PullAsync();
-                await B_Database.PullAsync();
+              var mr=   await Master.PullAsync();
+              var Ar=  await A_Database.PullAsync();
+              var Br=  await B_Database.PullAsync();
 
                 //9 - Write in the console the current state of each database
                 Debug.WriteLine("Data in master");
