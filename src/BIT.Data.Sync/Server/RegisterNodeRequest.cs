@@ -14,8 +14,8 @@ namespace BIT.Data.Sync.Server
         public string Key { get; set; }
 
         [DataMember]
-        public string Value { get; set; }
-        public Option(string key, string value)
+        public object Value { get; set; }
+        public Option(string key, object value)
         {
             Key = key;
             Value = value;

@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>ExpressApp.ico</ApplicationIcon>
+    <Deterministic>false</Deterministic>
+    <AssemblyVersion>1.0.*</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Configurations>Debug;Release;EasyTest</Configurations>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Include="DevExpress.ExpressApp.ListView" Alias="ListView" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Model.xafml" />
+    <None Remove="Images\Logo.svg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Model.xafml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\Logo.svg" />
+    <EmbeddedResource Include="Images\ExpressAppLogo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DevExpress.ExpressApp" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.Chart.Win" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.CodeAnalysis" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.Dashboards.Win" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.FileAttachment.Win" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.MultiTenancy.Win.Xpo" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.Notifications.Win" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.Office.Win" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.PivotChart.Win" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.PivotGrid.Win" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.ReportsV2.Win" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.Scheduler.Win" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.ScriptRecorder.Win" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.Security.Xpo" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.TreeListEditors.Win" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.Validation.Win" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.Win" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.Win.Design" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.Xpo" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.Persistent.Base" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.Persistent.BaseImpl.Xpo" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.Win.Design" Version="25.1.1-alpha" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SynFrameworkStudio.Module\SynFrameworkStudio.Module.csproj" />
+  </ItemGroup>
+</Project>

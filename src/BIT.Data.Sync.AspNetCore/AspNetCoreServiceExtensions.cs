@@ -51,5 +51,11 @@ namespace Microsoft.AspNetCore.Builder
             serviceCollection.AddSingleton<ISyncServer>(new SyncServer(Nodes) { RegisterNodeFunction = RegisterNodeFunction });
             return serviceCollection;
         }
+        public static IServiceCollection AddSyncServer(this IServiceCollection serviceCollection, Func<RegisterNodeRequest, ISyncServerNode> RegisterNodeFunction)
+        {
+      
+            serviceCollection.AddSingleton<ISyncServer>(new SyncServer() { RegisterNodeFunction = RegisterNodeFunction });
+            return serviceCollection;
+        }
     }
 }
