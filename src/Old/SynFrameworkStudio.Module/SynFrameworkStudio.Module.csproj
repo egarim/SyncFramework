@@ -7,6 +7,7 @@
     <FileVersion>1.0.0.0</FileVersion>
     <Configurations>Debug;Release;EasyTest</Configurations>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Model.DesignedDiffs.xafml" />
@@ -16,15 +17,28 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DevExpress.ExpressApp" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.AuditTrail.Xpo" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.Chart" Version="25.1.1-alpha" />
     <PackageReference Include="DevExpress.ExpressApp.CloneObject" Version="25.1.1-alpha" />
     <PackageReference Include="DevExpress.ExpressApp.CodeAnalysis" Version="25.1.1-alpha" />
     <PackageReference Include="DevExpress.ExpressApp.ConditionalAppearance" Version="25.1.1-alpha" />
     <PackageReference Include="DevExpress.ExpressApp.Dashboards" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.Kpi" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.MultiTenancy.Xpo" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.Notifications" Version="25.1.1-alpha" />
     <PackageReference Include="DevExpress.ExpressApp.Objects" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.Office" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.PivotChart" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.PivotGrid" Version="25.1.1-alpha" />
     <PackageReference Include="DevExpress.ExpressApp.ReportsV2" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.Scheduler" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.ScriptRecorder" Version="25.1.1-alpha" />
     <PackageReference Include="DevExpress.ExpressApp.Security" Version="25.1.1-alpha" />
     <PackageReference Include="DevExpress.ExpressApp.Security.Xpo" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.StateMachine" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.TreeListEditors" Version="25.1.1-alpha" />
     <PackageReference Include="DevExpress.ExpressApp.Validation" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.ViewVariantsModule" Version="25.1.1-alpha" />
     <PackageReference Include="DevExpress.ExpressApp.Xpo" Version="25.1.1-alpha" />
     <PackageReference Include="DevExpress.Persistent.Base" Version="25.1.1-alpha" />
     <PackageReference Include="DevExpress.Persistent.BaseImpl.Xpo" Version="25.1.1-alpha" />
@@ -33,12 +47,6 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BIT.Data.Sync.AspNetCore\BIT.Data.Sync.AspNetCore.csproj" />
     <ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
-    <ProjectReference Include="..\..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Pomelo.MySql\BIT.Data.Sync.EfCore.Pomelo.MySql.csproj" />
-    <ProjectReference Include="..\..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Sqlite\BIT.Data.Sync.EfCore.Sqlite.csproj" />
-    <ProjectReference Include="..\..\EntityFrameworkCore\BIT.Data.Sync.EfCore.SqlServer\BIT.Data.Sync.EfCore.SqlServer.csproj" />
-    <ProjectReference Include="..\..\EntityFrameworkCore\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
-    <ProjectReference Include="..\..\EntityFrameworkCore\NBIT.Data.Sync.EfCore.Npgsql\BIT.Data.Sync.EfCore.Npgsql.csproj" />
   </ItemGroup>
 </Project>

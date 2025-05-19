@@ -1,23 +1,33 @@
-﻿using DevExpress.ExpressApp.Security;
+﻿using BIT.Data.Sync.Imp;
+using BIT.Data.Sync.Server;
+using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.ApplicationBuilder;
 using DevExpress.ExpressApp.Blazor.ApplicationBuilder;
 using DevExpress.ExpressApp.Blazor.Services;
-using DevExpress.Persistent.Base;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Components.Server.Circuits;
-using DevExpress.ExpressApp.Xpo;
-using SynFrameworkStudio.Blazor.Server.Services;
-using DevExpress.Persistent.BaseImpl.PermissionPolicy;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.OData;
-using DevExpress.ExpressApp.WebApi.Services;
-using SynFrameworkStudio.WebApi.JWT;
+using DevExpress.ExpressApp.MultiTenancy;
+using DevExpress.ExpressApp.Security;
 using DevExpress.ExpressApp.Security.Authentication;
 using DevExpress.ExpressApp.Security.Authentication.ClientServer;
+using DevExpress.ExpressApp.WebApi.Services;
+using DevExpress.ExpressApp.WebApi.Xpo;
+using DevExpress.ExpressApp.Xpo;
+using DevExpress.Persistent.Base;
+using DevExpress.Persistent.BaseImpl.PermissionPolicy;
+using DevExpress.Xpo;
+using DevExpress.Xpo.Metadata;
+using DevExpress.XtraCharts.Native;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Server.Circuits;
+using Microsoft.AspNetCore.OData;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using SynFrameworkStudio.Blazor.Server.Services;
+using SynFrameworkStudio.Module.BusinessObjects.Sync;
+using SynFrameworkStudio.WebApi.JWT;
+using System.Text;
 
 namespace SynFrameworkStudio.Blazor.Server;
 
@@ -38,6 +48,57 @@ public class Startup {
         services.AddHttpContextAccessor();
         services.AddScoped<IAuthenticationTokenProvider, JwtTokenProviderService>();
         services.AddScoped<CircuitHandler, CircuitHandlerProxy>();
+        services.AddSyncServer((request) => {
+
+
+
+
+
+
+            string nodeId = request.Options.FirstOrDefault(k => k.Key == "NodeId").Value.ToString();
+            string ConnectionString = request.Options.FirstOrDefault(k => k.Key == "ConnectionString").Value.ToString();
+            XpoTypesInfoHelper.GetXpoTypeInfoSource();
+           
+            XafTypesInfo.Instance.RegisterEntity(typeof(XpoDeltaRecord));
+            XafTypesInfo.Instance.RegisterEntity(typeof(XpoDeltaState));
+            XafTypesInfo.Instance.RegisterEntity(typeof(XpoSequence));
+
+            XPObjectSpaceProvider osProvider = new XPObjectSpaceProvider(
+            ConnectionString, null);
+
+            osProvider.SchemaUpdateMode = SchemaUpdateMode.DatabaseAndSchema;
+            var UpdateOs = osProvider.CreateUpdatingObjectSpace(true) as XPObjectSpace;
+            //ReflectionDictionary reflectionDictionary = new ReflectionDictionary();
+            //var Tables= reflectionDictionary.GetDataStoreSchema(typeof(XpoDeltaRecord), typeof(XpoDeltaState), typeof(XpoSequence));
+
+            IDataLayer dl = XpoDefault.GetDataLayer(ConnectionString, DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema);
+            using (Session session = new Session(dl))
+            {
+                session.UpdateSchema(typeof(XpoDeltaState), typeof(XpoSequence), typeof(XpoDeltaRecord));
+                session.CreateObjectTypeRecords();
+            }
+
+
+            XpoSequenceService xpoSequenceService = new XpoSequenceService(osProvider);
+            XpoDeltaStore xpoDeltaStore = new XpoDeltaStore(xpoSequenceService, osProvider);
+
+            return new SyncServerNode(xpoDeltaStore, null, nodeId);
+
+
+
+
+
+
+
+            //string NodeId = request.Options.FirstOrDefault(k => k.Key == "NodeId").Value.ToString();
+            //XafApplication app = request.Options.FirstOrDefault(k => k.Key == "Application").Value as XafApplication;
+            //var ObjectSpace=  app.CreateObjectSpace<XpoDelta>();
+            //XpoSequenceService xpoSequenceService = new XpoSequenceService(app.ObjectSpaceProvider);
+            //XpoDeltaStore xpoDeltaStore = new XpoDeltaStore(xpoSequenceService, app.ObjectSpaceProvider);
+
+            //return new SyncServerNode(new MemoryDeltaStore(), null, NodeId);
+
+        });
         services.AddXaf(Configuration, builder => {
             builder.UseApplication<SynFrameworkStudioBlazorApplication>();
 
@@ -51,34 +112,46 @@ public class Startup {
             });
 
             builder.Modules
+                .AddAuditTrailXpo()
                 .AddCloning()
                 .AddConditionalAppearance()
                 .AddDashboards(options => {
                     options.DashboardDataType = typeof(DevExpress.Persistent.BaseImpl.DashboardData);
                 })
                 .AddFileAttachments()
+                .AddNotifications()
+                .AddOffice()
                 .AddReports(options => {
                     options.EnableInplaceReports = true;
                     options.ReportDataType = typeof(DevExpress.Persistent.BaseImpl.ReportDataV2);
                     options.ReportStoreMode = DevExpress.ExpressApp.ReportsV2.ReportStoreModes.XML;
                 })
+                .AddScheduler()
+                .AddStateMachine(options => {
+                    options.StateMachineStorageType = typeof(DevExpress.ExpressApp.StateMachine.Xpo.XpoStateMachine);
+                })
                 .AddValidation(options => {
                     options.AllowValidationDetailsAccess = false;
                 })
+                .AddViewVariants()
                 .Add<SynFrameworkStudio.Module.SynFrameworkStudioModule>()
                 .Add<SynFrameworkStudioBlazorModule>();
+
+            builder.AddMultiTenancy()
+                .WithHostDatabaseConnectionString(Configuration.GetConnectionString("ConnectionString"))
+#if EASYTEST
+                .WithHostDatabaseConnectionString(Configuration.GetConnectionString("EasyTestConnectionString"))
+#endif
+                .WithMultiTenancyModelDifferenceStore(options => {
+#if !RELEASE
+                    options.UseTenantSpecificModel = false;
+#endif
+                })
+                .WithTenantResolver<TenantByEmailResolver>();
+
             builder.ObjectSpaceProviders
                 .AddSecuredXpo((serviceProvider, options) => {
-                    string connectionString = null;
-                    if(Configuration.GetConnectionString("ConnectionString") != null) {
-                        connectionString = Configuration.GetConnectionString("ConnectionString");
-                    }
-#if EASYTEST
-                    if(Configuration.GetConnectionString("EasyTestConnectionString") != null) {
-                        connectionString = Configuration.GetConnectionString("EasyTestConnectionString");
-                    }
-#endif
-                    ArgumentNullException.ThrowIfNull(connectionString);
+                    string connectionString = serviceProvider.GetRequiredService<IConnectionStringProvider>().GetConnectionString();
                     options.ConnectionString = connectionString;
                     options.ThreadSafe = true;
                     options.UseSharedDataStoreProvider = true;

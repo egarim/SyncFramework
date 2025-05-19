@@ -1,10 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net9.0-windows</TargetFramework>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
     <IsPackable>false</IsPackable>
     <Configurations>Debug;Release;EasyTest</Configurations>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.2">
@@ -20,8 +22,10 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="DevExpress.ExpressApp.EasyTest.BlazorAdapter" Version="25.1.1-alpha" />
+    <PackageReference Include="DevExpress.ExpressApp.EasyTest.WinAdapter" Version="25.1.1-alpha" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SynFrameworkStudio.Blazor.Server\SynFrameworkStudio.Blazor.Server.csproj" />
     <ProjectReference Include="..\SynFrameworkStudio.Module\SynFrameworkStudio.Module.csproj" />
   </ItemGroup>
 </Project>

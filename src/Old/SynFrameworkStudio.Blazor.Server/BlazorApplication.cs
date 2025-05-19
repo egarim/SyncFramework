@@ -6,6 +6,8 @@ using DevExpress.ExpressApp.Security.ClientServer;
 using DevExpress.ExpressApp.SystemModule;
 using DevExpress.ExpressApp.Xpo;
 using SynFrameworkStudio.Blazor.Server.Services;
+using DevExpress.ExpressApp.MultiTenancy;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SynFrameworkStudio.Blazor.Server;
 
@@ -28,7 +30,7 @@ public class SynFrameworkStudioBlazorApplication : BlazorApplication {
         e.Updater.Update();
         e.Handled = true;
 #else
-        if(System.Diagnostics.Debugger.IsAttached) {
+        if(System.Diagnostics.Debugger.IsAttached || TenantId != null) {
             e.Updater.Update();
             e.Handled = true;
         }
@@ -45,5 +47,10 @@ public class SynFrameworkStudioBlazorApplication : BlazorApplication {
             throw new InvalidOperationException(message);
         }
 #endif
+    }
+    Guid? TenantId {
+        get {
+            return ServiceProvider?.GetService<ITenantProvider>()?.TenantId;
+        }
     }
 }

@@ -17,12 +17,14 @@ namespace SynFrameworkStudio.Module.E2E.Tests;
 
 public class SynFrameworkStudioTests : IDisposable {
     const string BlazorAppName = "SynFrameworkStudioBlazor";
+    const string WinAppName = "SynFrameworkStudioWin";
     const string AppDBName = "SynFrameworkStudio";
     EasyTestFixtureContext FixtureContext { get; } = new EasyTestFixtureContext();
 
     public SynFrameworkStudioTests() {
         FixtureContext.RegisterApplications(
-            new BlazorApplicationOptions(BlazorAppName, string.Format(@"{0}\..\..\..\..\SynFrameworkStudio.Blazor.Server", Environment.CurrentDirectory))
+            new BlazorApplicationOptions(BlazorAppName, string.Format(@"{0}\..\..\..\..\SynFrameworkStudio.Blazor.Server", Environment.CurrentDirectory)),
+            new WinApplicationOptions(WinAppName, string.Format(@"{0}\..\..\..\..\SynFrameworkStudio.Win\bin\EasyTest\net8.0-windows\SynFrameworkStudio.Win.exe", Environment.CurrentDirectory))
         );
         FixtureContext.RegisterDatabases(new DatabaseOptions(AppDBName, "SynFrameworkStudioEasyTest", server: @"(localdb)\mssqllocaldb"));
     }
@@ -42,5 +44,25 @@ public class SynFrameworkStudioTests : IDisposable {
         Assert.True(appContext.Navigate("Users"));
         Assert.True(appContext.Navigate("Reports.Dashboards"));
         Assert.True(appContext.Navigate("Reports.Reports"));
+        Assert.True(appContext.Navigate("State Machine.State Machine"));
+    }
+    [Theory]
+    [InlineData(WinAppName)]
+    public void TestWinApp(string applicationName) {
+        FixtureContext.DropDB(AppDBName);
+        var appContext = FixtureContext.CreateApplicationContext(applicationName);
+        appContext.RunApplication();
+        appContext.GetForm().FillForm(("User Name", "Admin"));
+        appContext.GetAction("Log In").Execute();
+        Assert.True(appContext.Navigate("My Details"));
+        Assert.True(appContext.Navigate("Role"));
+        Assert.True(appContext.Navigate("Users"));
+        Assert.True(appContext.Navigate("Reports.Dashboards"));
+        Assert.True(appContext.Navigate("KPI.Definition"));
+        Assert.True(appContext.Navigate("KPI.Scorecard"));
+        Assert.True(appContext.Navigate("Reports.Analysis"));
+        Assert.True(appContext.Navigate("Reports.Reports"));
+        Assert.True(appContext.Navigate("Scheduler Event"));
+        Assert.True(appContext.Navigate("State Machine.State Machine"));
     }
 }
