@@ -37,6 +37,7 @@ namespace SynFrameworkStudio.Module.Controllers
             RegisterNode.CustomizePopupWindowParams += RegisterNode_CustomizePopupWindowParams;
             RegisterNode.Caption = "Register Node";
 
+            
 
             // Target required Views (via the TargetXXX properties) and create their Actions.
         }
@@ -55,6 +56,13 @@ namespace SynFrameworkStudio.Module.Controllers
                 registerNodeRequest.Options.Add(new Option(nameof(Parameters.ConnectionString), Parameters.ConnectionString));
                 registerNodeRequest.Options.Add(new Option(nameof(Application), this.Application));
                 SyncServer.RegisterNodeAsync(registerNodeRequest);
+
+                var Node=this.ObjectSpace.CreateObject<ServerNode>();
+                Node.NodeId = Parameters.Id;
+                Node.Name = Parameters.Name;
+                Node.ConnectionString = Parameters.ConnectionString;
+                Node.Active = true;
+                this.ObjectSpace.CommitChanges();
             }
 
 

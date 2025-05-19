@@ -4,7 +4,12 @@ using DevExpress.ExpressApp.Xpo;
 
 namespace SynFrameworkStudio.Module.Provider
 {
-	public class XpoDataStoreProxyProvider : IXpoDataStoreProvider {
+    public interface IConnectToNodeData
+    {
+        void Connect(string ConnectionString);
+    }
+    public class XpoDataStoreProxyProvider : IXpoDataStoreProvider, IConnectToNodeData
+    {
 		private XpoDataStoreProxy proxy;
 		public XpoDataStoreProxyProvider() {
 			proxy = new XpoDataStoreProxy();
@@ -35,5 +40,10 @@ namespace SynFrameworkStudio.Module.Provider
 			proxy.Initialize(dictionary, legacyConnectionString, tempConnectionString);
 			IsInitialized = true;
 		}
-	}
+
+        public void Connect(string ConnectionString)
+        {
+            proxy.CreateOrUpdateSyncDataLayer(ConnectionString);
+        }
+    }
 }

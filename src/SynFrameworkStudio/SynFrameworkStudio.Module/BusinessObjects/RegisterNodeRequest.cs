@@ -107,6 +107,8 @@ namespace SynFrameworkStudio.Module.BusinessObjects
         void IXafEntityObject.OnCreated()
         {
             this.Id=Guid.CreateVersion7().ToString();
+            this.ConnectionString = "Integrated Security=SSPI;Pooling=false;Data Source=(localdb)\\mssqllocaldb;Initial Catalog=AAA_1";
+          
             // Place the entity initialization code here.
             // You can initialize reference properties using Object Space methods; e.g.:
             // this.Address = objectSpace.CreateObject<Address>();

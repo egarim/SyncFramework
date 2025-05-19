@@ -8,15 +8,16 @@ using System.Collections.Generic;
 namespace SynFrameworkStudio.Module.Provider
 {
     public class XpoDataStoreProxy : IDataStore, ICommandChannel {
-        private SimpleDataLayer legacyDataLayer;
-        private IDataStore legacyDataStore;
-        private SimpleDataLayer tempDataLayer;
-        private IDataStore tempDataStore;
-        private string[] tempDatabaseTables = new string[] { "ModuleInfo", "XPObjectType" };
+        private SimpleDataLayer appDataLayer;
+        private IDataStore appDataStore;
+        private SimpleDataLayer syncDataLayer;
+        private IDataStore syncDataStore;
+        private string[] syncDatabaseTables = new string[] { "XpoDeltaRecord", "XpoDeltaState", "XpoSequence" };
+        ReflectionDictionary syncDictionary;
 
         private bool IsSyncTable(string tableName) {
             if(!string.IsNullOrEmpty(tableName)) {
-                foreach(string currentTableName in tempDatabaseTables) {
+                foreach(string currentTableName in syncDatabaseTables) {
                     if(tableName.EndsWith(currentTableName)) {
                         return true;
                     }
@@ -24,23 +25,33 @@ namespace SynFrameworkStudio.Module.Provider
             }
             return false;
         }
-        public void Initialize(XPDictionary dictionary, string legacyConnectionString, string tempConnectionString) {
-            ReflectionDictionary legacyDictionary = new ReflectionDictionary();
-            ReflectionDictionary tempDictionary = new ReflectionDictionary();
-            foreach(XPClassInfo ci in dictionary.Classes) {
-                if(!IsSyncTable(ci.TableName)) {
-                    legacyDictionary.QueryClassInfo(ci.ClassType);
+        public void Initialize(XPDictionary dictionary, string legacyConnectionString, string tempConnectionString)
+        {
+            ReflectionDictionary appDictionary = new ReflectionDictionary();
+            syncDictionary = new ReflectionDictionary();
+            foreach (XPClassInfo ci in dictionary.Classes)
+            {
+                if (!IsSyncTable(ci.TableName))
+                {
+                    appDictionary.QueryClassInfo(ci.ClassType);
                 }
-                else {
-                    tempDictionary.QueryClassInfo(ci.ClassType);
+                else
+                {
+                    syncDictionary.QueryClassInfo(ci.ClassType);
                 }
             }
-            legacyDataStore = XpoDefault.GetConnectionProvider(legacyConnectionString, AutoCreateOption.DatabaseAndSchema);
-            legacyDataLayer = new SimpleDataLayer(legacyDictionary, legacyDataStore);
+            appDataStore = XpoDefault.GetConnectionProvider(legacyConnectionString, AutoCreateOption.DatabaseAndSchema);
+            appDataLayer = new SimpleDataLayer(appDictionary, appDataStore);
 
-            tempDataStore = XpoDefault.GetConnectionProvider(tempConnectionString, AutoCreateOption.DatabaseAndSchema);
-            tempDataLayer = new SimpleDataLayer(tempDictionary, tempDataStore);
+            CreateOrUpdateSyncDataLayer(tempConnectionString);
         }
+
+        public void CreateOrUpdateSyncDataLayer(string tempConnectionString)
+        {
+            syncDataStore = XpoDefault.GetConnectionProvider(tempConnectionString, AutoCreateOption.DatabaseAndSchema);
+            syncDataLayer = new SimpleDataLayer(syncDictionary, syncDataStore);
+        }
+
         public AutoCreateOption AutoCreateOption {
             get {
                 return AutoCreateOption.DatabaseAndSchema;
@@ -60,10 +71,10 @@ namespace SynFrameworkStudio.Module.Provider
 
             List<ParameterValue> resultSet = new List<ParameterValue>();
             if(legacyChanges.Count > 0) {
-                resultSet.AddRange(legacyDataLayer.ModifyData(legacyChanges.ToArray()).Identities);
+                resultSet.AddRange(appDataLayer.ModifyData(legacyChanges.ToArray()).Identities);
             }
             if(tempChanges.Count > 0) {
-                resultSet.AddRange(tempDataLayer.ModifyData(tempChanges.ToArray()).Identities);
+                resultSet.AddRange(syncDataLayer.ModifyData(tempChanges.ToArray()).Identities);
             }
             return new ModificationResult(resultSet);
         }
@@ -74,8 +85,8 @@ namespace SynFrameworkStudio.Module.Provider
             for(int i = 0; i < isExternals.Count; ++i) {
                 (isExternals[i] ? externalSelects : mainSelects).Add(selects[i]);
             }
-            var externalResults = (externalSelects.Count == 0 ? Enumerable.Empty<SelectStatementResult>() : tempDataLayer.SelectData(externalSelects.ToArray()).ResultSet).GetEnumerator();
-            var mainResults = (mainSelects.Count == 0 ? Enumerable.Empty<SelectStatementResult>() : legacyDataLayer.SelectData(mainSelects.ToArray()).ResultSet).GetEnumerator();
+            var externalResults = (externalSelects.Count == 0 ? Enumerable.Empty<SelectStatementResult>() : syncDataLayer.SelectData(externalSelects.ToArray()).ResultSet).GetEnumerator();
+            var mainResults = (mainSelects.Count == 0 ? Enumerable.Empty<SelectStatementResult>() : appDataLayer.SelectData(mainSelects.ToArray()).ResultSet).GetEnumerator();
             SelectStatementResult[] results = new SelectStatementResult[isExternals.Count];
             for(int i = 0; i < results.Length; ++i) {
                 var enumerator = isExternals[i] ? externalResults : mainResults;
@@ -96,12 +107,12 @@ namespace SynFrameworkStudio.Module.Provider
                     db2Tables.Add(table);
                 }
             }
-            legacyDataStore.UpdateSchema(false, db1Tables.ToArray());
-            tempDataStore.UpdateSchema(false, db2Tables.ToArray());
+            appDataStore.UpdateSchema(false, db1Tables.ToArray());
+            syncDataStore.UpdateSchema(false, db2Tables.ToArray());
             return UpdateSchemaResult.SchemaExists;
         }
         public object Do(string command, object args) {
-            return ((ICommandChannel)legacyDataLayer).Do(command, args);
+            return ((ICommandChannel)appDataLayer).Do(command, args);
         }
     }
 }

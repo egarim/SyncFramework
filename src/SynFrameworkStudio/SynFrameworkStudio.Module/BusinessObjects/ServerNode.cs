@@ -34,6 +34,8 @@ namespace SynFrameworkStudio.Module.BusinessObjects
             // Place your initialization code here (https://docs.devexpress.com/eXpressAppFramework/112834/getting-started/in-depth-tutorial-winforms-webforms/business-model-design/initialize-a-property-after-creating-an-object-xpo?v=22.1).
         }
 
+        string name;
+        bool active;
         string connectionString;
         string nodeId;
 
@@ -45,11 +47,24 @@ namespace SynFrameworkStudio.Module.BusinessObjects
         }
         
         [Size(SizeAttribute.DefaultStringMappingFieldSize)]
+        public string Name
+        {
+            get => name;
+            set => SetPropertyValue(nameof(Name), ref name, value);
+        }
+        [Size(SizeAttribute.DefaultStringMappingFieldSize)]
         public string ConnectionString
         {
             get => connectionString;
             set => SetPropertyValue(nameof(ConnectionString), ref connectionString, value);
         }
+        
+        public bool Active
+        {
+            get => active;
+            set => SetPropertyValue(nameof(Active), ref active, value);
+        }
+
 
     }
 }

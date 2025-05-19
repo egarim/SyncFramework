@@ -6,6 +6,8 @@ using System;
 namespace SynFrameworkStudio.Module.BusinessObjects.Sync
 {
 
+    [NavigationItem("Sync")]
+    [DefaultClassOptions()]
     [Persistent("XpoSequences")]
    
     public class XpoSequence : BaseObject

@@ -7,6 +7,7 @@ using System.Linq;
 
 namespace SynFrameworkStudio.Module.BusinessObjects.Sync
 {
+    [NavigationItem("Sync")]
     [DefaultClassOptions()]
     public class XpoDeltaRecord : BaseObject, IDelta
     {
