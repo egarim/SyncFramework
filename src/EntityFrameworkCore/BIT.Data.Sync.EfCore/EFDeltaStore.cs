@@ -17,7 +17,7 @@ namespace BIT.EfCore.Sync
 
 
         public static bool EnsureDeleted { get; set; }
-        DeltaDbContext DeltaDbContext;
+        public DeltaDbContext DeltaDbContext { get; protected set; }
         [Obsolete("use the constructor with DbContextOptionsBuilder or DeltaDbContext directly instead. This constructor is for testing purposes only and may be removed in future versions.",true)]
         public EfDeltaStore(DeltaDbContext DeltaDbContext):base(DeltaDbContext.GetService<ISequenceService>())
         {

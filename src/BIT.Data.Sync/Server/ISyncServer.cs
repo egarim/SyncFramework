@@ -45,11 +45,11 @@ namespace BIT.Data.Sync.Server
         /// <returns>True if success otherwise false</returns>
         bool  RegisterNodeAsync(ISyncServerNode serverNode);
         /// <summary>
-        /// Register a node to the server
+        /// create a node in the server
         /// </summary>
         /// <param name="registerNodeRequest"></param>
         /// <returns>True if success otherwise false</returns>
-        bool RegisterNodeAsync(RegisterNodeRequest registerNodeRequest);
+        bool CreateNodeAsync(RegisterNodeRequest registerNodeRequest);
         /// <summary>
         /// Function used to spin up a new server node
         /// </summary>

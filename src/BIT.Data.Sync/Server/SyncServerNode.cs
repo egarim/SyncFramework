@@ -33,6 +33,8 @@ namespace BIT.Data.Sync.Server
 
         public string NodeId { get; set; }
 
+        public IDeltaStore DeltaStore => deltaStore;
+
         public event EventHandler<NodeSavingDeltaEventArgs> NodeSavingDelta;
         public event EventHandler<NodeSavedDeltaEventArgs> NodeSavedDelta;
         public event EventHandler<NodeProcessingDeltaEventArgs> NodeProcessingDelta;

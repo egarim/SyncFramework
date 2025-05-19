@@ -1,23 +1,36 @@
-﻿using DevExpress.ExpressApp.Security;
+﻿using BIT.Data.Sync;
+using BIT.Data.Sync.Imp;
+using BIT.Data.Sync.Server;
+using BIT.EfCore.Sync;
+using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.ApplicationBuilder;
+using DevExpress.ExpressApp.ApplicationBuilder.Internal;
 using DevExpress.ExpressApp.Blazor.ApplicationBuilder;
 using DevExpress.ExpressApp.Blazor.Services;
-using DevExpress.Persistent.Base;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Components.Server.Circuits;
-using DevExpress.ExpressApp.Xpo;
-using SynFrameworkStudio.Blazor.Server.Services;
-using DevExpress.Persistent.BaseImpl.PermissionPolicy;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.OData;
-using DevExpress.ExpressApp.WebApi.Services;
-using SynFrameworkStudio.WebApi.JWT;
+using DevExpress.ExpressApp.Model.Core;
+using DevExpress.ExpressApp.Security;
 using DevExpress.ExpressApp.Security.Authentication;
 using DevExpress.ExpressApp.Security.Authentication.ClientServer;
+using DevExpress.ExpressApp.WebApi.Services;
+using DevExpress.ExpressApp.Xpo;
+using DevExpress.Persistent.Base;
+using DevExpress.Persistent.BaseImpl.PermissionPolicy;
+using DevExpress.Xpo;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Server.Circuits;
+using Microsoft.AspNetCore.OData;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using SynFrameworkStudio.Blazor.Server.Services;
+using SynFrameworkStudio.Module;
+using SynFrameworkStudio.Module.BusinessObjects;
+using SynFrameworkStudio.Module.BusinessObjects.Sync;
+using SynFrameworkStudio.WebApi.JWT;
+using System.ComponentModel;
+using System.Text;
 
 namespace SynFrameworkStudio.Blazor.Server;
 
@@ -33,6 +46,20 @@ public class Startup {
     public void ConfigureServices(IServiceCollection services) {
         services.AddSingleton(typeof(Microsoft.AspNetCore.SignalR.HubConnectionHandler<>), typeof(ProxyHubConnectionHandler<>));
 
+        services.AddSyncServer((request) =>
+        {
+
+
+            string nodeId = request.Options.FirstOrDefault(k => k.Key == "NodeId").Value.ToString();
+            string ConnectionString = request.Options.FirstOrDefault(k => k.Key == "ConnectionString").Value.ToString();
+
+            IDeltaStore EfDeltaStore = CreateEfDeltaStore(ConnectionString);
+
+            return new SyncServerNode(EfDeltaStore, null, nodeId);
+
+
+
+        });
         services.AddRazorPages();
         services.AddServerSideBlazor();
         services.AddHttpContextAccessor();
@@ -40,6 +67,16 @@ public class Startup {
         services.AddScoped<CircuitHandler, CircuitHandlerProxy>();
         services.AddXaf(Configuration, builder => {
             builder.UseApplication<SynFrameworkStudioBlazorApplication>();
+
+
+
+            builder.ObjectSpaceProviders.Events.OnObjectSpaceCreated = context => {
+                var nonPersistentObjectSpace = context.ObjectSpace as NonPersistentObjectSpace;
+                if (nonPersistentObjectSpace != null)
+                {
+                    nonPersistentObjectSpace.ObjectsGetting += NonPersistentObjectSpace_ObjectsGetting;
+                }
+            };
 
             builder.AddXafWebApi(webApiBuilder => {
                 webApiBuilder.AddXpoServices();
@@ -67,6 +104,9 @@ public class Startup {
                 })
                 .Add<SynFrameworkStudio.Module.SynFrameworkStudioModule>()
                 .Add<SynFrameworkStudioBlazorModule>();
+
+
+          
             builder.ObjectSpaceProviders
                 .AddSecuredXpo((serviceProvider, options) => {
                     string connectionString = null;
@@ -82,6 +122,7 @@ public class Startup {
                     options.ConnectionString = connectionString;
                     options.ThreadSafe = true;
                     options.UseSharedDataStoreProvider = true;
+                    
                 })
                 .AddNonPersistent();
             builder.Security
@@ -179,6 +220,45 @@ public class Startup {
         });
     }
 
+    private static IDeltaStore CreateEfDeltaStore(string ConnectionString)
+    {
+        var options = new DbContextOptionsBuilder<DeltaDbContext>()
+                  .UseSqlServer(ConnectionString)
+                  .Options;
+
+        DeltaDbContext deltaDbContext = new(options);
+
+
+        YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
+        EfSequenceService sequenceService = new EfSequenceService(implementationInstance, deltaDbContext);
+
+        IDeltaStore EfDeltaStore = new EfDeltaStore(deltaDbContext, sequenceService);
+        return EfDeltaStore;
+    }
+
+    private void NonPersistentObjectSpace_ObjectsGetting(object sender, ObjectsGettingEventArgs e)
+    {
+
+        var objectSpace = sender as NonPersistentObjectSpace;
+        var Server=  objectSpace.ServiceProvider.GetService(typeof(ISyncServer)) as ISyncServer;
+        SyncServerNode Node = Server.Nodes.FirstOrDefault() as SyncServerNode;
+        var Ef=   Node.DeltaStore as EfDeltaStore;
+
+        var currentDeltas = Ef.DeltaDbContext.Deltas;
+
+        if (e.ObjectType == typeof(DeltaRecord))
+        {
+
+            BindingList<DeltaRecord> objects = new BindingList<DeltaRecord>();
+
+            foreach (var item in currentDeltas)
+            {
+                objects.Add(new DeltaRecord(item));
+            }
+            e.Objects = objects;
+        }
+    }
+
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
         if(env.IsDevelopment()) {
@@ -200,6 +280,27 @@ public class Startup {
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseXaf();
+
+       var syncServer=  app.ApplicationServices.GetService<ISyncServer>();
+        var config = app.ApplicationServices.GetService<IConfiguration>();
+
+
+        var cnx= config.GetValue<string>("ConnectionStrings:ConnectionString");
+        //XpoTypesInfoHelper.GetXpoTypeInfoSource();
+
+        XPObjectSpaceProvider osProvider = new XPObjectSpaceProvider(
+        cnx, null);
+        IObjectSpace os = osProvider.CreateObjectSpace();
+        XpoTypesInfoHelper.GetXpoTypeInfoSource();
+        XafTypesInfo.Instance.RegisterEntity(typeof(ServerNode));
+
+        os.GetObjectsQuery<ServerNode>().Where(n=>n.Active).ToList().ForEach(n =>
+        {
+            syncServer.RegisterNodeAsync(new SyncServerNode(CreateEfDeltaStore(n.ConnectionString), null, n.NodeId));
+        });
+
+
+
         app.UseEndpoints(endpoints => {
             endpoints.MapXafEndpoints();
             endpoints.MapBlazorHub();

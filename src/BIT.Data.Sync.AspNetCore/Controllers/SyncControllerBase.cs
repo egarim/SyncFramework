@@ -210,7 +210,7 @@ namespace BIT.Data.Sync.AspNetCore.Controllers
                 return BadRequest("Request cannot be null.");
             }
 
-            bool result = _SyncServer.RegisterNodeAsync(request);
+            bool result = _SyncServer.CreateNodeAsync(request);
 
             if (result)
             {

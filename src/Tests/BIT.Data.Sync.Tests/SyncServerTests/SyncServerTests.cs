@@ -186,10 +186,10 @@ namespace BIT.Data.Sync.Tests.SyncServerTests
 
             server.RegisterNodeFunction = (node) =>
             {
-                string ServerNodeId = node.Options.FirstOrDefault(k => k.Key == "NodeId").Value;
+                string ServerNodeId = node.Options.FirstOrDefault(k => k.Key == "NodeId").Value.ToString();
                 return new SyncServerNode(new MemoryDeltaStore(), new SimpleDatabaseDeltaProcessor(new List<SimpleDatabaseRecord>(), null), ServerNodeId);
             };
-            server.RegisterNodeAsync(new RegisterNodeRequest() { Options = new System.Collections.Generic.List<Option>() { new Option("NodeId", NodeId) } });
+            server.CreateNodeAsync(new RegisterNodeRequest() { Options = new System.Collections.Generic.List<Option>() { new Option("NodeId", NodeId) } });
             return server;
         }
 

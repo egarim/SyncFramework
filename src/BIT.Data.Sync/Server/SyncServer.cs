@@ -157,7 +157,7 @@ namespace BIT.Data.Sync.Server
         }
 
    
-        public bool RegisterNodeAsync(RegisterNodeRequest registerNodeRequest)
+        public bool CreateNodeAsync(RegisterNodeRequest registerNodeRequest)
         {
            return RegisterNodeAsync(this.RegisterNodeFunction(registerNodeRequest));
         }

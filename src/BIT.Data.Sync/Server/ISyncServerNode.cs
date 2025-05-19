@@ -8,6 +8,7 @@ namespace BIT.Data.Sync.Server
 {
     public interface ISyncServerNode
     {
+        IDeltaStore DeltaStore { get;  }
         string NodeId { get; set; }
         Task SaveDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken);
         /// <summary>
