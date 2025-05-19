@@ -6,7 +6,7 @@ using DevExpress.Xpo;
 using System;
 using System.Threading.Tasks;
 
-namespace SynFrameworkStudio.Module.BusinessObjects
+namespace SynFrameworkStudio.Module.BusinessObjects.Sync
 {
     public class XpoSequenceService : SequenceServiceBase, ISequenceService
     {

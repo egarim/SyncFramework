@@ -4,9 +4,9 @@ using DevExpress.Xpo;
 using System;
 using System.Linq;
 
-namespace SynFrameworkStudio.Module.BusinessObjects
+namespace SynFrameworkStudio.Module.BusinessObjects.Sync
 {
-    [DefaultClassOptions()]
+   
     public class XpoDeltaState : BaseObject
     {
         public XpoDeltaState(Session session) : base(session) { }

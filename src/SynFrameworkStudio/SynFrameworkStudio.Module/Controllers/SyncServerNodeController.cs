@@ -42,9 +42,22 @@ namespace SynFrameworkStudio.Module.Controllers
         }
         private void RegisterNode_Execute(object sender, PopupWindowShowActionExecuteEventArgs e)
         {
-            var selectedPopupWindowObjects = e.PopupWindowViewSelectedObjects;
-            var selectedSourceViewObjects = e.SelectedObjects;
-            // Execute your business logic (https://docs.devexpress.com/eXpressAppFramework/112723/).
+            var Parameters = e.PopupWindowViewSelectedObjects[0] as RegisterNodeRequestParameters;
+
+
+
+            var SyncServer = this.Application.ServiceProvider.GetService(typeof(ISyncServer)) as ISyncServer;
+
+            if (SyncServer != null)
+            {
+                RegisterNodeRequest registerNodeRequest = new() { };
+                registerNodeRequest.Options.Add(new Option("NodeId", Parameters.Id));
+                registerNodeRequest.Options.Add(new Option(nameof(Parameters.ConnectionString), Parameters.ConnectionString));
+                registerNodeRequest.Options.Add(new Option(nameof(Application), this.Application));
+                SyncServer.RegisterNodeAsync(registerNodeRequest);
+            }
+
+
         }
         private void RegisterNode_CustomizePopupWindowParams(object sender, CustomizePopupWindowParamsEventArgs e)
         {
@@ -55,15 +68,7 @@ namespace SynFrameworkStudio.Module.Controllers
         }
         private void RegisterNode_Execute(object sender, SimpleActionExecuteEventArgs e)
         {
-            var SyncServer = this.Application.ServiceProvider.GetService(typeof(ISyncServer)) as ISyncServer;
-
-            if (SyncServer != null)
-            {
-                RegisterNodeRequest registerNodeRequest = new() { };
-                registerNodeRequest.Options.Add(new Option("NodeId", Guid.NewGuid().ToString()));
-                registerNodeRequest.Options.Add(new Option(nameof(Application),this.Application));
-                SyncServer.RegisterNodeAsync(registerNodeRequest);
-            }
+           
         }
         protected override void OnActivated()
         {

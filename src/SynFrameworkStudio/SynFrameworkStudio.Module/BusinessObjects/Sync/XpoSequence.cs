@@ -3,11 +3,11 @@ using DevExpress.Persistent.BaseImpl;
 using DevExpress.Xpo;
 using System;
 
-namespace SynFrameworkStudio.Module.BusinessObjects
+namespace SynFrameworkStudio.Module.BusinessObjects.Sync
 {
 
     [Persistent("XpoSequences")]
-    [DefaultClassOptions()]
+   
     public class XpoSequence : BaseObject
     {
         public XpoSequence(Session session) : base(session) { }

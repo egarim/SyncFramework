@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SynFrameworkStudio.Module.BusinessObjects
+namespace SynFrameworkStudio.Module.BusinessObjects.Sync
 {
 
     public class XpoDeltaStore : DeltaStoreBase
@@ -18,26 +18,26 @@ namespace SynFrameworkStudio.Module.BusinessObjects
         IObjectSpaceProvider Provider;
         public XpoDeltaStore(ISequenceService sequenceService, IObjectSpaceProvider objectSpace) : base(sequenceService)
         {
-            this.Provider = objectSpace;
+            Provider = objectSpace;
         }
 
         public override async Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken)
         {
-            var delta = Provider.CreateObjectSpace().FindObject<DeltaRecord>(CriteriaOperator.Parse("DeltaId = ?", deltaId));
+            var delta = Provider.CreateObjectSpace().FindObject<XpoDeltaRecord>(CriteriaOperator.Parse("DeltaId = ?", deltaId));
             return delta;
         }
 
         public override async Task<int> GetDeltaCountAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
             var guardedStartIndex = GuardStartIndex(startIndex);
-            return Provider.CreateObjectSpace().GetObjects<DeltaRecord>(
+            return Provider.CreateObjectSpace().GetObjects<XpoDeltaRecord>(
                 CriteriaOperator.Parse("Identity = ? AND Index > ?", identity, guardedStartIndex)).Count;
         }
 
         public override async Task<IEnumerable<IDelta>> GetDeltasAsync(string startIndex, CancellationToken cancellationToken = default)
         {
             var guardedStartIndex = GuardStartIndex(startIndex);
-            var deltas = Provider.CreateObjectSpace().GetObjects<DeltaRecord>(
+            var deltas = Provider.CreateObjectSpace().GetObjects<XpoDeltaRecord>(
                 CriteriaOperator.Parse("Index > ?", guardedStartIndex));
             return deltas.Cast<IDelta>();
         }
@@ -45,7 +45,7 @@ namespace SynFrameworkStudio.Module.BusinessObjects
         public override async Task<IEnumerable<IDelta>> GetDeltasByIdentityAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
             var guardedStartIndex = GuardStartIndex(startIndex);
-            var deltas = Provider.CreateObjectSpace().GetObjects<DeltaRecord>(
+            var deltas = Provider.CreateObjectSpace().GetObjects<XpoDeltaRecord>(
                 CriteriaOperator.Parse("Identity = ? AND Index > ?", identity, guardedStartIndex));
             return deltas.Cast<IDelta>();
         }
@@ -53,7 +53,7 @@ namespace SynFrameworkStudio.Module.BusinessObjects
         public override async Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
             var guardedStartIndex = GuardStartIndex(startIndex);
-            var deltas = Provider.CreateObjectSpace().GetObjects<DeltaRecord>(
+            var deltas = Provider.CreateObjectSpace().GetObjects<XpoDeltaRecord>(
                 CriteriaOperator.Parse("Identity != ? AND Index > ?", identity, guardedStartIndex));
             return deltas.Cast<IDelta>();
         }
@@ -73,7 +73,7 @@ namespace SynFrameworkStudio.Module.BusinessObjects
         public override async Task PurgeDeltasAsync(string identity, CancellationToken cancellationToken = default)
         {
             IObjectSpace objectSpace = Provider.CreateObjectSpace();
-            var deltas = objectSpace.GetObjects<DeltaRecord>(
+            var deltas = objectSpace.GetObjects<XpoDeltaRecord>(
                 CriteriaOperator.Parse("Identity = ?", identity));
 
             foreach (var delta in deltas)
@@ -111,7 +111,7 @@ namespace SynFrameworkStudio.Module.BusinessObjects
                         await SetDeltaIndex(delta);
                     }
 
-                    var record = os.CreateObject<DeltaRecord>();
+                    var record = os.CreateObject<XpoDeltaRecord>();
                     record.DeltaId = delta.DeltaId;
                     record.Date = delta.Date;
                     record.Epoch = delta.Epoch;

@@ -5,12 +5,12 @@ using DevExpress.Xpo;
 using System;
 using System.Linq;
 
-namespace SynFrameworkStudio.Module.BusinessObjects
+namespace SynFrameworkStudio.Module.BusinessObjects.Sync
 {
     [DefaultClassOptions()]
-    public class DeltaRecord : BaseObject, IDelta
+    public class XpoDeltaRecord : BaseObject, IDelta
     {
-        public DeltaRecord(Session session) : base(session) { }
+        public XpoDeltaRecord(Session session) : base(session) { }
 
         string _DeltaId;
       

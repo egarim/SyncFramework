@@ -7,7 +7,7 @@ using DevExpress.ExpressApp.Xpo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SynFrameworkStudio.Blazor.Server;
-using SynFrameworkStudio.Module.BusinessObjects;
+using SynFrameworkStudio.Module.BusinessObjects.Sync;
 
 [Route("api/[controller]")]
 [ApiController]

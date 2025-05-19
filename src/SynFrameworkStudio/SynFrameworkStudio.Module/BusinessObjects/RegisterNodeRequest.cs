@@ -37,9 +37,10 @@ namespace SynFrameworkStudio.Module.BusinessObjects
 
 
 
+        string name;
         string connectionString;
         string id;
-
+       
         public string Id
         {
             get => id;
@@ -51,8 +52,20 @@ namespace SynFrameworkStudio.Module.BusinessObjects
                 OnPropertyChanged();
             }
         }
-
         
+        public string Name
+        {
+            get => name;
+            set
+            {
+                if (name == value)
+                    return;
+                name = value;
+                OnPropertyChanged();
+            }
+        }
+
+        [ModelDefault("RowCount","3")]
         public string ConnectionString
         {
             get => connectionString;
@@ -93,6 +106,7 @@ namespace SynFrameworkStudio.Module.BusinessObjects
         #region IXafEntityObject members (see https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.IXafEntityObject)
         void IXafEntityObject.OnCreated()
         {
+            this.Id=Guid.CreateVersion7().ToString();
             // Place the entity initialization code here.
             // You can initialize reference properties using Object Space methods; e.g.:
             // this.Address = objectSpace.CreateObject<Address>();

@@ -13,6 +13,9 @@ using DevExpress.ExpressApp.WebApi.Xpo;
 using DevExpress.ExpressApp.Xpo;
 using DevExpress.Persistent.Base;
 using DevExpress.Persistent.BaseImpl.PermissionPolicy;
+using DevExpress.Xpo;
+using DevExpress.Xpo.Metadata;
+using DevExpress.XtraCharts.Native;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +25,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SynFrameworkStudio.Blazor.Server.Services;
-using SynFrameworkStudio.Module.BusinessObjects;
+using SynFrameworkStudio.Module.BusinessObjects.Sync;
 using SynFrameworkStudio.WebApi.JWT;
 using System.Text;
 
@@ -47,13 +50,53 @@ public class Startup {
         services.AddScoped<CircuitHandler, CircuitHandlerProxy>();
         services.AddSyncServer((request) => {
 
-            string NodeId = request.Options.FirstOrDefault(k => k.Key == "NodeId").Value.ToString();
-            XafApplication app = request.Options.FirstOrDefault(k => k.Key == "Application").Value as XafApplication;
-            var ObjectSpace=  app.CreateObjectSpace<XpoDelta>();
-            XpoSequenceService xpoSequenceService = new XpoSequenceService(app.ObjectSpaceProvider);
-            XpoDeltaStore xpoDeltaStore = new XpoDeltaStore(xpoSequenceService, app.ObjectSpaceProvider);
+
+
+
+
+
+            string nodeId = request.Options.FirstOrDefault(k => k.Key == "NodeId").Value.ToString();
+            string ConnectionString = request.Options.FirstOrDefault(k => k.Key == "ConnectionString").Value.ToString();
+            XpoTypesInfoHelper.GetXpoTypeInfoSource();
            
-            return new SyncServerNode(new MemoryDeltaStore(), null, NodeId);
+            XafTypesInfo.Instance.RegisterEntity(typeof(XpoDeltaRecord));
+            XafTypesInfo.Instance.RegisterEntity(typeof(XpoDeltaState));
+            XafTypesInfo.Instance.RegisterEntity(typeof(XpoSequence));
+
+            XPObjectSpaceProvider osProvider = new XPObjectSpaceProvider(
+            ConnectionString, null);
+
+            osProvider.SchemaUpdateMode = SchemaUpdateMode.DatabaseAndSchema;
+            var UpdateOs = osProvider.CreateUpdatingObjectSpace(true) as XPObjectSpace;
+            //ReflectionDictionary reflectionDictionary = new ReflectionDictionary();
+            //var Tables= reflectionDictionary.GetDataStoreSchema(typeof(XpoDeltaRecord), typeof(XpoDeltaState), typeof(XpoSequence));
+
+            IDataLayer dl = XpoDefault.GetDataLayer(ConnectionString, DevExpress.Xpo.DB.AutoCreateOption.DatabaseAndSchema);
+            using (Session session = new Session(dl))
+            {
+                session.UpdateSchema(typeof(XpoDeltaState), typeof(XpoSequence), typeof(XpoDeltaRecord));
+                session.CreateObjectTypeRecords();
+            }
+
+
+            XpoSequenceService xpoSequenceService = new XpoSequenceService(osProvider);
+            XpoDeltaStore xpoDeltaStore = new XpoDeltaStore(xpoSequenceService, osProvider);
+
+            return new SyncServerNode(xpoDeltaStore, null, nodeId);
+
+
+
+
+
+
+
+            //string NodeId = request.Options.FirstOrDefault(k => k.Key == "NodeId").Value.ToString();
+            //XafApplication app = request.Options.FirstOrDefault(k => k.Key == "Application").Value as XafApplication;
+            //var ObjectSpace=  app.CreateObjectSpace<XpoDelta>();
+            //XpoSequenceService xpoSequenceService = new XpoSequenceService(app.ObjectSpaceProvider);
+            //XpoDeltaStore xpoDeltaStore = new XpoDeltaStore(xpoSequenceService, app.ObjectSpaceProvider);
+
+            //return new SyncServerNode(new MemoryDeltaStore(), null, NodeId);
 
         });
         services.AddXaf(Configuration, builder => {
