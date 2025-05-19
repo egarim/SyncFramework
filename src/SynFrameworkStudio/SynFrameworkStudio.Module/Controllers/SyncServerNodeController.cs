@@ -80,7 +80,7 @@ namespace SynFrameworkStudio.Module.Controllers
             
             var CurrentServerNode=  this.View.CurrentObject as ServerNode;
 
-            httpClient.BaseAddress = new Uri("https://localhost:5001/api/SyncFramework");
+            httpClient.BaseAddress = new Uri("https://localhost:5001/api/SyncFramework/");
             serviceDescriptors.AddSyncFrameworkForSQLite("Data Source=EfSqlite_Deltas.db", httpClient, CurrentServerNode.NodeId, "Test", additionalDeltaGenerators);
 
             YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();

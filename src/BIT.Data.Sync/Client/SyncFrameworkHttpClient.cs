@@ -91,7 +91,7 @@ namespace BIT.Data.Sync.Client
             }
 
 
-            return await _httpClient.PostAsync("https://localhost:5001/api/SyncFramework/Push", data, cancellationToken).ConfigureAwait(false);
+            return await _httpClient.PostAsync(PushRequestUri, data, cancellationToken).ConfigureAwait(false);
         }
 
         public virtual async Task<FetchOperationResponse> FetchAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
