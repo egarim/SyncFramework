@@ -11,7 +11,8 @@ namespace BIT.Data.Sync.Client
         public string Message { get; set; }
         public bool Success { get; set; }
 
-
+        public string ServerNodeId { get; set; }
+        public string ClientNodeId { get; set; }
 
     }
     public class SyncServerRequestBase
@@ -27,9 +28,12 @@ namespace BIT.Data.Sync.Client
      
 
 
+        public List<string> ProcessedDeltasIds { get; set; } = new List<string>();
+    
     }
     public class FetchOperationResponse : SyncServerResponseBase
     {
+     
         public FetchOperationResponse()
         {
             Deltas = new List<Delta>(); 

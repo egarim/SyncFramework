@@ -65,6 +65,15 @@ namespace SynFrameworkStudio.Module.BusinessObjects.Sync
             get => active;
             set => SetPropertyValue(nameof(Active), ref active, value);
         }
+      
+        [Association("ServerNode-PersistentPushOperationResponses")]
+        public XPCollection<Events> Events
+        {
+            get
+            {
+                return GetCollection<Events>(nameof(Events));
+            }
+        }
 
 
     }

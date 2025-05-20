@@ -127,6 +127,8 @@ namespace SynFrameworkStudio.Module.Controllers
             await Context.SaveChangesAsync();
 
             var Result=await Context.PushAsync();
+            var Fetch= await Context.FetchAsync();
+            Context.Database.EnsureDeleted();
             // Execute your business logic (https://docs.devexpress.com/eXpressAppFramework/112737/).
 
         }

@@ -55,12 +55,18 @@ namespace BIT.Data.Sync.AspNetCore.Controllers
 
                     DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(List<Delta>));
                     List<Delta> Deltas = (List<Delta>)deserialized.ReadObject(ms);
+                    pushOperationResponse.ClientNodeId = Deltas.FirstOrDefault()?.Identity;
                     await _SyncServer.SaveDeltasAsync(NodeId, Deltas, new CancellationToken());
                     var Message = $"Push to node:{NodeId}{Environment.NewLine}Deltas Received:{Deltas.Count}{Environment.NewLine}Identity:{Deltas.FirstOrDefault()?.Identity}";
                     _logger.LogInformation(Message);
                     Debug.WriteLine(Message);
                     pushOperationResponse.Success = true;
                     pushOperationResponse.Message = Message;
+                    pushOperationResponse.ServerNodeId = NodeId;
+                    foreach (Delta delta in Deltas)
+                    {
+                        pushOperationResponse.ProcessedDeltasIds.Add(delta.DeltaId);
+                    }
                 }
             }
             catch (NodeNotFoundException argEx)
@@ -99,9 +105,9 @@ namespace BIT.Data.Sync.AspNetCore.Controllers
             FetchOperationResponse fetchOperationResponse = new FetchOperationResponse();
             try
             {
-               
+                fetchOperationResponse.ClientNodeId = identity;
                 string NodeId = GetHeader("NodeId");
-
+                fetchOperationResponse.ServerNodeId=NodeId;
 
                 var Message = $"Fetch from node:{NodeId}{Environment.NewLine}Start delta index:{startIndex}{Environment.NewLine}Client identity:{identity}";
                 _logger.LogInformation(Message);

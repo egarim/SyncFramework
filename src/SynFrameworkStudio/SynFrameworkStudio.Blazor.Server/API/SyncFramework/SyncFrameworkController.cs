@@ -1,4 +1,5 @@
-﻿using BIT.Data.Sync.AspNetCore.Controllers;
+﻿using BIT.Data.Sync;
+using BIT.Data.Sync.AspNetCore.Controllers;
 using BIT.Data.Sync.Client;
 using BIT.Data.Sync.Imp;
 using BIT.Data.Sync.Server;
@@ -8,6 +9,10 @@ using DevExpress.ExpressApp.Xpo;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SynFrameworkStudio.Module.BusinessObjects.Sync;
+using System.Diagnostics;
+using System.Runtime.Serialization.Json;
+using System.ServiceModel.Channels;
+using System.Text;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -15,16 +20,30 @@ using SynFrameworkStudio.Module.BusinessObjects.Sync;
 public class SyncFrameworkController : SyncControllerBase
 {
     IObjectSpaceFactory objectSpaceFactory;
-    public SyncFrameworkController(ILogger<SyncControllerBase> logger, ISyncServer syncServer, IObjectSpaceFactory objectSpaceFactory) : base(logger, syncServer)
+    INonSecuredObjectSpaceFactory nonSecuredObjectSpaceFactory;
+    public SyncFrameworkController(ILogger<SyncControllerBase> logger, ISyncServer syncServer, IObjectSpaceFactory objectSpaceFactory, INonSecuredObjectSpaceFactory nonSecuredObjectSpaceFactory) : base(logger, syncServer)
     {
         this.objectSpaceFactory = objectSpaceFactory;
+        this.nonSecuredObjectSpaceFactory= nonSecuredObjectSpaceFactory;
 
-      
+
+
     }
 
     public override Task<string> Fetch(string startIndex, string identity)
     {
-        return base.Fetch(startIndex, identity);
+        Task<string> Response = base.Fetch(startIndex, identity);
+        var os = nonSecuredObjectSpaceFactory.CreateNonSecuredObjectSpace<Events>();
+        Events response = os.CreateObject<Events>();
+
+        FetchOperationResponse FetchResponse = DeserializeFetchResponse(Response.Result);
+
+
+        response.LoadFrom(FetchResponse);
+        response.Date = DateOnly.FromDateTime(DateTime.Now);
+        response.Time = TimeOnly.FromDateTime(DateTime.Now);
+        os.CommitChanges();
+        return Response;
     }
 
     [HttpGet]
@@ -34,10 +53,36 @@ public class SyncFrameworkController : SyncControllerBase
         // ...
         return Ok();
     }
-
+    public FetchOperationResponse DeserializeFetchResponse(string jsonString)
+    {
+        using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonString)))
+        {
+            DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(FetchOperationResponse));
+            return (FetchOperationResponse)deserializer.ReadObject(ms);
+        }
+    }
+    public PushOperationResponse DeserializeResponse(string jsonString)
+    {
+        using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonString)))
+        {
+            DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(PushOperationResponse));
+            return (PushOperationResponse)deserializer.ReadObject(ms);
+        }
+    }
     public override async Task<string> Push()
     {
+
         var resut = await base.Push();
+        var PushOperationResult = DeserializeResponse(resut);
+        var os= nonSecuredObjectSpaceFactory.CreateNonSecuredObjectSpace<Events>();
+
+        Events  response= os.CreateObject<Events>();
+        response.LoadFrom(PushOperationResult);
+        response.Date = DateOnly.FromDateTime(DateTime.Now);
+        response.Time = TimeOnly.FromDateTime(DateTime.Now);
+        os.CommitChanges();
+
+
         return resut;
     }
 
