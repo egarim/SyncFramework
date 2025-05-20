@@ -2,6 +2,8 @@
 using BIT.Data.Sync.Imp;
 using BIT.Data.Sync.Server;
 using BIT.EfCore.Sync;
+using DevExpress.Data.Linq;
+using DevExpress.Data.Linq.Helpers;
 using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.ApplicationBuilder;
 using DevExpress.ExpressApp.ApplicationBuilder.Internal;
@@ -60,6 +62,8 @@ public class Startup {
 
 
         });
+
+        services.AddScoped<SelectedServerNode>();
         services.AddRazorPages();
         services.AddServerSideBlazor();
         services.AddHttpContextAccessor();
@@ -240,24 +244,60 @@ public class Startup {
     {
 
         var objectSpace = sender as NonPersistentObjectSpace;
-        var Server=  objectSpace.ServiceProvider.GetService(typeof(ISyncServer)) as ISyncServer;
-        SyncServerNode Node = Server.Nodes.FirstOrDefault() as SyncServerNode;
-        var Ef=   Node.DeltaStore as EfDeltaStore;
+        var Server = objectSpace.ServiceProvider.GetService(typeof(ISyncServer)) as ISyncServer;
+
+        var selectedServerNode = objectSpace.ServiceProvider.GetService(typeof(SelectedServerNode)) as SelectedServerNode;
+
+        SyncServerNode Node = Server.Nodes.FirstOrDefault(n=>n.NodeId == selectedServerNode.Node) as SyncServerNode;
+        var Ef = Node.DeltaStore as EfDeltaStore;
+
+
+
 
         var currentDeltas = Ef.DeltaDbContext.Deltas;
+
+
+        CriteriaToExpressionConverter converter = new CriteriaToExpressionConverter();
+        IQueryable<IDelta> filteredData = currentDeltas.AppendWhere(converter, e.Criteria) as IQueryable<IDelta>;
 
         if (e.ObjectType == typeof(DeltaRecord))
         {
 
             BindingList<DeltaRecord> objects = new BindingList<DeltaRecord>();
 
-            foreach (var item in currentDeltas)
+            foreach (var item in filteredData)
             {
                 objects.Add(new DeltaRecord(item));
             }
             e.Objects = objects;
         }
     }
+
+    //private void NonPersistentObjectSpace_ObjectsGetting(object sender, ObjectsGettingEventArgs e)
+    //{
+
+    //    var objectSpace = sender as NonPersistentObjectSpace;
+    //    var Server=  objectSpace.ServiceProvider.GetService(typeof(ISyncServer)) as ISyncServer;
+    //    SyncServerNode Node = Server.Nodes.FirstOrDefault() as SyncServerNode;
+    //    var Ef=   Node.DeltaStore as EfDeltaStore;
+
+    //    var currentDeltas = Ef.DeltaDbContext.Deltas;
+
+
+
+
+    //    if (e.ObjectType == typeof(DeltaRecord))
+    //    {
+
+    //        BindingList<DeltaRecord> objects = new BindingList<DeltaRecord>();
+
+    //        foreach (var item in currentDeltas)
+    //        {
+    //            objects.Add(new DeltaRecord(item));
+    //        }
+    //        e.Objects = objects;
+    //    }
+    //}
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {

@@ -10,7 +10,7 @@ using DevExpress.ExpressApp.Utils;
 using DevExpress.Persistent.Base;
 using DevExpress.Persistent.Validation;
 using SynFrameworkStudio.Module.BusinessObjects;
-
+using SynFrameworkStudio.Module.BusinessObjects.Sync;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +29,7 @@ namespace SynFrameworkStudio.Module.Controllers
         {
        
             ServerNodesAction = new SingleChoiceAction(this, "Server Nodes", "View");
-            ServerNodesAction.ItemType = SingleChoiceActionItemType.ItemIsOperation;
+            ServerNodesAction.ItemType = SingleChoiceActionItemType.ItemIsMode;
             ServerNodesAction.Execute += ServerNodesAction_Execute;
             // Create some items
             //ServerNodesAction.Items.Add(new ChoiceActionItem("MyItem1", "My Item 1", 1));
@@ -41,20 +41,13 @@ namespace SynFrameworkStudio.Module.Controllers
         {
             var itemData = e.SelectedChoiceActionItem.Data as ServerNode;
 
+            var selectedServerNode = this.Application.ServiceProvider.GetService(typeof(SelectedServerNode)) as SelectedServerNode;
 
-            List<IObjectSpaceProvider> Providers = this.Application.ObjectSpaceProviders.ToList();
-            foreach (var provider in Providers)
-            {
-                if (provider is IConnectToNodeData xpoDataStoreProvider)
-                {
-                    var connectionString = itemData.ConnectionString;
-                    if (!string.IsNullOrEmpty(connectionString))
-                    {
-                        ((IConnectToNodeData)xpoDataStoreProvider).Connect(connectionString);
-                    }
-                }
-            }
+            selectedServerNode.Node = itemData.NodeId;
 
+       
+            this.View.Refresh(true);
+            this.View.RefreshDataSource();
 
             // Execute your business logic (https://docs.devexpress.com/eXpressAppFramework/112738/).
         }
@@ -66,8 +59,23 @@ namespace SynFrameworkStudio.Module.Controllers
 
             os.GetObjectsQuery<ServerNode>().Where(x => x.Active == true).ToList().ForEach(x =>
             {
-                ServerNodesAction.Items.Add(new ChoiceActionItem(x.Name, x.NodeId, x));
+                ServerNodesAction.Items.Add(new ChoiceActionItem(x.NodeId, x.Name, x));
             });
+            var selectedServerNode = this.Application.ServiceProvider.GetService(typeof(SelectedServerNode)) as SelectedServerNode;
+
+            if(selectedServerNode.Node!=null)
+            {
+                var selectedNode = ServerNodesAction.Items.FirstOrDefault(x => x.Data is ServerNode && ((ServerNode)x.Data).NodeId == selectedServerNode.Node);
+                if (selectedNode != null)
+                {
+                    ServerNodesAction.SelectedItem = selectedNode;
+                }
+            }
+            else
+            {
+                ServerNodesAction.SelectedItem = null;
+            }
+            this.ServerNodesAction.SelectedItem = ServerNodesAction.Items.FirstOrDefault();
 
             // Perform various tasks depending on the target View.
         }

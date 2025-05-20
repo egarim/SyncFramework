@@ -150,6 +150,10 @@ namespace SynFrameworkStudio.Module.Controllers
         }
         private void RegisterNode_CustomizePopupWindowParams(object sender, CustomizePopupWindowParamsEventArgs e)
         {
+
+
+         
+
             var Os = this.Application.CreateObjectSpace(typeof(RegisterNodeRequestParameters));
             var registerNodeRequestParameters = Os.CreateObject<RegisterNodeRequestParameters>();
             // Set the e.View parameter to a newly created view (https://docs.devexpress.com/eXpressAppFramework/112723/).
