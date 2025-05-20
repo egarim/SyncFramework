@@ -11,7 +11,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace SynFrameworkStudio.Module.BusinessObjects
+namespace SynFrameworkStudio.Module.BusinessObjects.Sync
 {
     [DomainComponent]
 
@@ -84,8 +84,8 @@ namespace SynFrameworkStudio.Module.BusinessObjects
         #region IXafEntityObject members (see https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.IXafEntityObject)
         void IXafEntityObject.OnCreated()
         {
-            this.Id=Guid.CreateVersion7().ToString();
-            this.ConnectionString = "Integrated Security=SSPI;Pooling=false;Data Source=(localdb)\\mssqllocaldb;Initial Catalog=AAA_1";
+            Id=Guid.CreateVersion7().ToString();
+            ConnectionString = "Integrated Security=SSPI;Pooling=false;Data Source=(localdb)\\mssqllocaldb;Initial Catalog=AAA_1";
           
             // Place the entity initialization code here.
             // You can initialize reference properties using Object Space methods; e.g.:

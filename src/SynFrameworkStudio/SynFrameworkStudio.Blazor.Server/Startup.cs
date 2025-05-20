@@ -28,7 +28,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SynFrameworkStudio.Blazor.Server.Services;
 using SynFrameworkStudio.Module;
-using SynFrameworkStudio.Module.BusinessObjects;
 using SynFrameworkStudio.Module.BusinessObjects.Sync;
 using SynFrameworkStudio.WebApi.JWT;
 using System.ComponentModel;
@@ -249,6 +248,10 @@ public class Startup {
         var selectedServerNode = objectSpace.ServiceProvider.GetService(typeof(SelectedServerNode)) as SelectedServerNode;
 
         SyncServerNode Node = Server.Nodes.FirstOrDefault(n=>n.NodeId == selectedServerNode.Node) as SyncServerNode;
+
+        if(Node == null)
+            return;
+
         var Ef = Node.DeltaStore as EfDeltaStore;
 
 

@@ -9,7 +9,6 @@ using DevExpress.ExpressApp.Templates;
 using DevExpress.ExpressApp.Utils;
 using DevExpress.Persistent.Base;
 using DevExpress.Persistent.Validation;
-using SynFrameworkStudio.Module.BusinessObjects;
 using SynFrameworkStudio.Module.BusinessObjects.Sync;
 using System;
 using System.Collections.Generic;
@@ -73,10 +72,10 @@ namespace SynFrameworkStudio.Module.Controllers
             }
             else
             {
-                ServerNodesAction.SelectedItem = null;
+                this.ServerNodesAction.SelectedItem = ServerNodesAction.Items.FirstOrDefault();
             }
-            this.ServerNodesAction.SelectedItem = ServerNodesAction.Items.FirstOrDefault();
-
+        
+            selectedServerNode.Node= this.ServerNodesAction.SelectedItem.Data is ServerNode ? ((ServerNode)this.ServerNodesAction.SelectedItem.Data).NodeId : null; 
             // Perform various tasks depending on the target View.
         }
         protected override void OnViewControlsCreated()
