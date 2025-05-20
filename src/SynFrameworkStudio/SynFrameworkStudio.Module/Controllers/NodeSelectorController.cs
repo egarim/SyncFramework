@@ -44,11 +44,8 @@ namespace SynFrameworkStudio.Module.Controllers
 
             selectedServerNode.Node = itemData.NodeId;
 
-       
-            this.View.Refresh(true);
-            this.View.RefreshDataSource();
+            this.Frame.GetController<RefreshController>().RefreshAction.DoExecute();
 
-            // Execute your business logic (https://docs.devexpress.com/eXpressAppFramework/112738/).
         }
     
         protected override void OnActivated()

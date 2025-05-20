@@ -59,11 +59,24 @@ namespace SynFrameworkStudio.Module.Controllers
 
             // Target required Views (via the TargetXXX properties) and create their Actions.
         }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Async/await", "CRR0033:The void async method should be in a try/catch block", Justification = "<Pending>")]
         private  async void Test_Execute(object sender, SimpleActionExecuteEventArgs e)
         {
 
+
             DbContextOptionsBuilder<TestDbContext> ContextBuilder = new DbContextOptionsBuilder<TestDbContext>();
-            ContextBuilder.UseSqlite("Data Source=EfSqlite_Data.db");
+
+
+            string tempDbPath = Path.Combine(Path.GetTempPath(), "EfSqlite_Data.db");
+
+            if(File.Exists(tempDbPath))
+            {
+                File.Delete(tempDbPath);
+            }
+
+            ContextBuilder.UseSqlite($"Data Source={tempDbPath}");
+
+            //ContextBuilder.UseSqlite("Data Source=EfSqlite_Data.db");
 
             var serverVersion = new MySqlServerVersion(new Version(8, 0, 31));
 
@@ -81,7 +94,17 @@ namespace SynFrameworkStudio.Module.Controllers
             var CurrentServerNode=  this.View.CurrentObject as ServerNode;
 
             httpClient.BaseAddress = new Uri("https://localhost:5001/api/SyncFramework/");
-            serviceDescriptors.AddSyncFrameworkForSQLite("Data Source=EfSqlite_Deltas.db", httpClient, CurrentServerNode.NodeId, "Test", additionalDeltaGenerators);
+
+            string tempDeltaDbPath = Path.Combine(Path.GetTempPath(), "EfSqlite_Deltas.db");
+
+
+            if (File.Exists(tempDeltaDbPath))
+            {
+                File.Delete(tempDeltaDbPath);
+            }
+
+            var DeltaCnx = $"Data Source={tempDeltaDbPath}";
+            serviceDescriptors.AddSyncFrameworkForSQLite(DeltaCnx, httpClient, CurrentServerNode.NodeId, "Test", additionalDeltaGenerators);
 
             YearSequencePrefixStrategy implementationInstance = new YearSequencePrefixStrategy();
             serviceDescriptors.AddSingleton(typeof(ISequencePrefixStrategy), implementationInstance);
@@ -99,7 +122,7 @@ namespace SynFrameworkStudio.Module.Controllers
 
 
             Data data = new Data();
-            data.Text = "asdkasdkaldkaskasda";
+            data.Text = "this is a test delta";
             Context.DataRecords.Add(data);
             await Context.SaveChangesAsync();
 

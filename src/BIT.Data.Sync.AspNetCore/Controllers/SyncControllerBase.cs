@@ -48,6 +48,8 @@ namespace BIT.Data.Sync.AspNetCore.Controllers
                 string NodeId = GetHeader("NodeId");
                 var stream = new StreamReader(this.Request.Body);
                 var body = await stream.ReadToEndAsync();
+
+
                 using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(body)))
                 {
 

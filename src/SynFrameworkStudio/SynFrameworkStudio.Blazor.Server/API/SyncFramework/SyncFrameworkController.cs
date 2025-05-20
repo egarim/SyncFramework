@@ -35,9 +35,10 @@ public class SyncFrameworkController : SyncControllerBase
         return Ok();
     }
 
-    public override Task<string> Push()
+    public override async Task<string> Push()
     {
-        return base.Push();
+        var resut = await base.Push();
+        return resut;
     }
 
     public override Task<IActionResult> RegisterNode()
