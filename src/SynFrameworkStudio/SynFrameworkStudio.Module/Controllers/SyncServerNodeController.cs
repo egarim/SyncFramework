@@ -129,6 +129,7 @@ namespace SynFrameworkStudio.Module.Controllers
             var Result=await Context.PushAsync();
             var Fetch= await Context.FetchAsync();
             Context.Database.EnsureDeleted();
+            this.Frame.GetController<RefreshController>().RefreshAction.DoExecute();
             // Execute your business logic (https://docs.devexpress.com/eXpressAppFramework/112737/).
 
         }

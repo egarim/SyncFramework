@@ -28,11 +28,46 @@ namespace SynFrameworkStudio.Module.BusinessObjects.Sync
         public ServerNode(Session session)
             : base(session)
         {
+            
         }
         public override void AfterConstruction()
         {
             base.AfterConstruction();
             // Place your initialization code here (https://docs.devexpress.com/eXpressAppFramework/112834/getting-started/in-depth-tutorial-winforms-webforms/business-model-design/initialize-a-property-after-creating-an-object-xpo?v=22.1).
+        }
+        void Events_CollectionChanged(object sender, XPCollectionChangedEventArgs e)
+        {
+            LoadClients();
+        }
+        // Inside your ServerNode class, add a method or property like this:
+        public IEnumerable<string> GetDistinctClientNodeIds()
+        {
+            return Events
+                .Where(e => !string.IsNullOrEmpty(e.ClientNodeId))
+                .Select(e => e.ClientNodeId)
+                .Distinct()
+                .ToList();
+        }
+        private void LoadClients()
+        {
+            Clients = new BindingList<ClientNode>();
+            foreach (var item in GetDistinctClientNodeIds())
+            {
+                //if (item.EventType == EventType.Push)
+                //{
+
+                //}
+                var client = new ClientNode();
+                client.Name = item;
+                Clients.Add(client);
+            }
+        }
+
+        protected override void OnLoaded()
+        {
+            base.OnLoaded();
+            LoadClients();
+            this.Events.CollectionChanged += Events_CollectionChanged;
         }
 
         string name;
@@ -75,6 +110,7 @@ namespace SynFrameworkStudio.Module.BusinessObjects.Sync
             }
         }
 
-
+        public BindingList<ClientNode> Clients;
+        
     }
 }
