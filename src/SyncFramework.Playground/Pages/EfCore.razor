@@ -75,22 +75,28 @@
         </MudExpansionPanel>
     </MudPaper>
 
-    <MudText Typo="Typo.h5" Class="mb-3">Client Nodes</MudText>
+    <MudText Typo="Typo.h5" Class="mb-3">Nodes</MudText>
     <MudPaper Elevation="2" Class="pa-4">
-        @if (ClientNodes.Any())
-        {
-            @foreach (var item in this.ClientNodes)
+        <MudTabs>
+            <MudTabPanel Text="Server">
+                <SyncServerComponent DeltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
+            </MudTabPanel>
+            @if (ClientNodes.Any())
             {
-                <div class="mb-3">
-                    <ClientNodeComponent item="@item"></ClientNodeComponent>
-                </div>
-                <MudDivider Class="my-3" />
+                @foreach (var item in ClientNodes)
+                {
+                    <MudTabPanel Text="@item.Id">
+                        <ClientNodeComponent item="@item"></ClientNodeComponent>
+                    </MudTabPanel>
+                }
             }
-        }
-        else
-        {
-            <MudAlert Severity="Severity.Info">No client nodes added yet. Click "Add client node" to begin.</MudAlert>
-        }
+            else
+            {
+                <MudTabPanel Text="No Clients">
+                    <MudAlert Severity="Severity.Info">No client nodes added yet. Click "Add client node" to begin.</MudAlert>
+                </MudTabPanel>
+            }
+        </MudTabs>
     </MudPaper>
 </MudContainer>
 
