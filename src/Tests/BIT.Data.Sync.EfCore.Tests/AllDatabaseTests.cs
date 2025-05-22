@@ -205,6 +205,11 @@ namespace BIT.Data.Sync.EfCore.Tests
             var Node_B_HttpClient = HttpClientFactory.CreateClient("Node B");
             var Node_C_HttpClient = HttpClientFactory.CreateClient("Node C");
 
+            MasterHttpClient.BaseAddress = new Uri("http://localhost/sync/");
+            Node_A_HttpClient.BaseAddress = new Uri("http://localhost/sync/");
+            Node_B_HttpClient.BaseAddress = new Uri("http://localhost/sync/");
+            Node_C_HttpClient.BaseAddress = new Uri("http://localhost/sync/");
+
             ServiceCollection ServiceCollectionMaster = new ServiceCollection();
             ServiceCollection ServiceCollectionNode_A = new ServiceCollection();
             ServiceCollection ServiceCollectionNode_B = new ServiceCollection();
