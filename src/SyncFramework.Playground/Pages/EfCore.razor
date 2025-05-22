@@ -26,54 +26,42 @@
         </MudCardContent>
     </MudCard>
 
-    <MudPaper Elevation="3" Class="pa-4 mb-4">
-        <MudText Typo="Typo.h5" Class="mb-3">Server Configuration</MudText>
-        <SyncServerComponent DeltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
+    <MudText Typo="Typo.subtitle1" Class="mb-2">Node Management</MudText>
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="4">
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
+                       Color="Color.Primary" OnClick="AddClientNode" FullWidth="true">
+                Add Client Node
+            </MudButton>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudCheckBox T="bool" Label="Generate Random Data"
+                         Color="Color.Primary" @bind-Checked="@GenerateRandomData" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileDownload"
+                       Color="Color.Secondary" OnClick="DownloadAllDatabases" FullWidth="true">
+                Download All Databases
+            </MudButton>
+        </MudItem>
+    </MudGrid>
 
-        <MudDivider Class="my-4" />
+    <MudDivider Class="my-4" />
 
-        <MudExpansionPanel>
-            <TitleContent>
-                <MudText Typo="Typo.h6">Client Node Options</MudText>
-            </TitleContent>
-            <ChildContent>
-                <MudGrid>
-                    <MudItem xs="12" sm="6">
-                        <MudCard Elevation="0" Class="pa-2">
-                            <MudCardContent>
-                                <MudButton StartIcon="@Icons.Material.Filled.Add"
-                                           Color="Color.Primary"
-                                           OnClick="AddClientNode"
-                                           Size="Size.Small">Add client node</MudButton>
-                                <MudCheckBox T="bool"
-                                             Dense="true"
-                                             Label="Generate Random Data"
-                                             @bind-Checked="@GenerateRandomData" />
-                            </MudCardContent>
-                        </MudCard>
-                    </MudItem>
-                    <MudItem xs="12" sm="6">
-                        <MudCard Elevation="0" Class="pa-2">
-                            <MudCardContent>
-                                <MudButton StartIcon="@Icons.Material.Filled.FileDownload"
-                                           Color="Color.Primary"
-                                           OnClick="DownloadAllDatabases"
-                                           Size="Size.Small">Download all databases</MudButton>
-                            </MudCardContent>
-                        </MudCard>
-                    </MudItem>
-                </MudGrid>
+    <MudText Typo="Typo.subtitle1" Class="mb-2">Database Compatibility</MudText>
+    <MudText Typo="Typo.caption" Class="mb-3">Check options to generate deltas compatible with other databases</MudText>
 
-                <MudText Typo="Typo.subtitle2" Class="mt-3">Additional delta generators:</MudText>
-                <MudText Typo="Typo.caption" Class="mb-2">Check to generate deltas compatible with other databases</MudText>
-                <MudPaper Elevation="0" Class="pa-2 d-flex gap-4">
-                    <MudCheckBox T="bool" Label="Postgres" Dense="true" @bind-Checked="@Postgres" />
-                    <MudCheckBox T="bool" Label="MySql" Dense="true" @bind-Checked="@MySql" />
-                    <MudCheckBox T="bool" Label="SqlServer" Dense="true" @bind-Checked="@SqlServer" />
-                </MudPaper>
-            </ChildContent>
-        </MudExpansionPanel>
-    </MudPaper>
+    <MudGrid>
+        <MudItem xs="4">
+            <MudCheckBox T="bool" Label="PostgreSQL" Color="Color.Info" @bind-Checked="@Postgres" />
+        </MudItem>
+        <MudItem xs="4">
+            <MudCheckBox T="bool" Label="MySQL" Color="Color.Info" @bind-Checked="@MySql" />
+        </MudItem>
+        <MudItem xs="4">
+            <MudCheckBox T="bool" Label="SQL Server" Color="Color.Info" @bind-Checked="@SqlServer" />
+        </MudItem>
+    </MudGrid>
 
     <MudText Typo="Typo.h5" Class="mb-3">Nodes</MudText>
     <MudPaper Elevation="2" Class="pa-4">
