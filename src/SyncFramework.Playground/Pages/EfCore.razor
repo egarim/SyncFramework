@@ -5,56 +5,95 @@
 
 <PageTitle>EfCore Demo</PageTitle>
 
-@*
-<MudText Typo="Typo.body1">This playground is a demo of the <MudLink Underline="Underline.Always" Href="https://github.com/egarim/SyncFramework">SyncFramework</MudLink> created by <MudLink Underline="Underline.Always" Href="https://www.jocheojeda.com">Joche Ojeda</MudLink>.CTO for the companies  <MudLink Underline="Underline.Always" Href="https://www.xari.io">XARI</MudLink> &  <MudLink Underline="Underline.Always" Href="https://www.bitframeworks.com">BIT Frameworks</MudLink> </MudText>
-<MudText Typo="Typo.body1">you can download all the nugets packages to implement your own Synchronization from  <MudLink Underline="Underline.Always" Href="https://www.nuget.org/packages?q=%09BIT.Data.Sync">Nuget.org</MudLink>.Here <MudLink Underline="Underline.Always" Href="https://www.jocheojeda.com">me</MudLink> and <MudLink Underline="Underline.Always" Href="https://xafmarin.com">Javier</MudLink> tal can see a demo on how the playground works </MudText>
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudCard Elevation="3" Class="mb-4">
+        <MudCardHeader>
+            <MudText Typo="Typo.h4">SyncFramework: A Demonstration</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudText Typo="Typo.body1">
+                A professional demonstration of the <MudLink Underline="Underline.Always" Target="_blank" Href="https://github.com/egarim/SyncFramework">SyncFramework</MudLink>
+                for Entity Framework Core, developed by <MudLink Target="_blank" Underline="Underline.Always" Href="https://www.jocheojeda.com">Joche Ojeda</MudLink>,
+                CTO at <MudLink Underline="Underline.Always" Target="_blank" Href="https://www.xari.io">XARI</MudLink> and
+                <MudLink Underline="Underline.Always" Target="_blank" Href="https://www.bitframeworks.com">BIT Frameworks</MudLink>.
+            </MudText>
+            <MudText Typo="Typo.body2" Class="mt-2">
+                All required NuGet packages are available at <MudLink Target="_blank" Underline="Underline.Always" Href="https://www.nuget.org/packages?q=%09BIT.Data.Sync">Nuget.org</MudLink>.
+                View our <MudLink Target="_blank" Underline="Underline.Always" Href="https://youtu.be/JqjGvcbIUzQ">video tutorial</MudLink> where
+                <MudLink Target="_blank" Underline="Underline.Always" Href="https://xafmarin.com">Javier</MudLink> and
+                <MudLink Target="_blank" Underline="Underline.Always" Href="https://www.jocheojeda.com">I</MudLink> explain the SyncFramework playground.
+            </MudText>
+        </MudCardContent>
+    </MudCard>
 
- *@
+    <MudPaper Elevation="3" Class="pa-4 mb-4">
+        <MudText Typo="Typo.h5" Class="mb-3">Server Configuration</MudText>
+        <SyncServerComponent DeltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
 
-<MudText Typo="Typo.h5" Align="Align.Center">SyncFramework: A Demonstration</MudText>
+        <MudDivider Class="my-4" />
 
-<br>
-<br>
-<br>
+        <MudExpansionPanel>
+            <TitleContent>
+                <MudText Typo="Typo.h6">Client Node Options</MudText>
+            </TitleContent>
+            <ChildContent>
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudCard Elevation="0" Class="pa-2">
+                            <MudCardContent>
+                                <MudButton StartIcon="@Icons.Material.Filled.Add"
+                                           Color="Color.Primary"
+                                           OnClick="AddClientNode"
+                                           Size="Size.Small">Add client node</MudButton>
+                                <MudCheckBox T="bool"
+                                             Dense="true"
+                                             Label="Generate Random Data"
+                                             @bind-Checked="@GenerateRandomData" />
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudCard Elevation="0" Class="pa-2">
+                            <MudCardContent>
+                                <MudButton StartIcon="@Icons.Material.Filled.FileDownload"
+                                           Color="Color.Primary"
+                                           OnClick="DownloadAllDatabases"
+                                           Size="Size.Small">Download all databases</MudButton>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                </MudGrid>
 
-<p>The following presentation is a professional demonstration of the <MudLink Underline="Underline.Always" Target="_blank" Href="https://github.com/egarim/SyncFramework">SyncFramework</MudLink> for Entity Framework Core, developed by <MudLink Target="_blank" Underline="Underline.Always" Href="https://www.jocheojeda.com">Joche Ojeda</MudLink>, who currently holds the position of Chief Technology Officer (CTO) at the esteemed firms <MudLink Underline="Underline.Always" Target="_blank" Href="https://www.xari.io">XARI</MudLink> and <MudLink Underline="Underline.Always" Target="_blank" Href="https://www.bitframeworks.com">BIT Frameworks</MudLink>.</p>
+                <MudText Typo="Typo.subtitle2" Class="mt-3">Additional delta generators:</MudText>
+                <MudText Typo="Typo.caption" Class="mb-2">Check to generate deltas compatible with other databases</MudText>
+                <MudPaper Elevation="0" Class="pa-2 d-flex gap-4">
+                    <MudCheckBox T="bool" Label="Postgres" Dense="true" @bind-Checked="@Postgres" />
+                    <MudCheckBox T="bool" Label="MySql" Dense="true" @bind-Checked="@MySql" />
+                    <MudCheckBox T="bool" Label="SqlServer" Dense="true" @bind-Checked="@SqlServer" />
+                </MudPaper>
+            </ChildContent>
+        </MudExpansionPanel>
+    </MudPaper>
 
-<p>
-    All required NuGet packages for implementing your personalized synchronization are readily available for download at <MudLink Target="_blank" Underline="Underline.Always" Href="https://www.nuget.org/packages?q=%09BIT.Data.Sync">Nuget.org</MudLink>.
-    <br>
-    In the associated <MudLink Target="_blank" Underline="Underline.Always" Href="https://youtu.be/JqjGvcbIUzQ">video tutorial</MudLink> tutorial, my colleague <MudLink Target="_blank" Underline="Underline.Always" Href="https://xafmarin.com">Javier</MudLink> and <MudLink Target="_blank" Underline="Underline.Always" Href="https://www.jocheojeda.com">I</MudLink> will provide an in-depth explanation of the SyncFramework playground's operations.
-</p>
-<br>
-<br>
-<br>
-<SyncServerComponent DeltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
-<MudStack Row="true">
-    <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddClientNode">Add client node</MudButton>
-    <MudCheckBox T="bool" Label=" Generate Random Data" @bind-Checked="@GenerateRandomData" />
-    <MudButton StartIcon="@Icons.Material.Filled.FileDownload" Color="Color.Primary" OnClick="DownloadAllDatabases">Download all databases</MudButton>
-</MudStack>
-
-
-<MudStack Row="true">
-    <MudCheckBox T="bool" Label="Postgres" @bind-Checked="@Postgres" />
-    <MudCheckBox T="bool" Label="MySql" @bind-Checked="@MySql" />
-    <MudCheckBox T="bool" Label="SqlServer" @bind-Checked="@SqlServer" />
-</MudStack>
-<MudText Typo="Typo.body1">Additional delta generators (check them to generate deltas compatible with other databases)</MudText>
-<br>
-<br>
-<MudText Typo="Typo.h5" Align="Align.Center">Client Nodes</MudText>
-<br>
-<br>
-<MudStack>
-    @foreach (var item in this.ClientNodes)
-    {
-        <br>
-        <ClientNodeComponent item="@item"></ClientNodeComponent>
-    }
-
-</MudStack>
+    <MudText Typo="Typo.h5" Class="mb-3">Client Nodes</MudText>
+    <MudPaper Elevation="2" Class="pa-4">
+        @if (ClientNodes.Any())
+        {
+            @foreach (var item in this.ClientNodes)
+            {
+                <div class="mb-3">
+                    <ClientNodeComponent item="@item"></ClientNodeComponent>
+                </div>
+                <MudDivider Class="my-3" />
+            }
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info">No client nodes added yet. Click "Add client node" to begin.</MudAlert>
+        }
+    </MudPaper>
+</MudContainer>
 
 <MudScrollToTop>
-    <MudFab Color="Color.Tertiary" Icon="@Icons.Material.Filled.ArrowCircleUp" />
+    <MudFab Color="Color.Tertiary" Size="Size.Small" Icon="@Icons.Material.Filled.ArrowCircleUp" />
 </MudScrollToTop>
