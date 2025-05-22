@@ -37,25 +37,26 @@ else
             <MudButton StartIcon="@Icons.Material.Filled.DeleteForever" Color="Color.Error" OnClick="@(()=>item.PurgeDeltas())">Purge Deltas</MudButton>
             <MudButton StartIcon="@Icons.Material.Filled.SaveAlt"       Color="Color.Info" OnClick="@(()=>item.DownloadFile())">Download Databases</MudButton>
              <MudStack Row="true" AlignItems="AlignItems.Stretch">
-                 <MudDataGrid Virtualize="true" FixedHeader="true" Height="250px" Items="@item.People" @bind-SelectedItem="@item.SelectedPerson" Hover="true" Striped="true" Dense="true" MultiSelection="false">
+                <MudDataGrid Virtualize="true" FixedHeader="true" Height="250px" Items="@item.People" @bind-SelectedItem="@item.SelectedPerson" Hover="true" Striped="true" Dense="true" MultiSelection="false">
                     <ToolBarContent>
                         <MudText Typo="Typo.h6" Align="Align.Center">Contacts</MudText>
                         <MudSpacer />
                         <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="AddPerson" />
                     </ToolBarContent>
                     <Columns>
-                            <PropertyColumn Property="x => x.FirstName" Title="Name" />
-                            <PropertyColumn Property="x => x.LastName" Title="Lastname" />
-                            <TemplateColumn CellClass="d-flex justify-end">
-                                <CellTemplate>
-                                    <MudStack Row>
-                                     <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Success" OnClick="@(()=>EditPerson(context.Item))"></MudIconButton>
-                                     <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(()=>RemovePerson(context.Item))"></MudIconButton>
-                                 </MudStack>
-                             </CellTemplate>
-                         </TemplateColumn>
-                     </Columns>
-                 </MudDataGrid>
+                        <SelectColumn />
+                        <PropertyColumn Property="x => x.FirstName" Title="Name" />
+                        <PropertyColumn Property="x => x.LastName" Title="Lastname" />
+                        <TemplateColumn CellClass="d-flex justify-end">
+                            <CellTemplate>
+                                <MudStack Row>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Success" OnClick="@(()=>EditPerson(context.Item))"></MudIconButton>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(()=>RemovePerson(context.Item))"></MudIconButton>
+                                </MudStack>
+                            </CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                </MudDataGrid>
                  <MudDataGrid Virtualize="true" FixedHeader="true" Height="250px" Items="@item.PhoneNumbers" Hover="true" Striped="true" Dense="true" MultiSelection="false">
                  <ToolBarContent>
                      <MudText Typo="Typo.h6" Align="Align.Center">Phones</MudText>
@@ -63,6 +64,7 @@ else
                      <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="AddPhone" />
                  </ToolBarContent>
                      <Columns>
+                        <SelectColumn />
                          <PropertyColumn Property="x => x.Number" Title="Number" />
                          <TemplateColumn CellClass="d-flex justify-end">
                              <CellTemplate>
@@ -80,6 +82,7 @@ else
                         <MudSpacer />
                     </ToolBarContent>
                      <Columns>
+                        <SelectColumn />
                          <PropertyColumn Property="x => x.Key.Epoch" Title="Epoch" />
                          <PropertyColumn Property="x => x.Key.Date" Title="Date" />
                          <PropertyColumn Property="x => x.Key.Index" Title="Index" />
