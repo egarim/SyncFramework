@@ -31,20 +31,41 @@
         <MudTabs>
             <MudTabPanel Text="Server">
                 <MudGrid>
-                    <!-- Server Info Card -->
+                    <!-- First Row: Buttons -->
                     <MudItem xs="12" md="4">
-                        <MudCard Elevation="2">
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileDownload"
+                                   Color="Color.Secondary" OnClick="@DownloadAllDatabases" FullWidth Class="mb-2">
+                            Download All Databases
+                        </MudButton>
+                    </MudItem>
+                    <MudItem xs="12" md="8">
+                        <MudGrid>
+                            <MudItem xs="12" md="8">
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
+                                           Color="Color.Primary" OnClick="@AddClientNode" FullWidth Class="mb-2">
+                                    Add Client Node
+                                </MudButton>
+                            </MudItem>
+                            <MudItem xs="12" md="4" Class="d-flex align-items-center">
+                                <MudCheckBox T="bool" Label="Generate Random Data"
+                                             Color="Color.Primary" @bind-Checked="@GenerateRandomData" />
+                            </MudItem>
+                        </MudGrid>
+                    </MudItem>
+
+                    <!-- Second Row: Cards -->
+                    <MudItem xs="12" md="4">
+                        <MudCard Elevation="2" Class="h-100 d-flex flex-column">
                             <MudCardHeader>
-                                <MudText Typo="Typo.h6">Server Information</MudText>
+                                <MudText Typo="Typo.h6">Sync Server Control Panel</MudText>
                             </MudCardHeader>
-                            <MudCardContent>
+                            <MudCardContent Class="flex-grow-1 d-flex flex-column">
                                 <MudList T="object" Dense="true">
                                     <MudListItem T="object">
                                         <MudListItemText>
                                             Node ID: @NodeId
                                         </MudListItemText>
                                     </MudListItem>
-                                    <!-- Add more server info as needed -->
                                     <MudListItem T="object">
                                         <MudListItemText>
                                             Status: Online
@@ -59,84 +80,59 @@
                             </MudCardContent>
                         </MudCard>
                     </MudItem>
-
-                    <!-- Node Management Actions -->
                     <MudItem xs="12" md="8">
-                        <MudCard Elevation="2">
-                            <MudCardHeader>
-                                <MudText Typo="Typo.h6">Node Management</MudText>
-                            </MudCardHeader>
+                        <MudCard Elevation="2" Class="h-100 d-flex flex-column">
                             <MudCardContent>
-                                <MudGrid>
-                                    <MudItem xs="12" sm="6" md="4">
-                                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
-                                                   Color="Color.Primary" OnClick="@AddClientNode" FullWidth>
-                                            Add Client Node
-                                        </MudButton>
-                                    </MudItem>
-                                    <MudItem xs="12" sm="6" md="4">
-                                        <MudCheckBox T="bool" Label="Generate Random Data"
-                                                     Color="Color.Primary" @bind-Checked="@GenerateRandomData" />
-                                    </MudItem>
-                                    <MudItem xs="12" sm="6" md="4">
-                                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileDownload"
-                                                   Color="Color.Secondary" OnClick="@DownloadAllDatabases" FullWidth>
-                                            Download All Databases
-                                        </MudButton>
-                                    </MudItem>
-                                </MudGrid>
+                                <MudCard Elevation="1" Class="mb-0">
+                                    <MudCardHeader>
+                                        <MudText Typo="Typo.subtitle1">Database Compatibility</MudText>
+                                    </MudCardHeader>
+                                    <MudCardContent>
+                                        <MudText Typo="Typo.caption" Class="mb-3">
+                                            Check options to generate deltas compatible with other databases
+                                        </MudText>
+                                        <MudGrid>
+                                            <MudItem xs="4">
+                                                <MudCheckBox T="bool" Label="PostgreSQL" Color="Color.Info" @bind-Checked="@Postgres" />
+                                            </MudItem>
+                                            <MudItem xs="4">
+                                                <MudCheckBox T="bool" Label="MySQL" Color="Color.Info" @bind-Checked="@MySql" />
+                                            </MudItem>
+                                            <MudItem xs="4">
+                                                <MudCheckBox T="bool" Label="SQL Server" Color="Color.Info" @bind-Checked="@SqlServer" />
+                                            </MudItem>
+                                        </MudGrid>
+                                    </MudCardContent>
+                                </MudCard>
                             </MudCardContent>
                         </MudCard>
                     </MudItem>
                 </MudGrid>
 
-                    <MudDivider Class="my-4" />
+                <MudDivider Class="my-4" />
 
-                    <!-- Database Compatibility Section -->
-                    <MudCard Elevation="1" Class="mb-4">
-                        <MudCardHeader>
-                            <MudText Typo="Typo.subtitle1">Database Compatibility</MudText>
-                        </MudCardHeader>
-                        <MudCardContent>
-                            <MudText Typo="Typo.caption" Class="mb-3">
-                                Check options to generate deltas compatible with other databases
-                            </MudText>
-                            <MudGrid>
-                                <MudItem xs="4">
-                                    <MudCheckBox T="bool" Label="PostgreSQL" Color="Color.Info" @bind-Checked="@Postgres" />
-                                </MudItem>
-                                <MudItem xs="4">
-                                    <MudCheckBox T="bool" Label="MySQL" Color="Color.Info" @bind-Checked="@MySql" />
-                                </MudItem>
-                                <MudItem xs="4">
-                                    <MudCheckBox T="bool" Label="SQL Server" Color="Color.Info" @bind-Checked="@SqlServer" />
-                                </MudItem>
-                            </MudGrid>
-                        </MudCardContent>
-                    </MudCard>
-
-                    <!-- Server Component -->
-                    <SyncServerComponent DeltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="serverComponent" />
-                </MudTabPanel>
-                @if (ClientNodes.Any())
+                <!-- Server Component -->
+                <SyncServerComponent DeltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="serverComponent" />
+            </MudTabPanel>
+            @if (ClientNodes.Any())
+            {
+                @foreach (var item in ClientNodes)
                 {
-                    @foreach (var item in ClientNodes)
-                    {
-                        <MudTabPanel Text="@item.Id">
-                            <ClientNodeComponent item="@item"></ClientNodeComponent>
-                        </MudTabPanel>
-                    }
-                }
-                else
-                {
-                    <MudTabPanel Text="No Clients">
-                        <MudAlert Severity="Severity.Info">No client nodes added yet. Click "Add client node" to begin.</MudAlert>
+                    <MudTabPanel Text="@item.Id">
+                        <ClientNodeComponent item="@item"></ClientNodeComponent>
                     </MudTabPanel>
                 }
-            </MudTabs>
-        </MudPaper>
-    </MudContainer>
+            }
+            else
+            {
+                <MudTabPanel Text="No Clients">
+                    <MudAlert Severity="Severity.Info">No client nodes added yet. Click "Add client node" to begin.</MudAlert>
+                </MudTabPanel>
+            }
+        </MudTabs>
+    </MudPaper>
+</MudContainer>
 
-    <MudScrollToTop>
-        <MudFab Color="Color.Tertiary" Size="Size.Small" Icon="@Icons.Material.Filled.ArrowCircleUp" />
-    </MudScrollToTop>
+<MudScrollToTop>
+    <MudFab Color="Color.Tertiary" Size="Size.Small" Icon="@Icons.Material.Filled.ArrowCircleUp" />
+</MudScrollToTop>
