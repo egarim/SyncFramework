@@ -27,7 +27,7 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
         {
             //0 - Get the network client connected to the API controller exposed by the test infrastructure
             var httpclient = this.GetTestClientFactory().CreateClient("TestClient");
-
+            httpclient.BaseAddress = new Uri("http://localhost/sync/");
 
             string NodeId = "Custom";
 
@@ -71,7 +71,7 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
         {
             //0 - Get the network client connected to the API controller exposed by the test infrastructure
             var httpclient = this.GetTestClientFactory().CreateClient("TestClient");
-
+            httpclient.BaseAddress = new Uri("http://localhost/sync/");
 
             string NodeId =TestStartup.STR_MemoryDeltaStore1;
 
@@ -97,7 +97,7 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
         {
             //0 - Get the network client connected to the API controller exposed by the test infrastructure
             var httpclient = this.GetTestClientFactory().CreateClient("TestClient");
-
+            httpclient.BaseAddress = new Uri("http://localhost/sync/");
 
             string NodeId = TestStartup.STR_MemoryDeltaStore1;
 
@@ -123,6 +123,7 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
         {
             // Arrange: Create an HttpClient with an invalid BaseAddress.
             var httpclient = new HttpClient();
+
             httpclient.BaseAddress = new Uri("http://localhost:12345/invalid");
             httpclient.Timeout = TimeSpan.FromSeconds(3);
             string NodeId = TestStartup.STR_MemoryDeltaStore1;
@@ -219,6 +220,7 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
         {
             // 0 - Get the network client connected to the API controller exposed by the test infrastructure
             var httpclient = this.GetTestClientFactory().CreateClient("TestClient");
+            httpclient.BaseAddress = new Uri("http://localhost/sync/");
             string NodeId = TestStartup.STR_MemoryDeltaStore1;
             ISyncFrameworkClient syncFrameworkClient = new SyncFrameworkHttpClient(httpclient, NodeId);
 
@@ -246,7 +248,7 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
         {
             //0 - Get the network client connected to the API controller exposed by the test infrastructure
             var httpclient = this.GetTestClientFactory().CreateClient("TestClient");
-
+            httpclient.BaseAddress = new Uri("http://localhost/sync/");
 
             string NodeId = "Custom";
 
