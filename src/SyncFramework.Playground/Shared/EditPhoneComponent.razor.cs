@@ -7,7 +7,7 @@ namespace SyncFramework.Playground.Shared
     public partial class EditPhoneComponent
     {
         public MudForm form { get; set; }
-        [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+        [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
 
         [Parameter] public IPhoneNumber Phone { get; set; }
 

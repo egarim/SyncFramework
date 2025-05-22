@@ -6,7 +6,7 @@ namespace SyncFramework.Playground.Shared
     public partial class DeltaPreviewComponent
     {
     
-        [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+        [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
 
         [Parameter] public string Content { get; set; }
 

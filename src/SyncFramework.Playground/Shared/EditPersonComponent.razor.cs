@@ -7,7 +7,7 @@ namespace SyncFramework.Playground.Shared
     public partial class EditPersonComponent
     {
         public MudForm form { get; set; }
-        [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+        [CascadingParameter] IMudDialogInstance MudDialog { get; set; }
 
         [Parameter] public IPerson Person { get; set; }
 

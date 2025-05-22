@@ -30,15 +30,15 @@
 <SyncServerComponent DeltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
 <MudStack Row="true">
     <MudButton StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddClientNode">Add client node</MudButton>
-    <MudCheckBox Label="Generate Random Data" @bind-Checked="@GenerateRandomData" />
+    <MudCheckBox T="bool" Label=" Generate Random Data" @bind-Checked="@GenerateRandomData" />
     <MudButton StartIcon="@Icons.Material.Filled.FileDownload" Color="Color.Primary" OnClick="DownloadAllDatabases">Download all databases</MudButton>
 </MudStack>
 
 
 <MudStack Row="true">
-    <MudCheckBox Label="Postgres" @bind-Checked="@Postgres" />
-    <MudCheckBox Label="MySql" @bind-Checked="@MySql" />
-    <MudCheckBox Label="SqlServer" @bind-Checked="@SqlServer" />
+    <MudCheckBox T="bool" Label="Postgres" @bind-Checked="@Postgres" />
+    <MudCheckBox T="bool" Label="MySql" @bind-Checked="@MySql" />
+    <MudCheckBox T="bool" Label="SqlServer" @bind-Checked="@SqlServer" />
 </MudStack>
 <MudText Typo="Typo.body1">Additional delta generators (check them to generate deltas compatible with other databases)</MudText>
 <br>
