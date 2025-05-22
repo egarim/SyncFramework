@@ -26,47 +26,50 @@
         </MudCardContent>
     </MudCard>
 
-    <MudText Typo="Typo.subtitle1" Class="mb-2">Node Management</MudText>
-    <MudGrid>
-        <MudItem xs="12" sm="6" md="4">
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
-                       Color="Color.Primary" OnClick="AddClientNode" FullWidth="true">
-                Add Client Node
-            </MudButton>
-        </MudItem>
-        <MudItem xs="12" sm="6" md="4">
-            <MudCheckBox T="bool" Label="Generate Random Data"
-                         Color="Color.Primary" @bind-Checked="@GenerateRandomData" />
-        </MudItem>
-        <MudItem xs="12" sm="6" md="4">
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileDownload"
-                       Color="Color.Secondary" OnClick="DownloadAllDatabases" FullWidth="true">
-                Download All Databases
-            </MudButton>
-        </MudItem>
-    </MudGrid>
+ 
 
-    <MudDivider Class="my-4" />
-
-    <MudText Typo="Typo.subtitle1" Class="mb-2">Database Compatibility</MudText>
-    <MudText Typo="Typo.caption" Class="mb-3">Check options to generate deltas compatible with other databases</MudText>
-
-    <MudGrid>
-        <MudItem xs="4">
-            <MudCheckBox T="bool" Label="PostgreSQL" Color="Color.Info" @bind-Checked="@Postgres" />
-        </MudItem>
-        <MudItem xs="4">
-            <MudCheckBox T="bool" Label="MySQL" Color="Color.Info" @bind-Checked="@MySql" />
-        </MudItem>
-        <MudItem xs="4">
-            <MudCheckBox T="bool" Label="SQL Server" Color="Color.Info" @bind-Checked="@SqlServer" />
-        </MudItem>
-    </MudGrid>
+    
 
     <MudText Typo="Typo.h5" Class="mb-3">Nodes</MudText>
     <MudPaper Elevation="2" Class="pa-4">
         <MudTabs>
             <MudTabPanel Text="Server">
+                <MudText Typo="Typo.subtitle1" Class="mb-2">Node Management</MudText>
+                <MudGrid>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
+                                   Color="Color.Primary" OnClick="AddClientNode" FullWidth="true">
+                            Add Client Node
+                        </MudButton>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudCheckBox T="bool" Label="Generate Random Data"
+                                     Color="Color.Primary" @bind-Checked="@GenerateRandomData" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileDownload"
+                                   Color="Color.Secondary" OnClick="DownloadAllDatabases" FullWidth="true">
+                            Download All Databases
+                        </MudButton>
+                    </MudItem>
+                </MudGrid>
+
+                <MudDivider Class="my-4" />
+
+                <MudText Typo="Typo.subtitle1" Class="mb-2">Database Compatibility</MudText>
+                <MudText Typo="Typo.caption" Class="mb-3">Check options to generate deltas compatible with other databases</MudText>
+
+                <MudGrid>
+                    <MudItem xs="4">
+                        <MudCheckBox T="bool" Label="PostgreSQL" Color="Color.Info" @bind-Checked="@Postgres" />
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudCheckBox T="bool" Label="MySQL" Color="Color.Info" @bind-Checked="@MySql" />
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudCheckBox T="bool" Label="SQL Server" Color="Color.Info" @bind-Checked="@SqlServer" />
+                    </MudItem>
+                </MudGrid>
                 <SyncServerComponent DeltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
             </MudTabPanel>
             @if (ClientNodes.Any())
