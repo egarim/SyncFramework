@@ -1,7 +1,5 @@
 ﻿using BIT.Data.Sync;
 using BIT.Data.Sync.Server;
-using Microsoft.AspNetCore.Http;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
@@ -11,131 +9,60 @@ using System.Web;
 
 namespace SyncFramework.Playground.Components
 {
+    /// <summary>
+    /// Custom HTTP message handler that provides synchronization functionality by delegating requests to an ISyncServer.
+    /// Handles GET requests for fetching deltas and POST requests for pushing deltas.
+    /// </summary>
     public class FakeHandler : HttpMessageHandler
     {
-        ISyncServer syncServer;
+        private readonly ISyncServer _syncServer;
+
+        /// <summary>
+        /// Initializes a new instance of the FakeHandler class.
+        /// </summary>
+        /// <param name="syncServer">The sync server implementation to handle sync operations</param>
         public FakeHandler(ISyncServer syncServer)
         {
-            this.syncServer = syncServer;
-        }
-        protected string GetHeader(string HeaderName, HttpRequestMessage request)
-        {
-            var stringValues = request.Headers.FirstOrDefault(h => h.Key == HeaderName);
-            return stringValues.Value.FirstOrDefault();
-        }
-        public async Task ProcessPush(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            string NodeId = GetHeader("NodeId", request);
-            var stream = new StreamReader(request.Content.ReadAsStream());
-            var body = await stream.ReadToEndAsync();
-            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(body)))
-            {
-
-                DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(List<Delta>));
-                List<Delta> Deltas = (List<Delta>)deserialized.ReadObject(ms);
-                await syncServer.SaveDeltasAsync(NodeId, Deltas, new CancellationToken());
-                var Message = $"Push to node:{NodeId}{Environment.NewLine}Deltas Received:{Deltas.Count}{Environment.NewLine}Identity:{Deltas.FirstOrDefault()?.Identity}";
-                Debug.WriteLine(Message);
-
-            }
+            _syncServer = syncServer ?? throw new ArgumentNullException(nameof(syncServer));
         }
 
-        public virtual async Task<string> ProcessFetch(string startIndex, string identity, HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-
-            string NodeId = GetHeader("NodeId", request);
-
-
-            var Message = $"Fetch from node:{NodeId}{Environment.NewLine}Start delta index:{startIndex}{Environment.NewLine}Client identity:{identity}";
-
-            Debug.WriteLine(Message);
-            IEnumerable<IDelta> enumerable;
-
-            if (startIndex == null)
-                startIndex = "";
-
-            if (string.IsNullOrEmpty(identity))
-                enumerable = await syncServer.GetDeltasAsync(NodeId, startIndex, new CancellationToken());
-            else
-                enumerable = await syncServer.GetDeltasFromOtherNodes(NodeId, startIndex, identity, new CancellationToken());
-
-            List<Delta> toSerialize = new List<Delta>();
-            foreach (IDelta delta in enumerable)
-            {
-                toSerialize.Add(new Delta(delta));
-            }
-            DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(List<Delta>));
-            MemoryStream msObj = new MemoryStream();
-            js.WriteObject(msObj, toSerialize);
-            msObj.Position = 0;
-            StreamReader sr = new StreamReader(msObj);
-            string jsonDeltas = sr.ReadToEnd();
-            return jsonDeltas;
-
-        }
-        private static Dictionary<string, string> GetQueryParameters(Uri uri)
-        {
-            return HttpUtility.ParseQueryString(uri.Query)
-                .AllKeys
-                .ToDictionary(key => key, key => HttpUtility.ParseQueryString(uri.Query)[key]);
-        }
-        public static Dictionary<string, string> Parse(string queryString)
-        {
-            var queryDictionary = new Dictionary<string, string>();
-
-            if (!string.IsNullOrEmpty(queryString))
-            {
-                queryString = queryString.StartsWith('?') ? queryString.Substring(1) : queryString;
-                var pairs = queryString.Split('&');
-
-                foreach (var pair in pairs)
-                {
-                    var keyValue = pair.Split('=');
-                    if (keyValue.Length == 2)
-                    {
-                        queryDictionary[keyValue[0]] = Uri.UnescapeDataString(keyValue[1]);
-                    }
-                }
-            }
-
-            return queryDictionary;
-        }
-
+        /// <summary>
+        /// Processes the HTTP request and returns an HTTP response.
+        /// </summary>
+        /// <param name="request">The HTTP request message to process</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
+        /// <returns>The HTTP response message to send back</returns>
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
             HttpResponseMessage responseMessage;
 
             switch (request.Method.Method)
             {
                 case "GET":
-                    var Values=Parse(request.RequestUri.Query);
-                    //NameValueCollection Values = System.Web.HttpUtility.ParseQueryString(request.RequestUri.Query);
+                    var queryParams = ParseQueryString(request.RequestUri.Query);
 
-                    //var queryParams = GetQueryParameters(request.RequestUri);
-                    //foreach (var param in queryParams)
-                    //{
-                    //    Debug.WriteLine($"{param.Key} = {param.Value}");
-                    //}
+                    // Extract query parameters for delta fetching
+                    string startIndex = queryParams.TryGetValue("startIndex", out var index) ? index : string.Empty;
+                    string identity = queryParams.TryGetValue("identity", out var id) ? id : string.Empty;
 
-                    string startIndex = Values.FirstOrDefault().Value.ToString();
-                    string identity = Values.LastOrDefault().Value.ToString();
-                    //startIndex = Values.Get("startIndex");
-                    //identity = Values.Get("identity");
-                    var output=await ProcessFetch(startIndex, identity, request, cancellationToken);
+                    var output = await ProcessFetchAsync(startIndex, identity, request, cancellationToken);
                     responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
                     {
                         Content = new StringContent(output)
                     };
                     break;
-                case "POST":
-                    await ProcessPush(request, cancellationToken);
 
+                case "POST":
+                    await ProcessPushAsync(request, cancellationToken);
                     responseMessage = new HttpResponseMessage(HttpStatusCode.Created)
                     {
-                        Content = new StringContent("Hello! This is a response to a POST request!")
+                        Content = new StringContent("Request processed successfully")
                     };
                     break;
-                // You can add cases for other HTTP methods as needed
+
                 default:
                     responseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest)
                     {
@@ -144,7 +71,108 @@ namespace SyncFramework.Playground.Components
                     break;
             }
 
-            return await Task.FromResult(responseMessage);
+            return responseMessage;
+        }
+
+        /// <summary>
+        /// Processes a push request to save deltas to the sync server.
+        /// </summary>
+        /// <param name="request">The HTTP request containing deltas to push</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
+        public async Task ProcessPushAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            string nodeId = GetHeader("NodeId", request);
+            var stream = new StreamReader(await request.Content.ReadAsStreamAsync(cancellationToken));
+            var body = await stream.ReadToEndAsync();
+
+            using var ms = new MemoryStream(Encoding.Unicode.GetBytes(body));
+            var serializer = new DataContractJsonSerializer(typeof(List<Delta>));
+            var deltas = (List<Delta>)serializer.ReadObject(ms);
+
+            await _syncServer.SaveDeltasAsync(nodeId, deltas, cancellationToken);
+
+            var message = $"Push to node:{nodeId}{Environment.NewLine}" +
+                         $"Deltas Received:{deltas.Count}{Environment.NewLine}" +
+                         $"Identity:{deltas.FirstOrDefault()?.Identity}";
+            Debug.WriteLine(message);
+        }
+
+        /// <summary>
+        /// Processes a fetch request to retrieve deltas from the sync server.
+        /// </summary>
+        /// <param name="startIndex">The starting index from which to fetch deltas</param>
+        /// <param name="identity">The identity of the client requesting deltas</param>
+        /// <param name="request">The HTTP request message</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
+        /// <returns>JSON string containing serialized deltas</returns>
+        public virtual async Task<string> ProcessFetchAsync(string startIndex, string identity, HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            string nodeId = GetHeader("NodeId", request);
+
+            var message = $"Fetch from node:{nodeId}{Environment.NewLine}" +
+                         $"Start delta index:{startIndex}{Environment.NewLine}" +
+                         $"Client identity:{identity}";
+            Debug.WriteLine(message);
+
+            // Get deltas based on parameters
+            IEnumerable<IDelta> deltaResults;
+            startIndex ??= string.Empty;
+
+            if (string.IsNullOrEmpty(identity))
+                deltaResults = await _syncServer.GetDeltasAsync(nodeId, startIndex, cancellationToken);
+            else
+                deltaResults = await _syncServer.GetDeltasFromOtherNodes(nodeId, startIndex, identity, cancellationToken);
+
+            // Convert and serialize deltas
+            var deltasToSerialize = deltaResults.Select(d => new Delta(d)).ToList();
+
+            using var msObj = new MemoryStream();
+            var serializer = new DataContractJsonSerializer(typeof(List<Delta>));
+            serializer.WriteObject(msObj, deltasToSerialize);
+            msObj.Position = 0;
+
+            using var sr = new StreamReader(msObj);
+            return await sr.ReadToEndAsync();
+        }
+
+        /// <summary>
+        /// Extracts a specific header value from the HTTP request.
+        /// </summary>
+        /// <param name="headerName">The name of the header to retrieve</param>
+        /// <param name="request">The HTTP request containing the headers</param>
+        /// <returns>The header value or null if not found</returns>
+        protected string GetHeader(string headerName, HttpRequestMessage request)
+        {
+            if (request.Headers.TryGetValues(headerName, out var values))
+                return values.FirstOrDefault();
+            return null;
+        }
+
+        /// <summary>
+        /// Parses a query string into a dictionary of key-value pairs.
+        /// </summary>
+        /// <param name="queryString">The query string to parse</param>
+        /// <returns>Dictionary containing the parsed query parameters</returns>
+        public static Dictionary<string, string> ParseQueryString(string queryString)
+        {
+            var queryDictionary = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            if (string.IsNullOrEmpty(queryString))
+                return queryDictionary;
+
+            queryString = queryString.TrimStart('?');
+            var pairs = queryString.Split('&', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var pair in pairs)
+            {
+                var keyValue = pair.Split('=');
+                if (keyValue.Length == 2)
+                {
+                    queryDictionary[keyValue[0]] = Uri.UnescapeDataString(keyValue[1]);
+                }
+            }
+
+            return queryDictionary;
         }
     }
 }
