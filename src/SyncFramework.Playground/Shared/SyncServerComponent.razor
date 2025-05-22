@@ -1,31 +1,85 @@
-﻿@* <MudText Typo="Typo.h5" Align="Align.Center" >Sync Server</MudText> *@
-<MudText Typo="Typo.h5" Align="Align.Center" >Server Node Id:@NodeId</MudText>
+﻿<MudContainer Class="mt-4">
+    <MudCard Elevation="3" Class="mb-4">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h5">Sync Server Control Panel</MudText>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                <MudChip T="string" Color="Color.Success" Size="Size.Small" Icon="@Icons.Material.Filled.Cloud">Online</MudChip>
+            </CardHeaderActions>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-2">
+                <MudText Typo="Typo.body1"><MudText Typo="Typo.body1" Color="Color.Primary" Inline="true">Node ID:</MudText> @NodeId</MudText>
+                <MudBadge Content="@this.Deltas.Count()" Color="Color.Info" Overlap="true" Class="ml-2">
+                    <MudIcon Icon="@Icons.Material.Filled.Storage" />
+                </MudBadge>
+            </MudStack>
+        </MudCardContent>
+    </MudCard>
 
+    <MudCard Elevation="3">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Server Deltas</MudText>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                <MudTooltip Text="Refresh Delta List">
+                    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Color="Color.Default" Size="Size.Small" />
+                </MudTooltip>
+            </CardHeaderActions>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudDataGrid Items="@this.Deltas" 
+                        Hover="true" 
+                        Striped="true" 
+                        Dense="true" 
+                        MultiSelection="false" 
+                        Virtualize="true" 
+                        FixedHeader="true" 
+                        Height="350px"
+                        Class="elevation-1">
+                <ToolBarContent>
+                    <MudTextField @bind-Value="searchString" Placeholder="Search" 
+                                Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" 
+                                IconSize="Size.Medium" Class="mt-0"></MudTextField>
+                </ToolBarContent>
+                <Columns>
+                    <PropertyColumn Property="x => x.Key.Identity" Title="Node Identity" />
+                    <PropertyColumn Property="x => x.Key.Epoch" Title="Epoch" />
+                    <PropertyColumn Property="x => x.Key.Date" Title="Date" />
+                    <PropertyColumn Property="x => x.Key.Index" Title="Index" />
+                    <TemplateColumn CellClass="d-flex justify-center" Title="Actions">
+                        <CellTemplate>
+                            <MudStack Row>
+                                <MudTooltip Text="View delta details">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Visibility" 
+                                                Color="Color.Info" 
+                                                Size="Size.Small" 
+                                                OnClick="@(()=>PreviewDelta(context.Item.Value))"/>
+                                </MudTooltip>
+                                <MudTooltip Text="Download delta data">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Download" 
+                                                Color="Color.Primary" 
+                                                Size="Size.Small" 
+                                                OnClick="@(()=>DownloadDelta(context.Item))"/>
+                                </MudTooltip>
+                            </MudStack>
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+                <PagerContent>
+                    <MudDataGridPager />
+                </PagerContent>
+            </MudDataGrid>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
 
-@* 
-<MudText Typo="Typo.body1">This playground is a demo of the <MudLink Underline="Underline.Always" Href="https://github.com/egarim/SyncFramework">SyncFramework</MudLink> created by <MudLink Underline="Underline.Always" Href="https://www.jocheojeda.com">Joche Ojeda</MudLink>.CTO for the companies  <MudLink Underline="Underline.Always" Href="https://www.xari.io">XARI</MudLink> &  <MudLink Underline="Underline.Always" Href="https://www.bitframeworks.com">BIT Frameworks</MudLink> </MudText>
-<MudText Typo="Typo.body1">you can download all the nugets packages to implement your own Synchronization from  <MudLink Underline="Underline.Always" Href="https://www.nuget.org/packages?q=%09BIT.Data.Sync">Nuget.org</MudLink>.Here <MudLink Underline="Underline.Always" Href="https://www.jocheojeda.com">me</MudLink> and <MudLink Underline="Underline.Always" Href="https://xafmarin.com">Javier</MudLink> tal can see a demo on how the playground works </MudText>
-
- *@
-
-<MudText Typo="Typo.h6" Align="Align.Center">Server Deltas</MudText>
-<br>
-<br>
-<MudDataGrid Items="@this.Deltas" Hover="true" Striped="true" Dense="true" MultiSelection="false" Virtualize="true" FixedHeader="true" Height="250px">
-    <Columns>
-        <PropertyColumn Property="x => x.Key.Identity" Title="Node Identity" />
-        <PropertyColumn Property="x => x.Key.Epoch" Title="Epoch" />
-        <PropertyColumn Property="x => x.Key.Date" Title="Date" />
-        <PropertyColumn Property="x => x.Key.Index" Title="Index" />
-
-        <TemplateColumn CellClass="d-flex justify-end">
-            <CellTemplate>
-                <MudStack Row>
-                    <MudButton StartIcon="@Icons.Material.Filled.Preview" Color="Color.Success" OnClick="@(()=>PreviewDelta(context.Item.Value))">Preview</MudButton>
-                    <MudButton StartIcon="@Icons.Material.Filled.Download" Color="Color.Success" OnClick="@(()=>DownloadDelta(context.Item))">Download</MudButton>
-                </MudStack>
-            </CellTemplate>
-        </TemplateColumn>
-    </Columns>
-</MudDataGrid>
-
+@code {
+    private string searchString = "";
+    
+    // Add this property if it doesn't exist elsewhere in your component code
+    // [Parameter]
+    // public string NodeId { get; set; }
+}
