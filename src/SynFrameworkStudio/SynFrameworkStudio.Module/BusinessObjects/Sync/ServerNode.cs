@@ -39,28 +39,112 @@ namespace SynFrameworkStudio.Module.BusinessObjects.Sync
         {
             LoadClients();
         }
-        // Inside your ServerNode class, add a method or property like this:
-        public IEnumerable<string> GetDistinctClientNodeIds()
+        //// Inside your ServerNode class, add a method or property like this:
+        //public IEnumerable<string> GetDistinctClientNodeIds()
+        //{
+        //    return Events
+        //        .Where(e => !string.IsNullOrEmpty(e.ClientNodeId))
+        //        .Select(e => e.ClientNodeId)
+        //        .Distinct()
+        //        .ToList();
+
+
+
+
+        //}
+        //// Returns a dictionary: NodeId -> (latestPush, latestFetch)
+        //public static Dictionary<string, (Events? LatestPush, Events? LatestFetch)> GetLatestPushAndFetchPerNode(IQueryable<Events> events)
+        //{
+        //    // Group events by NodeId
+        //    var grouped = events
+        //        .Where(e => e.ServerNode != null)
+        //        .GroupBy(e => e.ServerNode.NodeId)
+        //        .ToDictionary(
+        //            g => g.Key,
+        //            g => (
+        //                LatestPush: g
+        //                    .Where(e => e.EventType == EventType.Push)
+        //                    .OrderByDescending(e => e.Date)
+        //                    .ThenByDescending(e => e.Time)
+        //                    .FirstOrDefault(),
+        //                LatestFetch: g
+        //                    .Where(e => e.EventType == EventType.Fetch)
+        //                    .OrderByDescending(e => e.Date)
+        //                    .ThenByDescending(e => e.Time)
+        //                    .FirstOrDefault()
+        //            )
+        //        );
+        //    return grouped;
+        //}
+
+
+        public static BindingList<ClientNode> GetClientNodesWithLatestOperations(IEnumerable<Events> events)
         {
-            return Events
+            var result = new BindingList<ClientNode>();
+
+            // Group events by ClientNodeId
+            var clientGroups = events
                 .Where(e => !string.IsNullOrEmpty(e.ClientNodeId))
-                .Select(e => e.ClientNodeId)
-                .Distinct()
-                .ToList();
+                .GroupBy(e => e.ClientNodeId);
+
+            foreach (var clientGroup in clientGroups)
+            {
+                var clientNodeId = clientGroup.Key;
+                var clientNode = new ClientNode { Name = clientNodeId };
+
+                // Find latest push operation
+                var latestPush = clientGroup
+                    .Where(e => e.EventType == EventType.Push)
+                    .OrderByDescending(e => e.Date)
+                    .ThenByDescending(e => e.Time)
+                    .FirstOrDefault();
+
+                // Find latest fetch operation
+                var latestFetch = clientGroup
+                    .Where(e => e.EventType == EventType.Fetch)
+                    .OrderByDescending(e => e.Date)
+                    .ThenByDescending(e => e.Time)
+                    .FirstOrDefault();
+
+                // Set the DateTime values
+                if (latestPush != null)
+                {
+                    clientNode.LastPushOperation = new DateTime(
+                        latestPush.Date.Year,
+                        latestPush.Date.Month,
+                        latestPush.Date.Day,
+                        latestPush.Time.Hour,
+                        latestPush.Time.Minute,
+                        latestPush.Time.Second);
+                }
+
+                if (latestFetch != null)
+                {
+                    clientNode.LastFetchOperation = new DateTime(
+                        latestFetch.Date.Year,
+                        latestFetch.Date.Month,
+                        latestFetch.Date.Day,
+                        latestFetch.Time.Hour,
+                        latestFetch.Time.Minute,
+                        latestFetch.Time.Second);
+                }
+
+                result.Add(clientNode);
+            }
+
+            return result;
         }
+
         private void LoadClients()
         {
-            Clients = new BindingList<ClientNode>();
-            foreach (var item in GetDistinctClientNodeIds())
-            {
-                //if (item.EventType == EventType.Push)
-                //{
 
-                //}
-                var client = new ClientNode();
-                client.Name = item;
-                Clients.Add(client);
-            }
+           
+            Clients = GetClientNodesWithLatestOperations(this.Events);
+
+
+
+
+          
         }
 
         protected override void OnLoaded()

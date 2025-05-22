@@ -16,6 +16,9 @@ namespace SynFrameworkStudio.Module.BusinessObjects.Sync
     {
 
         public string Name { get; set; }
+        public DateTime LastPushOperation { get; set; }
+        public DateTime LastFetchOperation { get; set; }
+
 
 
     }
