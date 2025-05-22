@@ -1,0 +1,98 @@
+﻿@page "/remoteserver"
+@using SyncFramework.Playground.EfCore;
+@using MudBlazor;
+@inject ISnackbar Snackbar
+
+<PageTitle>SyncFramework - Remote Server Demo</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudPaper Elevation="3" Class="pa-4 mb-4">
+        <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-3" Color="Color.Primary">SyncFramework</MudText>
+        <MudText Typo="Typo.h6" Align="Align.Center" Class="mb-4">Entity Framework Core Synchronization Demo</MudText>
+
+        <MudDivider Class="my-3" />
+
+        <MudText Typo="Typo.body1" Class="mb-3">
+            This is a professional demonstration of the <MudLink Underline="Underline.Always" Target="_blank" Href="https://github.com/egarim/SyncFramework">SyncFramework</MudLink>
+            for Entity Framework Core, developed by <MudLink Target="_blank" Underline="Underline.Always" Href="https://www.jocheojeda.com">Joche Ojeda</MudLink>,
+            CTO at <MudLink Underline="Underline.Always" Target="_blank" Href="https://www.xari.io">XARI</MudLink> and
+            <MudLink Underline="Underline.Always" Target="_blank" Href="https://www.bitframeworks.com">BIT Frameworks</MudLink>.
+        </MudText>
+
+        <MudText Typo="Typo.body1" Class="mb-3">
+            Download all required NuGet packages at <MudLink Target="_blank" Underline="Underline.Always" Href="https://www.nuget.org/packages?q=%09BIT.Data.Sync">Nuget.org</MudLink>.
+            Watch our <MudLink Target="_blank" Underline="Underline.Always" Href="https://youtu.be/JqjGvcbIUzQ">video tutorial</MudLink>
+            featuring <MudLink Target="_blank" Underline="Underline.Always" Href="https://xafmarin.com">Javier</MudLink> and
+            <MudLink Target="_blank" Underline="Underline.Always" Href="https://www.jocheojeda.com">Joche</MudLink>
+            for an in-depth explanation of the SyncFramework playground.
+        </MudText>
+    </MudPaper>
+
+    <MudPaper Elevation="3" Class="pa-4 mb-4">
+        <MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-3">Server Configuration</MudText>
+        <SyncServerComponent DeltaStore="@ServerDeltaStore" NodeId="@NodeId" @ref="@serverComponent" />
+
+        <MudDivider Class="my-4" />
+
+        <MudText Typo="Typo.subtitle1" Class="mb-2">Node Management</MudText>
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="4">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
+                           Color="Color.Primary" OnClick="AddClientNode" FullWidth="true">
+                    Add Client Node
+                </MudButton>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudCheckBox T="bool" Label="Generate Random Data"
+                             Color="Color.Primary" @bind-Checked="@GenerateRandomData" />
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileDownload"
+                           Color="Color.Secondary" OnClick="DownloadAllDatabases" FullWidth="true">
+                    Download All Databases
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+
+        <MudDivider Class="my-4" />
+
+        <MudText Typo="Typo.subtitle1" Class="mb-2">Database Compatibility</MudText>
+        <MudText Typo="Typo.caption" Class="mb-3">Check options to generate deltas compatible with other databases</MudText>
+
+        <MudGrid>
+            <MudItem xs="4">
+                <MudCheckBox T="bool" Label="PostgreSQL" Color="Color.Info" @bind-Checked="@Postgres" />
+            </MudItem>
+            <MudItem xs="4">
+                <MudCheckBox T="bool" Label="MySQL" Color="Color.Info" @bind-Checked="@MySql" />
+            </MudItem>
+            <MudItem xs="4">
+                <MudCheckBox T="bool" Label="SQL Server" Color="Color.Info" @bind-Checked="@SqlServer" />
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    <MudPaper Elevation="3" Class="pa-4">
+        <MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">Client Nodes</MudText>
+
+        @if (!ClientNodes.Any())
+        {
+            <MudAlert Severity="Severity.Info" Class="my-3">No client nodes available. Add a client node to begin.</MudAlert>
+        }
+        else
+        {
+            <MudGrid>
+                @foreach (var item in this.ClientNodes)
+                {
+                    <MudItem xs="12" Class="mb-3">
+                        <ClientNodeComponent item="@item"></ClientNodeComponent>
+                    </MudItem>
+                }
+            </MudGrid>
+        }
+    </MudPaper>
+</MudContainer>
+
+<MudScrollToTop>
+    <MudFab Color="Color.Primary" Icon="@Icons.Material.Filled.KeyboardArrowUp" />
+</MudScrollToTop>
