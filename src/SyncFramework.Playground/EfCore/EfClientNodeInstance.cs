@@ -48,8 +48,13 @@ namespace SyncFramework.Playground.EfCore
 
             }
         }
+        bool IsInitialized = false;
         public async Task Init()
         {
+            if(IsInitialized)
+            {
+                return;
+            }
             await Task.Delay(TimeSpan.FromMilliseconds(100));
             await InitDbContext();
             //Delete the database if it exists
@@ -70,6 +75,8 @@ namespace SyncFramework.Playground.EfCore
             IsLoading = false;
            
             this.RefreshAction?.Invoke();
+
+            IsInitialized = true;
         }
 
         private async Task InitDbContext()

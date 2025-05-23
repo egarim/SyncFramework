@@ -74,7 +74,10 @@ namespace SyncFramework.Playground.Components
                 {
                     return forwardedResponse;
                 }
-
+                if(request.Method.Method=="GET")
+                {
+                    return forwardedResponse;
+                }
                 // Otherwise continue with local processing
             }
 
