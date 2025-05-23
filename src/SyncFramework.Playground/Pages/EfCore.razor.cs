@@ -23,15 +23,17 @@ namespace SyncFramework.Playground.Pages
 {
     public partial class EfCore
     {
-    
+      
+        
+        // Existing properties
         public IQueryable<IClientNodeInstance> ClientNodes
         {
             get
             {
                 return clientNodes.AsQueryable();
             }
-           
         }
+        
         [Inject]
         BlazorComponentBus.ComponentBus Bus { get; set; }
         [Inject]
@@ -42,28 +44,53 @@ namespace SyncFramework.Playground.Pages
         public Dictionary<string, DeltaGeneratorBase> deltaGeneratorBases { get; set; }
         public IDeltaStore ServerDeltaStore { get; set; }
         public string NodeId { get; set; }
+        
         protected override void OnInitialized()
         {
             base.OnInitialized();
+            // For debugging only
+            Console.WriteLine("Component initialized, IsRemoteMode: " + IsRemoteMode);
+            
             //DbContextOptionsBuilder ServerDbContextOptions = new DbContextOptionsBuilder();
             //var ServerCnx = $"Data Source=Server_Deltas.db";
             //ServerDbContextOptions.UseSqlite(ServerCnx);
             //EfDeltaStore efDeltaStore = new EfDeltaStore(new DeltaDbContext(ServerDbContextOptions.Options));
-            ServerDeltaStore =new MemoryDeltaStore();
+            ServerDeltaStore = new MemoryDeltaStore();
             NodeId = "MainServer";
             //Subscribe Component to Specific Message
             Bus.Subscribe<object>(RefreshDeltaCount);
             Randomizer.Seed = new Random(8675309);
-
         }
+        
+        // New method for remote connection
+        private async Task ConnectAsync()
+        {
+            if (IsRemoteMode && (string.IsNullOrWhiteSpace(RemoteUrl) || string.IsNullOrWhiteSpace(RemoteNodeId)))
+            {
+                Snackbar.Add("Please fill both URL and Node ID fields to connect to a remote server", Severity.Warning);
+                return;
+            }
+
+            var mode = IsRemoteMode
+                ? $"Remote Server (URL: {RemoteUrl}, NodeId: {RemoteNodeId})"
+                : "In-Memory Database";
+                
+            Snackbar.Add($"Connecting to {mode}...", Severity.Info);
+            await Task.Delay(500); // Simulate async work
+            
+            // TODO: Implement actual connection logic based on IsRemoteMode
+            // If remote mode, connect to the remote server
+            // If in-memory mode, use local memory store (already set up in OnInitialized)
+        }
+        
+        // Existing methods
         private async void RefreshDeltaCount(MessageArgs args)
         {
             var message = args.GetMessage<object>();
             DeltaCount = await this.ServerDeltaStore.GetDeltaCountAsync("", NodeId, default);
-           
             this.StateHasChanged();
-           
         }
+        
         public bool GenerateRandomData { get; set; } = true;
         SyncServerComponent serverComponent;
         private List<IClientNodeInstance> clientNodes = new List<IClientNodeInstance>();
@@ -73,6 +100,7 @@ namespace SyncFramework.Playground.Pages
         public bool Sqlite { get; set; } = true;
         public bool SqlServer { get; set; } = true;
         public bool MySql { get; set; } = true;
+        
         private async void DownloadAllDatabases()
         {
             Dictionary<string, byte[]> files = new Dictionary<string, byte[]>();
@@ -90,12 +118,11 @@ namespace SyncFramework.Playground.Pages
             //var ServerDeltasBytes = File.ReadAllBytes("Server_Deltas.db");
             //files.Add(DataFileName, ServerDeltasBytes);
 
-
-
             var zipBytes = FileUtil.CreateZipFromByteArrays(files);
             await FileUtil.SaveAs(js, $"SyncFrameworkPlayGround.zip", zipBytes);
         }
-            private async void AddClientNode()
+        
+        private async void AddClientNode()
         {
             NodeCount++;
             string DbName = $"ClientNode_{NodeCount}";
@@ -118,16 +145,12 @@ namespace SyncFramework.Playground.Pages
                 Generators.Add(deltaGeneratorBases["SqlServer"]);
             }
 
-            var NodeInstance=new EfClientNodeInstance(js, DbName,Bus, DbName,this.serverComponent.HttpClient,this.serverComponent.NodeId, Generators.ToArray(), this.GenerateRandomData);
+            var NodeInstance = new EfClientNodeInstance(js, DbName, Bus, DbName, this.serverComponent.HttpClient, this.serverComponent.NodeId, Generators.ToArray(), this.GenerateRandomData);
             this.clientNodes.Add(NodeInstance);
 
             Snackbar.Add($"New client added: {DbName}", Severity.Success);
-
         }
 
-
-
- 
         public int DeltaCount { get; set; }
     }
 }
