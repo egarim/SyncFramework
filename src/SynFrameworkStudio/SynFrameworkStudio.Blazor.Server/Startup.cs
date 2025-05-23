@@ -47,6 +47,15 @@ public class Startup {
     public void ConfigureServices(IServiceCollection services) {
         services.AddSingleton(typeof(Microsoft.AspNetCore.SignalR.HubConnectionHandler<>), typeof(ProxyHubConnectionHandler<>));
 
+        services.AddCors(options => {
+            options.AddPolicy("AllowBlazorApp",
+                builder => {
+                    builder.WithOrigins("https://localhost:7029") // Replace with your Blazor app's URL
+                           .AllowAnyHeader()
+                           .AllowAnyMethod();
+                });
+        });
+
         services.AddSyncServer((request) =>
         {
 
@@ -316,6 +325,9 @@ public class Startup {
             // The default HSTS value is 30 days. To change this for production scenarios, see: https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
+
+        app.UseCors("AllowBlazorApp");
+
         app.UseHttpsRedirection();
         app.UseRequestLocalization();
         app.UseStaticFiles();

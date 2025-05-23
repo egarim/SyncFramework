@@ -1,16 +1,12 @@
 ﻿<MudContainer Class="mt-4">
     <MudCard Elevation="3" Class="mb-4">
         <MudCardHeader>
-            <CardHeaderContent>
-                <MudText Typo="Typo.h5">Sync Server Control Panel</MudText>
-            </CardHeaderContent>
             <CardHeaderActions>
                 <MudChip T="string" Color="Color.Success" Size="Size.Small" Icon="@Icons.Material.Filled.Cloud">Online</MudChip>
             </CardHeaderActions>
         </MudCardHeader>
         <MudCardContent>
             <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-2">
-                <MudText Typo="Typo.body1"><MudText Typo="Typo.body1" Color="Color.Primary" Inline="true">Node ID:</MudText> @NodeId</MudText>
                 <MudBadge Content="@this.Deltas.Count()" Color="Color.Info" Overlap="true" Class="ml-2">
                     <MudIcon Icon="@Icons.Material.Filled.Storage" />
                 </MudBadge>

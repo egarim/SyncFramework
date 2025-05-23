@@ -50,18 +50,14 @@ namespace SyncFramework.Playground.Pages
             base.OnInitialized();
             // For debugging only
             Console.WriteLine("Component initialized, IsRemoteMode: " + IsRemoteMode);
-            
-            //DbContextOptionsBuilder ServerDbContextOptions = new DbContextOptionsBuilder();
-            //var ServerCnx = $"Data Source=Server_Deltas.db";
-            //ServerDbContextOptions.UseSqlite(ServerCnx);
-            //EfDeltaStore efDeltaStore = new EfDeltaStore(new DeltaDbContext(ServerDbContextOptions.Options));
+
             ServerDeltaStore = new MemoryDeltaStore();
             NodeId = "MainServer";
             //Subscribe Component to Specific Message
             Bus.Subscribe<object>(RefreshDeltaCount);
             Randomizer.Seed = new Random(8675309);
         }
-        
+
         // New method for remote connection
         private async Task ConnectAsync()
         {
@@ -71,18 +67,33 @@ namespace SyncFramework.Playground.Pages
                 return;
             }
 
-            var mode = IsRemoteMode
-                ? $"Remote Server (URL: {RemoteUrl}, NodeId: {RemoteNodeId})"
-                : "In-Memory Database";
-                
-            Snackbar.Add($"Connecting to {mode}...", Severity.Info);
-            await Task.Delay(500); // Simulate async work
-            
-            // TODO: Implement actual connection logic based on IsRemoteMode
-            // If remote mode, connect to the remote server
-            // If in-memory mode, use local memory store (already set up in OnInitialized)
+            try
+            {
+                if (IsRemoteMode)
+                {
+                    this.RemoteNodeId = this.RemoteNodeId.Trim();
+                    // Connect to remote server
+                    serverComponent.NodeId = RemoteNodeId;
+                    serverComponent.Connect(RemoteUrl, RemoteNodeId);
+                    Snackbar.Add($"Connected to remote server at {RemoteUrl}", Severity.Success);
+                }
+                else
+                {
+                    // Connect to in-memory server
+                    serverComponent.ConnectToInMemoryServer();
+                    Snackbar.Add("Connected to in-memory server", Severity.Success);
+                }
+
+                // Refresh the delta count after connecting
+                DeltaCount = await this.ServerDeltaStore.GetDeltaCountAsync("", NodeId, default);
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Connection failed: {ex.Message}", Severity.Error);
+            }
         }
-        
+
         // Existing methods
         private async void RefreshDeltaCount(MessageArgs args)
         {

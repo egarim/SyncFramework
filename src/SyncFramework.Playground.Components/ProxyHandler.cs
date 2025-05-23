@@ -12,22 +12,27 @@ namespace SyncFramework.Playground.Components
     /// <summary>
     /// Custom HTTP message handler that provides synchronization functionality by delegating requests to an ISyncServer.
     /// Handles GET requests for fetching deltas and POST requests for pushing deltas.
+    /// Can optionally forward requests to another HTTP client and only proceed locally if the forwarded request succeeds.
     /// </summary>
-    public class FakeHandler : HttpMessageHandler
+    public class ProxyHandler : HttpMessageHandler
     {
         private readonly ISyncServer _syncServer;
+        private readonly HttpClient _httpClient;
 
         /// <summary>
-        /// Initializes a new instance of the FakeHandler class.
+        /// Initializes a new instance of the ProxyHandler class.
         /// </summary>
         /// <param name="syncServer">The sync server implementation to handle sync operations</param>
-        public FakeHandler(ISyncServer syncServer)
+        /// <param name="httpClient">Optional HTTP client for forwarding requests</param>
+        public ProxyHandler(ISyncServer syncServer, HttpClient httpClient = null)
         {
             _syncServer = syncServer ?? throw new ArgumentNullException(nameof(syncServer));
+            _httpClient = httpClient;
         }
 
         /// <summary>
         /// Processes the HTTP request and returns an HTTP response.
+        /// If an HttpClient is provided, forwards the request to it and only proceeds locally if the forwarded request succeeds.
         /// </summary>
         /// <param name="request">The HTTP request message to process</param>
         /// <param name="cancellationToken">A cancellation token to cancel the operation</param>
@@ -37,6 +42,36 @@ namespace SyncFramework.Playground.Components
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
 
+            // Forward the request if an HttpClient is available
+            if (_httpClient != null)
+            {
+                // Create a clone of the request to send
+                var forwardedRequest = new HttpRequestMessage
+                {
+                    Method = request.Method,
+                    RequestUri = request.RequestUri,
+                    Content = request.Content
+                };
+
+                // Copy all headers
+                foreach (var header in request.Headers)
+                {
+                    forwardedRequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                }
+
+                // Send the request and wait for response
+                var forwardedResponse = await _httpClient.SendAsync(forwardedRequest, cancellationToken);
+
+                // If the forwarded request was not successful, return its response immediately
+                if (!forwardedResponse.IsSuccessStatusCode)
+                {
+                    return forwardedResponse;
+                }
+
+                // Otherwise continue with local processing
+            }
+
+            // Process the request locally
             HttpResponseMessage responseMessage;
 
             switch (request.Method.Method)

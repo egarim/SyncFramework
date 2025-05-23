@@ -10,6 +10,7 @@ using MudBlazor;
 using Microsoft.JSInterop;
 using SyncFramework.Playground.Components;
 using SyncFramework.Playground.Components.Interfaces;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace SyncFramework.Playground.Shared
 {
@@ -21,12 +22,28 @@ namespace SyncFramework.Playground.Shared
         public string NodeId { get; set; }
         protected override void OnInitialized()
         {
-            SyncServerNode syncServerNode = new SyncServerNode(DeltaStore, null, NodeId);
-            var Server = new SyncServer(syncServerNode);
-            this.HttpClient = new HttpClient(new FakeHandler(Server));
-            this.HttpClient.BaseAddress=new Uri("http://FakeHandlerAddress");   
+           
             base.OnInitialized();
         }
+        public void ConnectToInMemoryServer()
+        {
+            SyncServerNode syncServerNode = new SyncServerNode(DeltaStore, null, NodeId);
+            var Server = new SyncServer(syncServerNode);
+            this.HttpClient = new HttpClient(new ProxyHandler(Server));
+            this.HttpClient.BaseAddress = new Uri("https://FakeHandlerAddress");
+        }
+        public void Connect(string ServerAddress,string ServerNodeId)
+        {
+            SyncServerNode syncServerNode = new SyncServerNode(DeltaStore, null, NodeId);
+            var Server = new SyncServer(syncServerNode);
+            this.NodeId = ServerNodeId;
+            var internalHttpClient = new HttpClient();
+            internalHttpClient.BaseAddress= new Uri(ServerAddress);
+            this.HttpClient = new HttpClient(new ProxyHandler(Server, internalHttpClient));
+            this.HttpClient.BaseAddress = new Uri(ServerAddress);
+
+        }
+
         [Inject]
         public IJSRuntime js { get; set; }
         [Inject]
