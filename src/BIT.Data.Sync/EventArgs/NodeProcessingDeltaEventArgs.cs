@@ -5,12 +5,12 @@ namespace BIT.Data.Sync.EventArgs
 {
     public class NodeProcessingDeltaEventArgs : BaseSyncEvent
     {
-        public NodeProcessingDeltaEventArgs(ISyncServerNode node, ProcessingDeltaEventArgs Args) 
+        public NodeProcessingDeltaEventArgs(IServerSyncEndpoint node, ProcessingDeltaEventArgs Args) 
         {
             Node = node;
             this.ProcessingDeltaArgs = Args;
         }
-        public ISyncServerNode Node { get; set; }
+        public IServerSyncEndpoint Node { get; set; }
         public ProcessingDeltaEventArgs ProcessingDeltaArgs { get; set; }
     }
 }

@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.Builder
 
     public static class AspNetCoreServiceExtensions
     {
-        public static IServiceCollection AddSyncServerWithMemoryNode(this IServiceCollection serviceCollection, string NodeId, Func<RegisterNodeRequest, ISyncServerNode> RegisterNodeFunction)
+        public static IServiceCollection AddSyncServerWithMemoryNode(this IServiceCollection serviceCollection, string NodeId, Func<RegisterNodeRequest, IServerSyncEndpoint> RegisterNodeFunction)
         {
             SyncServerNode syncServerNode = new SyncServerNode(new MemoryDeltaStore(), null, NodeId);
             SyncServer implementationInstance = new SyncServer(syncServerNode);
@@ -35,23 +35,23 @@ namespace Microsoft.AspNetCore.Builder
             serviceCollection.AddSingleton<ISyncServer>(new SyncServer(syncServerNode));
             return serviceCollection;
         }
-        public static IServiceCollection AddSyncServerWithDeltaStoreNode(this IServiceCollection serviceCollection, IDeltaStore deltaStore, string NodeId, Func<RegisterNodeRequest, ISyncServerNode> RegisterNodeFunction)
+        public static IServiceCollection AddSyncServerWithDeltaStoreNode(this IServiceCollection serviceCollection, IDeltaStore deltaStore, string NodeId, Func<RegisterNodeRequest, IServerSyncEndpoint> RegisterNodeFunction)
         {
             SyncServerNode syncServerNode = new SyncServerNode(deltaStore, null, NodeId);
             serviceCollection.AddSingleton<ISyncServer>(new SyncServer(syncServerNode) { RegisterNodeFunction= RegisterNodeFunction });
             return serviceCollection;
         }
-        public static IServiceCollection AddSyncServerWithNodes(this IServiceCollection serviceCollection, params ISyncServerNode[] Nodes)
+        public static IServiceCollection AddSyncServerWithNodes(this IServiceCollection serviceCollection, params IServerSyncEndpoint[] Nodes)
         {
             serviceCollection.AddSingleton<ISyncServer>(new SyncServer(Nodes));
             return serviceCollection;
         }
-        public static IServiceCollection AddSyncServerWithNodes(this IServiceCollection serviceCollection, Func<RegisterNodeRequest, ISyncServerNode> RegisterNodeFunction, params ISyncServerNode[] Nodes)
+        public static IServiceCollection AddSyncServerWithNodes(this IServiceCollection serviceCollection, Func<RegisterNodeRequest, IServerSyncEndpoint> RegisterNodeFunction, params IServerSyncEndpoint[] Nodes)
         {
             serviceCollection.AddSingleton<ISyncServer>(new SyncServer(Nodes) { RegisterNodeFunction = RegisterNodeFunction });
             return serviceCollection;
         }
-        public static IServiceCollection AddSyncServer(this IServiceCollection serviceCollection, Func<RegisterNodeRequest, ISyncServerNode> RegisterNodeFunction)
+        public static IServiceCollection AddSyncServer(this IServiceCollection serviceCollection, Func<RegisterNodeRequest, IServerSyncEndpoint> RegisterNodeFunction)
         {
       
             serviceCollection.AddSingleton<ISyncServer>(new SyncServer() { RegisterNodeFunction = RegisterNodeFunction });

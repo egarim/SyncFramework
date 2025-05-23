@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BIT.Data.Sync.Imp
 {
-    public class SimpleDatabase : ISyncClientNode, IEnableDeltaTracking
+    public class SimpleDatabase : IClientSyncDatabase, IEnableDeltaTracking
     {
         public IDeltaProcessor DeltaProcessor { get; protected set; }
         public string Identity { get; set; }

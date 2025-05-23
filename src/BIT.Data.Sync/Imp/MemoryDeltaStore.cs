@@ -58,7 +58,7 @@ namespace BIT.Data.Sync.Imp
            
         }
 
-        public override Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string startIndex, string identity, CancellationToken cancellationToken = default)
+        public override Task<IEnumerable<IDelta>> GetDeltasFromOtherClients(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var result = Deltas.Where(d => string.Compare(d.Index, startIndex) > 0 && string.Compare(d.Identity, identity, StringComparison.Ordinal) != 0);
@@ -147,7 +147,13 @@ namespace BIT.Data.Sync.Imp
 
         public override Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken)
         {
-            return Deltas.FirstOrDefault(Deltas => Deltas.Index == deltaId) as Task<IDelta>;
+            return Task.FromResult(Deltas.FirstOrDefault(delta => delta.DeltaId == deltaId));
+        }
+
+        public  async override Task PurgeDeltaStoreAsync(CancellationToken cancellationToken)
+        {
+            this.Deltas.Clear();
+            await Task.CompletedTask;
         }
 
 

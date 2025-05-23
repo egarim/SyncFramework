@@ -8,7 +8,7 @@ namespace BIT.Data.Sync.Server
 {
     public interface ISyncServer
     {
-        List<ISyncServerNode> Nodes { get; }
+        List<IServerSyncEndpoint> Nodes { get; }
         /// <summary>
         /// The function will fetch all the deltas that are greater than current <paramref name="startIndex"/>
         /// </summary>
@@ -43,7 +43,7 @@ namespace BIT.Data.Sync.Server
         /// </summary>
         /// <param name="serverNode"></param>
         /// <returns>True if success otherwise false</returns>
-        bool  RegisterNodeAsync(ISyncServerNode serverNode);
+        bool  RegisterNodeAsync(IServerSyncEndpoint serverNode);
         /// <summary>
         /// create a node in the server
         /// </summary>
@@ -53,6 +53,6 @@ namespace BIT.Data.Sync.Server
         /// <summary>
         /// Function used to spin up a new server node
         /// </summary>
-        Func<RegisterNodeRequest, ISyncServerNode> RegisterNodeFunction { get; set; }
+        Func<RegisterNodeRequest, IServerSyncEndpoint> RegisterNodeFunction { get; set; }
     }
 }

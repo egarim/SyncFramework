@@ -181,7 +181,7 @@ namespace BIT.EfCore.Sync
 
         }
 
-        public override async Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string startIndex, string identity, CancellationToken cancellationToken = default)
+        public override async Task<IEnumerable<IDelta>> GetDeltasFromOtherClients(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             /* By default there is no Ef translation set for string.Compare in PostgreSql. luckily the PostgreSql is by default case sensitive */
@@ -205,6 +205,15 @@ namespace BIT.EfCore.Sync
         public override Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken)
         {
            return DeltaDbContext.Deltas.FirstOrDefaultAsync(d => d.Index == deltaId).ContinueWith(t => (IDelta)t.Result);
+        }
+
+        public async override Task PurgeDeltaStoreAsync(CancellationToken cancellationToken)
+        {
+             await DeltaDbContext.Deltas.ExecuteDeleteAsync(cancellationToken);
+            await DeltaDbContext.EFSyncStatus.ExecuteDeleteAsync(cancellationToken);
+            await DeltaDbContext.EfSequence.ExecuteDeleteAsync(cancellationToken);
+            await DeltaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return; 
         }
     }
 

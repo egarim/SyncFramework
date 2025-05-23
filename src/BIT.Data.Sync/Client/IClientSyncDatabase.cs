@@ -1,7 +1,7 @@
 ﻿
 namespace BIT.Data.Sync.Client
 {
-    public interface ISyncClientNode
+    public interface IClientSyncDatabase
     {
         IDeltaProcessor DeltaProcessor { get; }
         IDeltaStore DeltaStore { get; }

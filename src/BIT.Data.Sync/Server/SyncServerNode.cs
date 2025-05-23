@@ -8,7 +8,7 @@ using BIT.Data.Sync.EventArgs;
 namespace BIT.Data.Sync.Server
 {
 
-    public class SyncServerNode : ISyncServerNode, ISyncServerNodeWithEvents
+    public class SyncServerNode : IServerSyncEndpoint, ISyncServerNodeWithEvents
     {
         IDeltaStore deltaStore;
         IDeltaProcessor deltaProcessor;
@@ -52,7 +52,7 @@ namespace BIT.Data.Sync.Server
             if(string.IsNullOrEmpty(startIndex))
                 throw new ArgumentNullException(nameof(startIndex));
 
-            return this.deltaStore?.GetDeltasFromOtherNodes(startIndex, identity, cancellationToken);
+            return this.deltaStore?.GetDeltasFromOtherClients(startIndex, identity, cancellationToken);
         }
 
         public virtual Task ProcessDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken)

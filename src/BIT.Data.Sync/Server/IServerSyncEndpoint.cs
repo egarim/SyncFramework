@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BIT.Data.Sync.Server
 {
-    public interface ISyncServerNode
+    public interface IServerSyncEndpoint
     {
         IDeltaStore DeltaStore { get;  }
         string NodeId { get; set; }

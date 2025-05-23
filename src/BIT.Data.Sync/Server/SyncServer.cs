@@ -8,7 +8,7 @@ using BIT.Data.Sync.EventArgs;
 
 namespace BIT.Data.Sync.Server
 {
-    public class SyncServerNodeList:List<ISyncServerNode>
+    public class SyncServerNodeList:List<IServerSyncEndpoint>
     {
         
         public SyncServerNodeList()
@@ -22,17 +22,17 @@ namespace BIT.Data.Sync.Server
     }
     public class SyncServer : ISyncServer, ISyncServerWithEvents
     {
-        public SyncServer(IEnumerable<ISyncServerNode> nodes, Func<RegisterNodeRequest, ISyncServerNode> registerNodeRequest,IInfoServer infoServer)
+        public SyncServer(IEnumerable<IServerSyncEndpoint> nodes, Func<RegisterNodeRequest, IServerSyncEndpoint> registerNodeRequest,IInfoServer infoServer)
         {
             Nodes.AddRange(nodes);
-            foreach (ISyncServerNode syncServerNode in Nodes)
+            foreach (IServerSyncEndpoint syncServerNode in Nodes)
             {
                 RegisterEvents(syncServerNode as ISyncServerNodeWithEvents, syncServerNode);
                
             }
             RegisterNodeFunction = registerNodeRequest;
         }
-        public SyncServer(params ISyncServerNode[] Nodes) : this(Nodes, null, null)
+        public SyncServer(params IServerSyncEndpoint[] Nodes) : this(Nodes, null, null)
         {
 
         }
@@ -45,8 +45,8 @@ namespace BIT.Data.Sync.Server
          
         }
    
-        public List<ISyncServerNode> Nodes { get; } = new List<ISyncServerNode>();
-        public Func<RegisterNodeRequest, ISyncServerNode> RegisterNodeFunction { get; set; }
+        public List<IServerSyncEndpoint> Nodes { get; } = new List<IServerSyncEndpoint>();
+        public Func<RegisterNodeRequest, IServerSyncEndpoint> RegisterNodeFunction { get; set; }
 
         public event EventHandler<ServerSavingDeltaEventArgs> ServerSavingDelta;
         public event EventHandler<ServerSavedDeltaEventArgs> ServerSavedDelta;
@@ -56,7 +56,7 @@ namespace BIT.Data.Sync.Server
         public async Task<IEnumerable<IDelta>> GetDeltasAsync(string NodeId, string startIndex, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            ISyncServerNode Node = GetNode(NodeId);
+            IServerSyncEndpoint Node = GetNode(NodeId);
             if (Node != null)
             {
                 return await Node.GetDeltasFromOtherNodes(startIndex,null, cancellationToken).ConfigureAwait(false);
@@ -69,7 +69,7 @@ namespace BIT.Data.Sync.Server
         {
 
             cancellationToken.ThrowIfCancellationRequested();
-            ISyncServerNode Node = GetNode(nodeId);
+            IServerSyncEndpoint Node = GetNode(nodeId);
             if (Node != null)
             {
                 return await Node.GetDeltasFromOtherNodes(startIndex, identity, cancellationToken).ConfigureAwait(false);
@@ -80,7 +80,7 @@ namespace BIT.Data.Sync.Server
         public Task ProcessDeltasAsync(string NodeId, IEnumerable<IDelta> deltas, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            ISyncServerNode Node = GetNode(NodeId);
+            IServerSyncEndpoint Node = GetNode(NodeId);
             if (Node != null)
             {
                 return Node.ProcessDeltasAsync(deltas, cancellationToken);
@@ -89,9 +89,9 @@ namespace BIT.Data.Sync.Server
 
         }
 
-        private ISyncServerNode GetNode(string NodeId)
+        private IServerSyncEndpoint GetNode(string NodeId)
         {
-            ISyncServerNode syncServerNode = Nodes.FirstOrDefault(node => node.NodeId == NodeId);
+            IServerSyncEndpoint syncServerNode = Nodes.FirstOrDefault(node => node.NodeId == NodeId);
             if(syncServerNode==null)
             {
                 throw new NodeNotFoundException(NodeId);
@@ -103,7 +103,7 @@ namespace BIT.Data.Sync.Server
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            ISyncServerNode Node = GetNode(nodeId);
+            IServerSyncEndpoint Node = GetNode(nodeId);
 
             if (Node != null)
             {
@@ -116,7 +116,7 @@ namespace BIT.Data.Sync.Server
         /// </summary>
         /// <param name="serverNode"></param>
         /// <returns>True if success otherwise false</returns>
-        public bool RegisterNodeAsync(ISyncServerNode serverNode)
+        public bool RegisterNodeAsync(IServerSyncEndpoint serverNode)
         {
             if(this.Nodes.Contains(serverNode)==false)
             {
@@ -134,7 +134,7 @@ namespace BIT.Data.Sync.Server
         }
 
 
-        private void RegisterEvents(ISyncServerNodeWithEvents syncServerNodeWithEvents, ISyncServerNode syncServerNode)
+        private void RegisterEvents(ISyncServerNodeWithEvents syncServerNodeWithEvents, IServerSyncEndpoint syncServerNode)
         {
             if(syncServerNodeWithEvents == null)
             {

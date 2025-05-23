@@ -11,13 +11,13 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class ISyncClientNodeExtensions
     {
 
-        public static async Task<FetchOperationResponse> FetchAsync(this ISyncClientNode instance, CancellationToken cancellationToken = default)
+        public static async Task<FetchOperationResponse> FetchAsync(this IClientSyncDatabase instance, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var LastDeltaIndex = await instance.DeltaStore.GetLastProcessedDeltaAsync(instance.Identity, cancellationToken).ConfigureAwait(false);
             return await instance.SyncFrameworkClient.FetchAsync(LastDeltaIndex, instance.Identity, cancellationToken).ConfigureAwait(false);
         }
-        public static async Task<FetchOperationResponse> PullAsync(this ISyncClientNode instance, CancellationToken cancellationToken = default)
+        public static async Task<FetchOperationResponse> PullAsync(this IClientSyncDatabase instance, CancellationToken cancellationToken = default)
         {            
             cancellationToken.ThrowIfCancellationRequested();
             var Response = await instance.FetchAsync(cancellationToken).ConfigureAwait(false);
@@ -37,7 +37,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return Response;
 
         }
-        public static async Task<PushOperationResponse> PushAsync(this ISyncClientNode instance, CancellationToken cancellationToken = default)
+        public static async Task<PushOperationResponse> PushAsync(this IClientSyncDatabase instance, CancellationToken cancellationToken = default)
         {
             PushOperationResponse Response = null;
             cancellationToken.ThrowIfCancellationRequested();

@@ -31,7 +31,7 @@ namespace BIT.Data.Sync.Tests.Startups
             
 
         }
-        ISyncServerNode RegisterNewNode(RegisterNodeRequest request)
+        IServerSyncEndpoint RegisterNewNode(RegisterNodeRequest request)
         {
             string NodeId = request.Options.FirstOrDefault(k => k.Key == "NodeId").Value.ToString();
             return new SyncServerNode(new MemoryDeltaStore(), null, NodeId);

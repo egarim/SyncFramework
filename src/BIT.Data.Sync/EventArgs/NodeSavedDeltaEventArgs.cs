@@ -6,12 +6,12 @@ namespace BIT.Data.Sync.EventArgs
     public class NodeSavedDeltaEventArgs : BaseSyncEvent
     {
 
-        public NodeSavedDeltaEventArgs(ISyncServerNode node, SavedDeltaEventArgs Args) 
+        public NodeSavedDeltaEventArgs(IServerSyncEndpoint node, SavedDeltaEventArgs Args) 
         {
             Node = node;
             this.SaveDeltaArgs = Args;
         }
         public SavedDeltaEventArgs SaveDeltaArgs { get; set; }
-        public ISyncServerNode Node { get; set; }
+        public IServerSyncEndpoint Node { get; set; }
     }
 }

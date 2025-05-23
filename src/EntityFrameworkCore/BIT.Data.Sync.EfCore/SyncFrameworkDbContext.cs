@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace BIT.EfCore.Sync
 {
-    public abstract class SyncFrameworkDbContext : DbContext, ISyncClientNode
+    public abstract class SyncFrameworkDbContext : DbContext, IClientSyncDatabase
     {
         /// <summary>
         /// <para>

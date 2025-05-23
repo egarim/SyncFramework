@@ -31,6 +31,7 @@ namespace SynFrameworkStudio.Module.Controllers
     // For more typical usage scenarios, be sure to check out https://docs.devexpress.com/eXpressAppFramework/DevExpress.ExpressApp.ViewController.
     public partial class ServerNodeController : ViewController
     {
+        SimpleAction PurgeDeltas;
         SimpleAction Test;
         PopupWindowShowAction ShowConfig;
         PopupWindowShowAction RegisterNode;
@@ -56,8 +57,31 @@ namespace SynFrameworkStudio.Module.Controllers
             Test = new SimpleAction(this, "Test", "View");
             Test.Execute += Test_Execute;
 
+            PurgeDeltas = new SimpleAction(this, "Purge Deltas", "View");
+            PurgeDeltas.Execute += PurgeDeltas_Execute;
+            
 
             // Target required Views (via the TargetXXX properties) and create their Actions.
+        }
+        private async void PurgeDeltas_Execute(object sender, SimpleActionExecuteEventArgs e)
+        {
+            var SyncServer = this.Application.ServiceProvider.GetService(typeof(ISyncServer)) as ISyncServer;
+
+
+            try
+            {
+                await SyncServer.Nodes.FirstOrDefault().DeltaStore.PurgeDeltaStoreAsync(default);
+                var currentNode = this.View.CurrentObject as ServerNode;
+                this.View.ObjectSpace.Delete(currentNode.Events);
+                this.View.ObjectSpace.CommitChanges();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+          
         }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Async/await", "CRR0033:The void async method should be in a try/catch block", Justification = "<Pending>")]
         private  async void Test_Execute(object sender, SimpleActionExecuteEventArgs e)
