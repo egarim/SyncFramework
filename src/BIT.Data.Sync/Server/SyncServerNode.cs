@@ -12,7 +12,7 @@ namespace BIT.Data.Sync.Server
     {
         IDeltaStore deltaStore;
         IDeltaProcessor deltaProcessor;
-        public SyncServerNode(IDeltaStore deltaStore, IDeltaProcessor deltaProcessor,string nodeId)
+        public SyncServerNode(IDeltaStore deltaStore, IDeltaProcessor deltaProcessor,string ServerNodeId)
         {
             this.deltaStore = deltaStore;
             IDeltaStoreWithEvents deltaStoreWithEvents = deltaStore as IDeltaStoreWithEvents;
@@ -28,7 +28,7 @@ namespace BIT.Data.Sync.Server
                 deltaProcessorWithEvents.ProcessingDelta += (sender, e) => NodeProcessingDelta?.Invoke(sender, new NodeProcessingDeltaEventArgs(this, e));
                 deltaProcessorWithEvents.ProcessedDelta += (sender, e) => NodeProcessedDelta?.Invoke(sender, new NodeProcessedDeltaEventArgs(this,e));
             }
-            this.NodeId = nodeId;
+            this.NodeId = ServerNodeId;
         }
 
         public string NodeId { get; set; }

@@ -34,7 +34,7 @@ namespace SyncFramework.Playground.Shared
         }
         public void Connect(string ServerAddress,string ServerNodeId)
         {
-            SyncServerNode syncServerNode = new SyncServerNode(DeltaStore, null, NodeId);
+            SyncServerNode syncServerNode = new SyncServerNode(DeltaStore, null, ServerNodeId);
             var Server = new SyncServer(syncServerNode);
             this.NodeId = ServerNodeId;
             var internalHttpClient = new HttpClient();

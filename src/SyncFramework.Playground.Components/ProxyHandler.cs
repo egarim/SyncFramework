@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Web;
+using static NpgsqlTypes.NpgsqlTsQuery;
 
 namespace SyncFramework.Playground.Components
 {
@@ -53,10 +54,16 @@ namespace SyncFramework.Playground.Components
                     Content = request.Content
                 };
 
+                //var currentNodeId = request.Headers.Contains("NodeId") ? request.Headers.GetValues("NodeId").FirstOrDefault() : null;
+                //Console.WriteLine($"Current NodeId: {currentNodeId}");
+                //Debug.WriteLine($"Current NodeId: {currentNodeId}");
+                //forwardedRequest.Headers.Add("NodeId", currentNodeId);
+
+
                 // Copy all headers
                 foreach (var header in request.Headers)
                 {
-                    forwardedRequest.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                    forwardedRequest.Headers.Add(header.Key, request.Headers.GetValues(header.Key).FirstOrDefault());
                 }
 
                 // Send the request and wait for response

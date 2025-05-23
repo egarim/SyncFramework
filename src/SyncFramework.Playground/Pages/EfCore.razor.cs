@@ -52,7 +52,9 @@ namespace SyncFramework.Playground.Pages
             Console.WriteLine("Component initialized, IsRemoteMode: " + IsRemoteMode);
 
             ServerDeltaStore = new MemoryDeltaStore();
-            NodeId = "MainServer";
+            NodeId = "";
+            this.RemoteNodeId = "0196e80f-4258-7c11-9896-8fa64a2722b2";
+            this.RemoteUrl = "https://localhost:5001/api/SyncFramework/";
             //Subscribe Component to Specific Message
             Bus.Subscribe<object>(RefreshDeltaCount);
             Randomizer.Seed = new Random(8675309);
@@ -72,6 +74,7 @@ namespace SyncFramework.Playground.Pages
                 if (IsRemoteMode)
                 {
                     this.RemoteNodeId = this.RemoteNodeId.Trim();
+                    this.NodeId = this.RemoteNodeId.Trim();
                     // Connect to remote server
                     serverComponent.NodeId = RemoteNodeId;
                     serverComponent.Connect(RemoteUrl, RemoteNodeId);
@@ -79,6 +82,8 @@ namespace SyncFramework.Playground.Pages
                 }
                 else
                 {
+                    this.NodeId = "InMemoryServer";
+                    serverComponent.NodeId = NodeId;
                     // Connect to in-memory server
                     serverComponent.ConnectToInMemoryServer();
                     Snackbar.Add("Connected to in-memory server", Severity.Success);
