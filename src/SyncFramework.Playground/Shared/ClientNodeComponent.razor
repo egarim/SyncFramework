@@ -17,24 +17,35 @@
 }
 else
 {
-    <MudCard>
+    <MudCard Elevation="3">
         <MudCardHeader>
+            <CardHeaderAvatar>
+                <MudIcon Icon="@Icons.Material.Filled.LaptopMac" Color="@Color" Size="Size.Medium" />
+            </CardHeaderAvatar>
             <CardHeaderContent>
-                <MudText Typo="Typo.h5" Align="Align.Left" Color="Color.Primary">CLIENT ID:@item.Id</MudText>
+                <div class="d-flex align-center gap-2">
+                    <MudText Typo="Typo.subtitle1">Client</MudText>
+                    <MudChip T="string" Size="Size.Small" Color="Color.Primary">@item.Id</MudChip>
+                </div>
             </CardHeaderContent>
             <CardHeaderActions>
-                <MudIconButton Icon="@Icons.Material.Filled.LaptopMac" Color="@Color" />
+                <div class="d-flex align-center">
+                    <MudTooltip Text="Pending changes to synchronize">
+                        <MudBadge Content="@item.DeltaCount" Color="Color.Warning" Overlap="true" Dot="false" Max="99" Class="mx-2">
+                            <MudIcon Icon="@Icons.Material.Filled.DataObject" />
+                        </MudBadge>
+                    </MudTooltip>
+                    <MudText Typo="Typo.caption" Color="Color.Warning" Class="mr-2">Pending Changes</MudText>
+                </div>
             </CardHeaderActions>
         </MudCardHeader>
         <MudCardContent>
-            <MudText Typo="Typo.h6" Align="Align.Left" Color="Color.Warning">DELTA COUNT: @item.DeltaCount</MudText>
-
-            <MudPaper Class="pa-2 my-4 d-flex gap-2 flex-wrap">
-                <MudButton StartIcon="@Icons.Material.Filled.Refresh" Color="Color.Success" OnClick="@(() => item.ReloadData())">Reload Data</MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Primary" OnClick="@(() => item.Push())">Push Deltas</MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.ArrowDownward" Color="Color.Tertiary" OnClick="@(() => item.Pull())">Pull Deltas</MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.DeleteForever" Color="Color.Error" OnClick="@(() => item.PurgeDeltas())">Purge Deltas</MudButton>
-                <MudButton StartIcon="@Icons.Material.Filled.SaveAlt" Color="Color.Info" OnClick="@(() => item.DownloadFile())">Download Databases</MudButton>
+            <MudPaper Class="pa-2 mb-4 d-flex gap-2 flex-wrap" Elevation="0">
+                <MudButton StartIcon="@Icons.Material.Filled.Refresh" Size="Size.Small" Color="Color.Success" OnClick="@(() => item.ReloadData())">Reload Data</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.ArrowUpward" Size="Size.Small" Color="Color.Primary" OnClick="@(() => item.Push())">Push Deltas</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.ArrowDownward" Size="Size.Small" Color="Color.Tertiary" OnClick="@(() => item.Pull())">Pull Deltas</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.DeleteForever" Size="Size.Small" Color="Color.Error" OnClick="@(() => item.PurgeDeltas())">Purge Deltas</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.SaveAlt" Size="Size.Small" Color="Color.Info" OnClick="@(() => item.DownloadFile())">Download Databases</MudButton>
             </MudPaper>
 
             <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-4">
@@ -50,9 +61,9 @@ else
                         <MudPaper Class="flex-1" Elevation="0">
                             <MudDataGrid Virtualize="true" FixedHeader="true" Height="350px" Items="@item.People" @bind-SelectedItem="@item.SelectedPerson" Hover="true" Striped="true" Dense="true" MultiSelection="false">
                                 <ToolBarContent>
-                                    <MudText Typo="Typo.h6">Contacts</MudText>
+                                    <MudText Typo="Typo.subtitle1">Contacts</MudText>
                                     <MudSpacer />
-                                    <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddPerson" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Small" Color="Color.Primary" OnClick="AddPerson" />
                                 </ToolBarContent>
                                 <Columns>
                                     <SelectColumn />
@@ -73,9 +84,9 @@ else
                         <MudPaper Class="flex-1" Elevation="0">
                             <MudDataGrid Virtualize="true" FixedHeader="true" Height="350px" Items="@item.PhoneNumbers" Hover="true" Striped="true" Dense="true" MultiSelection="false">
                                 <ToolBarContent>
-                                    <MudText Typo="Typo.h6">Phones</MudText>
+                                    <MudText Typo="Typo.subtitle1">Phones</MudText>
                                     <MudSpacer />
-                                    <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddPhone" />
+                                    <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Small" Color="Color.Primary" OnClick="AddPhone" />
                                 </ToolBarContent>
                                 <Columns>
                                     <SelectColumn />
@@ -97,7 +108,7 @@ else
                 <MudTabPanel Text="Deltas">
                     <MudDataGrid Virtualize="true" FixedHeader="true" Height="400px" Items="@item.Deltas" Hover="true" Striped="true" Dense="true" MultiSelection="false">
                         <ToolBarContent>
-                            <MudText Typo="Typo.h6">Synchronization Deltas</MudText>
+                            <MudText Typo="Typo.subtitle1">Synchronization Deltas</MudText>
                             <MudSpacer />
                         </ToolBarContent>
                         <Columns>
