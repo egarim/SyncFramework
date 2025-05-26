@@ -1,4 +1,4 @@
-# Database Synchronization Test Flow
+﻿# Database Synchronization Test Flow
 
 This document illustrates the data flow in the `AllDatabaseTests.cs` test that validates cross-database synchronization using a master-node architecture.
 

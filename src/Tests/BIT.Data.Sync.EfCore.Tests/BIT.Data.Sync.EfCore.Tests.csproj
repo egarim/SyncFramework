@@ -13,10 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="AllDatatabaseTests.MD" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
