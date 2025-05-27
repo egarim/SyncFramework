@@ -46,7 +46,7 @@
                                     </MudListItem>
                                     <MudListItem T="object">
                                         <MudListItemText>
-                                            Status: Online
+                                            Status: <MudChip Color="@(IsConnected ? Color.Success : Color.Error)" Size="Size.Small">@(IsConnected ? "Connected" : "Disconnected")</MudChip>
                                         </MudListItemText>
                                     </MudListItem>
                                     <MudListItem T="object">
@@ -57,11 +57,13 @@
                                 </MudList>
                                 <div class="mt-auto d-flex flex-column gap-2">
                                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
-                                               Color="Color.Primary" OnClick="@AddClientNode" FullWidth>
+                                               Color="Color.Primary" OnClick="@AddClientNode" FullWidth
+                                               Disabled="@(!IsConnected)">
                                         Add Client Node
                                     </MudButton>
                                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileDownload"
-                                               Color="Color.Secondary" OnClick="@DownloadAllDatabases" FullWidth>
+                                               Color="Color.Secondary" OnClick="@DownloadAllDatabases" FullWidth
+                                               Disabled="@(!ClientNodes.Any())">
                                         Download All Databases
                                     </MudButton>
                                 </div>
@@ -89,21 +91,15 @@
                                     <MudCardContent>
                                         <!-- Connection Type Toggle -->
                                         <MudGrid Class="mb-3">
-                                            <MudItem xs="12" class="d-flex align-items-center gap-3">
+                                            <MudItem xs="12" class="d-flex align-items-center">
                                                 <MudSwitch T="bool" 
                                                            @bind-Checked="IsRemoteMode" 
                                                            Color="Color.Primary"
                                                            CheckedIcon="@Icons.Material.Filled.Cloud"
                                                            UncheckedIcon="@Icons.Material.Filled.Memory"
-                                                           Label="@(IsRemoteMode ? "Remote" : "In-Memory")"/>
-                                                
-                                                <MudButton Variant="Variant.Text" 
-                                                           Color="Color.Secondary"
-                                                           OnClick="@(() => IsRemoteMode = !IsRemoteMode)">
-                                                    Toggle Mode
-                                                </MudButton>
-                                                
-                                                <MudText>Debug: IsRemoteMode = @IsRemoteMode</MudText>
+                                                           Label="@(IsRemoteMode ? "Remote Server" : "In-Memory Database")"
+                                                           Disabled="@IsConnected"
+                                                           Style="min-width: 220px;"/>
                                             </MudItem>
                                         </MudGrid>
                                         
@@ -118,7 +114,7 @@
                                                               AdornmentIcon="@Icons.Material.Filled.Link"
                                                               Variant="Variant.Outlined"
                                                               FullWidth
-                                                              Disabled="@(!IsRemoteMode)" />
+                                                              Disabled="@(!IsRemoteMode || IsConnected)" />
                                             </MudItem>
                                             <MudItem xs="12" md="6">
                                                 <MudTextField @bind-Value="RemoteNodeId"
@@ -129,18 +125,18 @@
                                                               AdornmentIcon="@Icons.Material.Filled.Fingerprint"
                                                               Variant="Variant.Outlined"
                                                               FullWidth
-                                                              Disabled="@(!IsRemoteMode)" />
+                                                              Disabled="@(!IsRemoteMode || IsConnected)" />
                                             </MudItem>
                                         </MudGrid>
                                         
-                                        <!-- Connect Button -->
+                                        <!-- Connect/Disconnect Button -->
                                         <MudButton Variant="Variant.Filled" 
-                                                   Color="Color.Primary" 
-                                                   StartIcon="@Icons.Material.Filled.Power"
-                                                   OnClick="ConnectAsync"
+                                                   Color="@(IsConnected ? Color.Error : Color.Primary)" 
+                                                   StartIcon="@(IsConnected ? Icons.Material.Filled.PowerOff : Icons.Material.Filled.Power)"
+                                                   OnClick="@(IsConnected ? DisconnectAsync : ConnectAsync)"
                                                    Class="mb-4"
-                                                   Disabled="@(IsRemoteMode && (string.IsNullOrWhiteSpace(RemoteUrl) || string.IsNullOrWhiteSpace(RemoteNodeId)))">
-                                            Connect to @(IsRemoteMode ? "Remote Server" : "In-Memory Database")
+                                                   Disabled="@(IsRemoteMode && !IsConnected && (string.IsNullOrWhiteSpace(RemoteUrl) || string.IsNullOrWhiteSpace(RemoteNodeId)))">
+                                            @(IsConnected ? "Disconnect" : $"Connect to {(IsRemoteMode ? "Remote Server" : "In-Memory Database")}")
                                         </MudButton>
 
                                         <!-- Database Compatibility Section -->
@@ -196,20 +192,10 @@
 </MudScrollToTop>
 
 @code {
-    // Toggle logic with a direct IsRemoteMode property (no inversion needed)
+    // Connection type property
     private bool IsRemoteMode { get; set; } = false;
     
     // Remote connection parameters
     private string RemoteUrl { get; set; } = "";
     private string RemoteNodeId { get; set; } = "";
-    
-
-    
-    private void ToggleMode()
-    {
-        IsRemoteMode = !IsRemoteMode;
-        StateHasChanged(); // Explicitly tell Blazor to update the UI
-    }
-
-
 }
