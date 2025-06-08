@@ -31,6 +31,15 @@ namespace BIT.Data.Sync.Client
         public List<string> ProcessedDeltasIds { get; set; } = new List<string>();
     
     }
+    public class HandShakeOperationResponse : SyncServerResponseBase
+    {
+
+        public HandShakeOperationResponse()
+        {
+        
+        }
+    
+    }
     public class FetchOperationResponse : SyncServerResponseBase
     {
      

@@ -21,7 +21,7 @@ public class SyncFrameworkController : SyncControllerBase
 {
     IObjectSpaceFactory objectSpaceFactory;
     INonSecuredObjectSpaceFactory nonSecuredObjectSpaceFactory;
-    public SyncFrameworkController(ILogger<SyncControllerBase> logger, ISyncServer syncServer, IObjectSpaceFactory objectSpaceFactory, INonSecuredObjectSpaceFactory nonSecuredObjectSpaceFactory) : base(logger, syncServer)
+    public SyncFrameworkController(ILogger<SyncControllerBase> logger, ISyncFrameworkServer syncServer, IObjectSpaceFactory objectSpaceFactory, INonSecuredObjectSpaceFactory nonSecuredObjectSpaceFactory) : base(logger, syncServer)
     {
         this.objectSpaceFactory = objectSpaceFactory;
         this.nonSecuredObjectSpaceFactory= nonSecuredObjectSpaceFactory;

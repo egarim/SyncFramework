@@ -21,7 +21,7 @@ namespace BIT.Data.Sync.Tests.Controllers
     [Route("[controller]")]
     public class SyncController : SyncControllerBase
     {
-        public SyncController(ILogger<SyncControllerBase> logger, ISyncServer SyncServer) : base(logger, SyncServer)
+        public SyncController(ILogger<SyncControllerBase> logger, ISyncFrameworkServer SyncServer) : base(logger, SyncServer)
         {
             var ServerWithEvents= SyncServer as ISyncServerWithEvents;
             if (ServerWithEvents != null)

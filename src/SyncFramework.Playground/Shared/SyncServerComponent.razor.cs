@@ -28,14 +28,14 @@ namespace SyncFramework.Playground.Shared
         public void ConnectToInMemoryServer()
         {
             SyncServerNode syncServerNode = new SyncServerNode(DeltaStore, null, NodeId);
-            var Server = new SyncServer(syncServerNode);
+            var Server = new SyncFrameworkServer(syncServerNode);
             this.HttpClient = new HttpClient(new ProxyHandler(Server));
             this.HttpClient.BaseAddress = new Uri("https://FakeHandlerAddress");
         }
         public void Connect(string ServerAddress,string ServerNodeId)
         {
             SyncServerNode syncServerNode = new SyncServerNode(DeltaStore, null, ServerNodeId);
-            var Server = new SyncServer(syncServerNode);
+            var Server = new SyncFrameworkServer(syncServerNode);
             this.NodeId = ServerNodeId;
             var internalHttpClient = new HttpClient();
             internalHttpClient.BaseAddress= new Uri(ServerAddress);

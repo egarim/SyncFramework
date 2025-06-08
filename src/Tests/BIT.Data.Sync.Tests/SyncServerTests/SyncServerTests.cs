@@ -28,7 +28,7 @@ namespace BIT.Data.Sync.Tests.SyncServerTests
         public async Task ServerEvents()
         {
             var NodeId = "Node1";
-            ISyncServer server = GetSyncServer(NodeId);
+            ISyncFrameworkServer server = GetSyncServer(NodeId);
 
             List<IDelta> list = GetDeltas();
 
@@ -73,7 +73,7 @@ namespace BIT.Data.Sync.Tests.SyncServerTests
         public async Task CancelingDeltaSavingEvent()
         {
             var NodeId = "Node1";
-            ISyncServer server = GetSyncServer(NodeId);
+            ISyncFrameworkServer server = GetSyncServer(NodeId);
 
             List<IDelta> list = GetDeltas();
 
@@ -107,7 +107,7 @@ namespace BIT.Data.Sync.Tests.SyncServerTests
         public async Task CustomHandlingServerSavingDelta()
         {
             var NodeId = "Node1";
-            ISyncServer server = GetSyncServer(NodeId);
+            ISyncFrameworkServer server = GetSyncServer(NodeId);
 
             List<IDelta> list = GetDeltas();
 
@@ -142,7 +142,7 @@ namespace BIT.Data.Sync.Tests.SyncServerTests
         public async Task CustomHandlingServerProcessingDelta()
         {
             var NodeId = "Node1";
-            ISyncServer server = GetSyncServer(NodeId);
+            ISyncFrameworkServer server = GetSyncServer(NodeId);
 
             List<IDelta> list = GetDeltas();
 
@@ -180,9 +180,9 @@ namespace BIT.Data.Sync.Tests.SyncServerTests
             return list;
         }
 
-        private static ISyncServer GetSyncServer(string NodeId)
+        private static ISyncFrameworkServer GetSyncServer(string NodeId)
         {
-            ISyncServer server = new SyncServer();
+            ISyncFrameworkServer server = new SyncFrameworkServer();
 
             server.RegisterNodeFunction = (node) =>
             {

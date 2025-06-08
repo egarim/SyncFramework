@@ -65,7 +65,7 @@ namespace SynFrameworkStudio.Module.Controllers
         }
         private async void PurgeDeltas_Execute(object sender, SimpleActionExecuteEventArgs e)
         {
-            var SyncServer = this.Application.ServiceProvider.GetService(typeof(ISyncServer)) as ISyncServer;
+            var SyncServer = this.Application.ServiceProvider.GetService(typeof(ISyncFrameworkServer)) as ISyncFrameworkServer;
 
 
             try
@@ -178,7 +178,7 @@ namespace SynFrameworkStudio.Module.Controllers
 
 
 
-            var SyncServer = this.Application.ServiceProvider.GetService(typeof(ISyncServer)) as ISyncServer;
+            var SyncServer = this.Application.ServiceProvider.GetService(typeof(ISyncFrameworkServer)) as ISyncFrameworkServer;
 
             if (SyncServer != null)
             {

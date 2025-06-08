@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Serialization.Json;
+using System.Security.Principal;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -19,6 +20,7 @@ namespace BIT.Data.Sync.Client
     {
         private const string PushRequestUri = "Push";
         private const string FetchRequestUri = "Fetch?";
+        private const string HandShakeRequestUri = "HandShake";
 
         HttpClient _httpClient;
         string requestUri;
@@ -157,8 +159,35 @@ namespace BIT.Data.Sync.Client
             Debug.WriteLine($"{this._httpClient.BaseAddress}/{Uri}");
         }
 
+        public async Task<FetchOperationResponse> HandShake(CancellationToken cancellationToken)
+        {
+            try
+            {
+                string responseString = "";
+                responseString = await _httpClient.GetStringAsync(HandShakeRequestUri).ConfigureAwait(false);
+                using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(responseString)))
+                {
 
 
 
+                    DataContractJsonSerializer deserialized = new DataContractJsonSerializer(typeof(FetchOperationResponse));
+                    FetchOperationResponse response = (FetchOperationResponse)deserialized.ReadObject(ms);
+
+                    return response;
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+
+                FetchOperationResponse fetchOperationResponse = new FetchOperationResponse();
+                fetchOperationResponse.Success = false;
+                fetchOperationResponse.Message = $"An error occurred while fetching deltas from the server: {ex.Message}";
+                return fetchOperationResponse;
+            }
+        }
+
+       
     }
 }

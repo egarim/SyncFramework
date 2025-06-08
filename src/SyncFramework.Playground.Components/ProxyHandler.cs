@@ -17,7 +17,7 @@ namespace SyncFramework.Playground.Components
     /// </summary>
     public class ProxyHandler : HttpMessageHandler
     {
-        private readonly ISyncServer _syncServer;
+        private readonly ISyncFrameworkServer _syncServer;
         private readonly HttpClient _httpClient;
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace SyncFramework.Playground.Components
         /// </summary>
         /// <param name="syncServer">The sync server implementation to handle sync operations</param>
         /// <param name="httpClient">Optional HTTP client for forwarding requests</param>
-        public ProxyHandler(ISyncServer syncServer, HttpClient httpClient = null)
+        public ProxyHandler(ISyncFrameworkServer syncServer, HttpClient httpClient = null)
         {
             _syncServer = syncServer ?? throw new ArgumentNullException(nameof(syncServer));
             _httpClient = httpClient;

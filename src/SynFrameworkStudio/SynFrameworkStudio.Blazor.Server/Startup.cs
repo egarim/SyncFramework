@@ -252,7 +252,7 @@ public class Startup {
     {
 
         var objectSpace = sender as NonPersistentObjectSpace;
-        var Server = objectSpace.ServiceProvider.GetService(typeof(ISyncServer)) as ISyncServer;
+        var Server = objectSpace.ServiceProvider.GetService(typeof(ISyncFrameworkServer)) as ISyncFrameworkServer;
 
         var selectedServerNode = objectSpace.ServiceProvider.GetService(typeof(SelectedServerNode)) as SelectedServerNode;
 
@@ -336,7 +336,7 @@ public class Startup {
         app.UseAuthorization();
         app.UseXaf();
 
-       var syncServer=  app.ApplicationServices.GetService<ISyncServer>();
+       var syncServer=  app.ApplicationServices.GetService<ISyncFrameworkServer>();
         var config = app.ApplicationServices.GetService<IConfiguration>();
 
 

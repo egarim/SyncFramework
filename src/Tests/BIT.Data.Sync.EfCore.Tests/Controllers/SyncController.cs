@@ -21,7 +21,7 @@ namespace BIT.Data.Sync.EfCore.Tests.Controllers
     [Route("[controller]")]
     public class SyncController : SyncControllerBase
     {
-        public SyncController(ILogger<SyncControllerBase> logger, ISyncServer SyncServer) : base(logger, SyncServer)
+        public SyncController(ILogger<SyncControllerBase> logger, ISyncFrameworkServer SyncServer) : base(logger, SyncServer)
         {
         }
         public override Task<string> Fetch(string startIndex, string identity)

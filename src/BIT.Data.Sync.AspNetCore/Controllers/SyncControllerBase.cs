@@ -25,7 +25,7 @@ namespace BIT.Data.Sync.AspNetCore.Controllers
 
 
         protected readonly ILogger<SyncControllerBase> _logger;
-        protected readonly ISyncServer _SyncServer;
+        protected readonly ISyncFrameworkServer _SyncServer;
         protected string GetHeader(string HeaderName)
         {
             Microsoft.Extensions.Primitives.StringValues stringValues = HttpContext.Request.Headers[HeaderName];
@@ -33,7 +33,7 @@ namespace BIT.Data.Sync.AspNetCore.Controllers
         }
 
 
-        public SyncControllerBase(ILogger<SyncControllerBase> logger, ISyncServer SyncServer)
+        public SyncControllerBase(ILogger<SyncControllerBase> logger, ISyncFrameworkServer SyncServer)
         {
             _logger = logger;
             _SyncServer = SyncServer;
@@ -151,6 +151,31 @@ namespace BIT.Data.Sync.AspNetCore.Controllers
             catch (Exception ex)
             {
                 SetException(fetchOperationResponse, ex, "An unknown exception occurred.");
+            }
+            string fetchResponse = CreateFetchResponse(fetchOperationResponse);
+            return fetchResponse;
+
+
+
+        }
+
+        [HttpGet("HandShake")]
+        public virtual async Task<string> HandShake()
+        {
+
+            
+
+            var data=this._SyncServer.HandShake();
+            FetchOperationResponse fetchOperationResponse = new FetchOperationResponse();
+            try
+            {
+                fetchOperationResponse.Success = true;
+
+
+            }
+            catch (Exception ex)
+            {
+                SetException(fetchOperationResponse, ex, "An unknown error occurred during handshake.");
             }
             string fetchResponse = CreateFetchResponse(fetchOperationResponse);
             return fetchResponse;

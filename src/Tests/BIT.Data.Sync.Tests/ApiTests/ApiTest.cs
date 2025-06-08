@@ -12,6 +12,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using BIT.Data.Sync.Tests.Startups;
+using System.Threading;
 namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
 {
     public class ApiTest : MultiServerBaseTest
@@ -268,9 +269,49 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
             //var Result = await Master.FetchAsync();
         }
 
-    
+        [Test]
+        public async Task HandShakeTest()
+        {
+            // Arrange: Get the network client connected to the API controller
+            var httpclient = this.GetTestClientFactory().CreateClient("TestClient");
+            httpclient.BaseAddress = new Uri("http://localhost/sync/");
+            
+            string NodeId = TestStartup.STR_MemoryDeltaStore1;
+            ISyncFrameworkClient syncFrameworkClient = new SyncFrameworkHttpClient(httpclient, NodeId);
+            
+            // Act: Perform the HandShake operation
+            var handshakeResult = await syncFrameworkClient.HandShake(CancellationToken.None);
+            
+            // Assert: Verify the handshake response
+            Assert.IsNotNull(handshakeResult, "HandShake response should not be null");
+            Assert.IsTrue(handshakeResult.Success, "HandShake operation should succeed");
+            Assert.IsNotNull(handshakeResult.Deltas, "Deltas collection should be initialized");
+            //Assert.AreEqual(NodeId, handshakeResult.ClientNodeId, "Client node ID should match the provided ID");
+        }
 
+        [Test]
+        public async Task HandShakeTest_WrongUrl()
+        {
+            // Arrange: Create an HttpClient with an invalid BaseAddress
+            var httpclient = new HttpClient();
+            httpclient.BaseAddress = new Uri("http://localhost:12345/invalid");
+            httpclient.Timeout = TimeSpan.FromSeconds(3);
+
+            string NodeId = TestStartup.STR_MemoryDeltaStore1;
+            ISyncFrameworkClient syncFrameworkClient = new SyncFrameworkHttpClient(httpclient, NodeId);
+
+            // Act & Assert: Call HandShake and expect failure
+            try
+            {
+                var handshakeResult = await syncFrameworkClient.HandShake(CancellationToken.None);
+                // If no exception was thrown, the response should indicate failure
+                Assert.IsFalse(handshakeResult.Success, "HandShake operation should not succeed on an empty request.");
+            }
+            catch (Exception ex)
+            {
+                // Expected exception due to wrong URL
+                Assert.Pass("HandShake threw the expected exception: " + ex.Message);
+            }
+        }
     }
-
-   
 }

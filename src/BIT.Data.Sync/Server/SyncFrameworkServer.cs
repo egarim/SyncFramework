@@ -20,9 +20,9 @@ namespace BIT.Data.Sync.Server
     {
         
     }
-    public class SyncServer : ISyncServer, ISyncServerWithEvents
+    public class SyncFrameworkServer : ISyncFrameworkServer, ISyncServerWithEvents
     {
-        public SyncServer(IEnumerable<IServerSyncEndpoint> nodes, Func<RegisterNodeRequest, IServerSyncEndpoint> registerNodeRequest,IInfoServer infoServer)
+        public SyncFrameworkServer(IEnumerable<IServerSyncEndpoint> nodes, Func<RegisterNodeRequest, IServerSyncEndpoint> registerNodeRequest,IInfoServer infoServer)
         {
             Nodes.AddRange(nodes);
             foreach (IServerSyncEndpoint syncServerNode in Nodes)
@@ -32,21 +32,24 @@ namespace BIT.Data.Sync.Server
             }
             RegisterNodeFunction = registerNodeRequest;
         }
-        public SyncServer(params IServerSyncEndpoint[] Nodes) : this(Nodes, null, null)
+        public SyncFrameworkServer(params IServerSyncEndpoint[] Nodes) : this(Nodes, null, null)
         {
 
         }
-        public SyncServer(SyncServerNodeList Nodes) : this(Nodes.ToArray(), null, null)
+        public SyncFrameworkServer(SyncServerNodeList Nodes) : this(Nodes.ToArray(), null, null)
         {
 
         }
-        protected SyncServer()
+        protected SyncFrameworkServer()
         {
          
         }
    
         public List<IServerSyncEndpoint> Nodes { get; } = new List<IServerSyncEndpoint>();
         public Func<RegisterNodeRequest, IServerSyncEndpoint> RegisterNodeFunction { get; set; }
+
+  
+        Func<RegisterNodeRequest, IServerSyncEndpoint> ISyncFrameworkServer.RegisterNodeFunction { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public event EventHandler<ServerSavingDeltaEventArgs> ServerSavingDelta;
         public event EventHandler<ServerSavedDeltaEventArgs> ServerSavedDelta;
@@ -166,6 +169,18 @@ namespace BIT.Data.Sync.Server
         {
             return this.Nodes.Find(node => node.NodeId == nodeId).GetDeltaAsync(deltaId, cancellationToken);
         }
+
+        public Dictionary<string, string> HandShake()
+        {
+          return new Dictionary<string, string>()
+            {
+                { "ServerName", "SyncFrameworkServer" },
+                { "Version", "1.0" },
+                { "NodesCount", Nodes.Count.ToString() }
+            };
+        }
+
+    
     }
    
 

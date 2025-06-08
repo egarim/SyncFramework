@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace BIT.Data.Sync.Server
 {
-    public interface ISyncServer
+    public interface ISyncFrameworkServer
     {
+
+        Dictionary<string,string> HandShake();
         List<IServerSyncEndpoint> Nodes { get; }
         /// <summary>
         /// The function will fetch all the deltas that are greater than current <paramref name="startIndex"/>
