@@ -93,7 +93,7 @@
                                         <MudGrid Class="mb-3">
                                             <MudItem xs="12" class="d-flex align-items-center">
                                                 <MudSwitch T="bool" 
-                                                           @bind-Checked="IsRemoteMode" 
+                                                           @bind-Value="IsRemoteMode"
                                                            Color="Color.Primary"
                                                            CheckedIcon="@Icons.Material.Filled.Cloud"
                                                            UncheckedIcon="@Icons.Material.Filled.Memory"
@@ -192,10 +192,5 @@
 </MudScrollToTop>
 
 @code {
-    // Connection type property
-    private bool IsRemoteMode { get; set; } = false;
-    
-    // Remote connection parameters
-    private string RemoteUrl { get; set; } = "";
-    private string RemoteNodeId { get; set; } = "";
+    // This code block is kept empty as all code has been moved to the code-behind file
 }

@@ -46,6 +46,21 @@ namespace SyncFramework.Playground.Pages
         
         // Connection status tracking
         public bool IsConnected { get; set; } = false;
+
+        // Updated IsRemoteMode property with proper state change notification
+        public bool IsRemoteMode
+        {
+            get => isRemoteMode;
+            set
+            {
+                if (isRemoteMode != value)
+                {
+                    isRemoteMode = value;
+                    StateHasChanged();
+                }
+            }
+        }
+        private bool isRemoteMode;
         
         protected override void OnInitialized()
         {
@@ -212,5 +227,9 @@ namespace SyncFramework.Playground.Pages
         }
 
         public int DeltaCount { get; set; }
+        
+        // Remote connection parameters
+        private string RemoteUrl { get; set; } = "";
+        private string RemoteNodeId { get; set; } = "";
     }
 }
