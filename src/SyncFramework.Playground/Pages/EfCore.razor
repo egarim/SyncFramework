@@ -79,7 +79,7 @@
                                 <MudGrid>
                                     <MudItem xs="12" md="4" Class="d-flex align-items-end">
                                         <MudCheckBox T="bool" Label="Generate Random Data"
-                                                     Color="Color.Primary" @bind-Checked="@GenerateRandomData" />
+                                                     Color="Color.Primary" @bind-Value="@GenerateRandomData" />
                                     </MudItem>
                                 </MudGrid>
                                 
@@ -147,13 +147,13 @@
                                         </MudText>
                                         <MudGrid>
                                             <MudItem xs="4">
-                                                <MudCheckBox T="bool" Label="PostgreSQL" Color="Color.Info" @bind-Checked="@Postgres" />
+                                                <MudCheckBox T="bool" Label="PostgreSQL" Color="Color.Info" @bind-Value="@Postgres" />
                                             </MudItem>
                                             <MudItem xs="4">
-                                                <MudCheckBox T="bool" Label="MySQL" Color="Color.Info" @bind-Checked="@MySql" />
+                                                <MudCheckBox T="bool" Label="MySQL" Color="Color.Info" @bind-Value="@MySql" />
                                             </MudItem>
                                             <MudItem xs="4">
-                                                <MudCheckBox T="bool" Label="SQL Server" Color="Color.Info" @bind-Checked="@SqlServer" />
+                                                <MudCheckBox T="bool" Label="SQL Server" Color="Color.Info" @bind-Value="@SqlServer" />
                                             </MudItem>
                                         </MudGrid>
                                     </MudCardContent>
