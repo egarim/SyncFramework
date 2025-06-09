@@ -56,7 +56,7 @@ namespace SyncFramework.Playground.EfCore
                 return;
             }
             await Task.Delay(TimeSpan.FromMilliseconds(100));
-            await InitDbContext();
+            this.DbContext=await InitDbContext();
             //Delete the database if it exists
             await DbContext.Database.EnsureDeletedAsync();
             //Create the database with the sqlite connection
@@ -79,7 +79,7 @@ namespace SyncFramework.Playground.EfCore
             IsInitialized = true;
         }
 
-        private async Task InitDbContext()
+        private async Task<ContactsDbContext> InitDbContext()
         {
             ServiceCollection serviceCollection = new ServiceCollection();
             deltaConnectionString = $"Data Source={DbName}_Deltas.db";
@@ -98,7 +98,7 @@ namespace SyncFramework.Playground.EfCore
             dataConnectionString = $"Data Source={DbName}_Data.db";
             OptionsBuilder.UseSqlite(dataConnectionString);
 
-            this.DbContext = new ContactsDbContext(OptionsBuilder.Options, ServiceProvider);
+            return new ContactsDbContext(OptionsBuilder.Options, ServiceProvider);
 
         }
 

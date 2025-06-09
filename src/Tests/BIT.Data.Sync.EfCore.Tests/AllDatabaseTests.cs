@@ -264,6 +264,28 @@ namespace BIT.Data.Sync.EfCore.Tests
             return (masterContext, nodeAContext, nodeBContext, nodeCContext);
         }
 
+        private async Task<TestSyncFrameworkDbContext> SetupSingleContext(string nodeType)
+        {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+            EfDeltaStore.EnsureDeleted = true;
+            CleanupDatabases();
+
+            // Configure HTTP client
+            var httpClient = ConfigureHttpClient(HttpClientFactory.CreateClient(nodeType));
+
+            // Configure services
+            var serviceProvider = ConfigureServices(nodeType, httpClient, SqlServerSyncFrameworkTestDeltaCnx);
+
+            // Create context
+            var context = new TestSyncFrameworkDbContext(masterContextOptionBuilder.Options, serviceProvider);
+
+            // Create database
+            await context.Database.EnsureDeletedAsync();
+            await context.Database.EnsureCreatedAsync();
+
+            return context;
+        }
+
         private HttpClient ConfigureHttpClient(HttpClient client)
         {
             client.BaseAddress = new Uri("http://localhost/sync/");
@@ -411,6 +433,48 @@ namespace BIT.Data.Sync.EfCore.Tests
             // Pull to master and verify 10 blogs total
             await masterContext.PullAsync();
             Assert.AreEqual(10, masterContext.Blogs.Count());
+        }
+
+        [Test]
+        public async Task DeltasMarkedAsSentAfterPush()
+        {
+            // Arrange: Setup a context that we can use for testing
+            var masterContext = await SetupSingleContext("Master");
+            using (masterContext)
+            {
+                // Add some data to generate deltas
+                masterContext.Add(GetBlog("TestBlog1", "Post1", "Post2"));
+                masterContext.Add(GetBlog("TestBlog2", "Post3", "Post4"));
+                await masterContext.SaveChangesAsync();
+
+                // Get the delta store directly from the context to verify its state
+                var deltaStore = masterContext.DeltaStore as EfDeltaStore;
+                Assert.IsNotNull(deltaStore, "DeltaStore should be of type EfDeltaStore");
+
+                // Get deltas before push to verify they exist
+                var deltasBeforePush = await deltaStore.GetDeltasByIdentityAsync(string.Empty, masterContext.Identity, default);
+                Assert.IsTrue(deltasBeforePush.Any(), "Should have deltas to push");
+
+                // Get the last pushed delta before push (should be empty or at the initial value)
+                var lastPushedBefore = await deltaStore.GetLastPushedDeltaAsync(masterContext.Identity, default);
+
+                // Act: Push the deltas
+                var pushResult = await masterContext.PushAsync();
+
+                // Assert: Verify the push was successful
+                Assert.IsTrue(pushResult.Success, "Push operation should succeed");
+
+                // Get the max delta index that should have been pushed
+                var maxDeltaIndex = deltasBeforePush.Max(d => d.Index);
+
+                // Verify the last pushed delta was updated correctly
+                var lastPushedAfter = await deltaStore.GetLastPushedDeltaAsync(masterContext.Identity, default);
+                Assert.AreEqual(maxDeltaIndex, lastPushedAfter, "LastPushedDelta should be updated after successful push");
+
+                // Try to push again, should have nothing new to send since deltas were marked as sent
+                var secondPushResult = await masterContext.PushAsync();
+                StringAssert.Contains("Nothing to send", secondPushResult.Message, "Second push should indicate nothing to send");
+            }
         }
         #endregion
     }
