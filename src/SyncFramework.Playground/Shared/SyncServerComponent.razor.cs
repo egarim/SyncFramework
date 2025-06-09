@@ -1,5 +1,6 @@
 ﻿
 using BIT.Data.Sync;
+using BIT.Data.Sync.Client;
 using BIT.Data.Sync.EfCore.Data;
 using BIT.Data.Sync.Imp;
 using BIT.Data.Sync.Server;

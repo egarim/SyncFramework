@@ -11,7 +11,6 @@ using BIT.Data.Sync.Server;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using BIT.Data.Sync.Tests.Startups;
 using System.Collections.Generic;
 namespace BIT.Data.Sync.Tests.SyncServerTests
 {

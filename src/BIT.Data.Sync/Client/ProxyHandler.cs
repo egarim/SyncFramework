@@ -1,15 +1,21 @@
 ﻿using BIT.Data.Sync;
 using BIT.Data.Sync.Client;
 using BIT.Data.Sync.Server;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
-using static NpgsqlTypes.NpgsqlTsQuery;
 
-namespace SyncFramework.Playground.Components
+
+namespace BIT.Data.Sync.Client
 {
     /// <summary>
     /// Custom HTTP message handler that provides synchronization functionality by delegating requests to an ISyncServer.
@@ -55,12 +61,6 @@ namespace SyncFramework.Playground.Components
                     Content = request.Content
                 };
 
-                //var currentNodeId = request.Headers.Contains("NodeId") ? request.Headers.GetValues("NodeId").FirstOrDefault() : null;
-                //Console.WriteLine($"Current NodeId: {currentNodeId}");
-                //Debug.WriteLine($"Current NodeId: {currentNodeId}");
-                //forwardedRequest.Headers.Add("NodeId", currentNodeId);
-
-
                 // Copy all headers
                 foreach (var header in request.Headers)
                 {
@@ -75,7 +75,7 @@ namespace SyncFramework.Playground.Components
                 {
                     return forwardedResponse;
                 }
-                if(request.Method.Method=="GET")
+                if (request.Method.Method == "GET")
                 {
                     return forwardedResponse;
                 }
@@ -95,9 +95,25 @@ namespace SyncFramework.Playground.Components
                     string identity = queryParams.TryGetValue("identity", out var id) ? id : string.Empty;
 
                     var output = await ProcessFetchAsync(startIndex, identity, request, cancellationToken);
+
+                    // Create a FetchOperationResponse object instead of returning just serialized deltas
+                    var fetchResponse = new FetchOperationResponse
+                    {
+                        Success = true,
+                        ServerNodeId = GetHeader("NodeId", request)
+                    };
+
+                    DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(FetchOperationResponse));
+                    MemoryStream msObj = new MemoryStream();
+                    js.WriteObject(msObj, fetchResponse);
+                    msObj.Position = 0;
+                    StreamReader sr = new StreamReader(msObj);
+                    string fetchResponseString = sr.ReadToEnd();
+
                     responseMessage = new HttpResponseMessage(HttpStatusCode.OK)
                     {
-                        Content = new StringContent(output)
+                        // Use Unicode encoding to match client expectations
+                        Content = new StringContent(fetchResponseString, Encoding.Unicode, "application/json")
                     };
                     break;
 
@@ -110,25 +126,25 @@ namespace SyncFramework.Playground.Components
                         Message = "Push operation completed successfully",
                         ServerNodeId = GetHeader("NodeId", request)
                     };
-                    DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(PushOperationResponse));
-                    MemoryStream msObj = new MemoryStream();
-                    js.WriteObject(msObj, pushOperationResponse);
-                    msObj.Position = 0;
-                    StreamReader sr = new StreamReader(msObj);
-                    string ResponseString = sr.ReadToEnd();
-                    
 
+                    DataContractJsonSerializer pushJs = new DataContractJsonSerializer(typeof(PushOperationResponse));
+                    MemoryStream pushMsObj = new MemoryStream();
+                    pushJs.WriteObject(pushMsObj, pushOperationResponse);
+                    pushMsObj.Position = 0;
+                    StreamReader pushSr = new StreamReader(pushMsObj);
+                    string responseString = pushSr.ReadToEnd();
 
                     responseMessage = new HttpResponseMessage(HttpStatusCode.Created)
                     {
-                        Content = new StringContent(ResponseString)
+                        // Use Unicode encoding to match client expectations
+                        Content = new StringContent(responseString, Encoding.Unicode, "application/json")
                     };
                     break;
 
                 default:
                     responseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest)
                     {
-                        Content = new StringContent("This method is not supported.")
+                        Content = new StringContent("This method is not supported.", Encoding.Unicode)
                     };
                     break;
             }

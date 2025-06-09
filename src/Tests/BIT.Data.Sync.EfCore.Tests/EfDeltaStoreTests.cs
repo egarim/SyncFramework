@@ -11,7 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace BIT.Data.Sync.Tests
+namespace BIT.Data.Sync.EfCore.Tests
 {
         public class EfDeltaStoreTests 
     {

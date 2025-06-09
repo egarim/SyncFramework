@@ -11,7 +11,7 @@ using System.Net.Http;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class SyncFrameworkExtensions
+    public static class SyncFrameworkDbContextExtensions
     {
 
         /// <summary>
