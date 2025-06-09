@@ -217,10 +217,26 @@ namespace SyncFramework.Playground.EfCore
         public async Task Push()
         {
 
-            var Result = await DbContext.PushAsync();
+            //var Result = await DbContext.PushAsync();
+            //await Bus.Publish(new object());
+            //ShowMessage($"{this.Id} Deltas Pushed");
+            try
+            {
+                var Result = await DbContext.PushAsync();
+                if (!Result.Success)
+                {
+                    Debug.WriteLine($"Error pushing deltas: {Result.Message}");
+                    ShowMessage(Result.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
             await Bus.Publish(new object());
             ShowMessage($"{this.Id} Deltas Pushed");
-
 
         }
         public async Task PurgeDeltas()

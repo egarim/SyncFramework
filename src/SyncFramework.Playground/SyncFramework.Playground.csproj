@@ -5,7 +5,7 @@
 		<TargetFramework>net9.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+		<!--<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>-->
 		<Platforms>AnyCPU;x64</Platforms>
 
 
@@ -46,10 +46,9 @@
 	  <ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore.SqlServer\BIT.Data.Sync.EfCore.SqlServer.csproj" />
 	  <ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
 	  <ProjectReference Include="..\EntityFrameworkCore\NBIT.Data.Sync.EfCore.Npgsql\BIT.Data.Sync.EfCore.Npgsql.csproj" />
-	  <ProjectReference Include="..\SyncFramework.Playground.Components\SyncFramework.Playground.Components.csproj" />
 	</ItemGroup>
-	<ItemGroup>
+	<!--<ItemGroup>
 		<ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
-	</ItemGroup>
+	</ItemGroup>-->
 
 </Project>
