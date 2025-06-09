@@ -67,7 +67,7 @@ namespace SyncFramework.Playground.Pages
             base.OnInitialized();
             ServerDeltaStore = new MemoryDeltaStore();
             NodeId = "";
-            this.RemoteNodeId = "0196e80f-4258-7c11-9896-8fa64a2722b2";
+            this.RemoteNodeId = "";
             this.RemoteUrl = "https://localhost:5001/api/SyncFramework/";
             //Subscribe Component to Specific Message
             Bus.Subscribe<object>(RefreshDeltaCount);

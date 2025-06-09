@@ -217,7 +217,7 @@ namespace SyncFramework.Playground.EfCore
         public async Task Push()
         {
 
-            await DbContext.PushAsync();
+            var Result = await DbContext.PushAsync();
             await Bus.Publish(new object());
             ShowMessage($"{this.Id} Deltas Pushed");
 

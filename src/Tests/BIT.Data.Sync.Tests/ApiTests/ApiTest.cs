@@ -13,6 +13,7 @@ using System.Text;
 using System.Text.Json;
 using BIT.Data.Sync.Tests.Startups;
 using System.Threading;
+
 namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
 {
     public class ApiTest : MultiServerBaseTest
@@ -23,6 +24,7 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
         {
             base.Setup();
         }
+
         [Test]
         public async Task RegisterNodeInServer()
         {
@@ -67,6 +69,7 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
 
             await Master.PushAsync();
         }
+
         [Test]
         public async Task PushResult()
         {
@@ -74,8 +77,7 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
             var httpclient = this.GetTestClientFactory().CreateClient("TestClient");
             httpclient.BaseAddress = new Uri("http://localhost/sync/");
 
-            string NodeId =TestStartup.STR_MemoryDeltaStore1;
-
+            string NodeId = TestStartup.STR_MemoryDeltaStore1;
 
             ISyncFrameworkClient syncFrameworkClient = new SyncFrameworkHttpClient(httpclient, NodeId);
 
@@ -90,9 +92,8 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
             await Master.Add(World);
             var Result = await Master.PushAsync();
             Assert.IsTrue(Result.Success);
-
-
         }
+
         [Test]
         public async Task PullResult()
         {
@@ -101,7 +102,6 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
             httpclient.BaseAddress = new Uri("http://localhost/sync/");
 
             string NodeId = TestStartup.STR_MemoryDeltaStore1;
-
 
             ISyncFrameworkClient syncFrameworkClient = new SyncFrameworkHttpClient(httpclient, NodeId);
 
@@ -116,9 +116,8 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
             await Master.Add(World);
             var Result = await Master.PullAsync();
             Assert.IsTrue(Result.Success);
-
-
         }
+
         [Test]
         public async Task WrongUrlTest_ForFetch()
         {
@@ -133,7 +132,7 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
             // Act & Assert: Call FetchAsync directly.
             try
             {
-                var fetchResponse = await syncFrameworkClient.FetchAsync(string.Empty, NodeId,default);
+                var fetchResponse = await syncFrameworkClient.FetchAsync(string.Empty, NodeId, default);
                 // If no exception was thrown, the response should indicate failure.
                 Assert.IsFalse(fetchResponse.Success, "Fetch operation should not succeed with an invalid URL.");
             }
@@ -174,7 +173,7 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
         public async Task WrongUrlTest_OverrideBaseAddress()
         {
             // Arrange: Create a client via the factory and override its BaseAddress.
-            var httpclient = new HttpClient();//this.GetTestClientFactory().CreateClient("TestClient");
+            var httpclient = new HttpClient();
             httpclient.BaseAddress = new Uri("http://localhost:12345/invalid");
             httpclient.Timeout = TimeSpan.FromSeconds(3);
             string NodeId = TestStartup.STR_MemoryDeltaStore1;
@@ -234,7 +233,7 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
             await database.PushAsync();
 
             // 3 - Pull once to process any deltas and set the last processed delta
-            var pullrResult= await database.PullAsync();
+            var pullrResult = await database.PullAsync();
 
             // 4 - Pull again when there are no new deltas to process
             var Result = await database.PullAsync();
@@ -253,7 +252,6 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
 
             string NodeId = "Custom";
 
-           
             ISyncFrameworkClient syncFrameworkClient = new SyncFrameworkHttpClient(httpclient, NodeId);
 
             //1 - Create the master database
@@ -265,8 +263,7 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
 
             await Master.Add(Hello);
             await Master.Add(World);
-            var Result=await Master.PushAsync();
-            //var Result = await Master.FetchAsync();
+            var Result = await Master.PushAsync();
         }
 
         [Test]
@@ -275,18 +272,17 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
             // Arrange: Get the network client connected to the API controller
             var httpclient = this.GetTestClientFactory().CreateClient("TestClient");
             httpclient.BaseAddress = new Uri("http://localhost/sync/");
-            
+
             string NodeId = TestStartup.STR_MemoryDeltaStore1;
             ISyncFrameworkClient syncFrameworkClient = new SyncFrameworkHttpClient(httpclient, NodeId);
-            
+
             // Act: Perform the HandShake operation
             var handshakeResult = await syncFrameworkClient.HandShake(CancellationToken.None);
-            
+
             // Assert: Verify the handshake response
             Assert.IsNotNull(handshakeResult, "HandShake response should not be null");
             Assert.IsTrue(handshakeResult.Success, "HandShake operation should succeed");
             Assert.IsNotNull(handshakeResult.Deltas, "Deltas collection should be initialized");
-            //Assert.AreEqual(NodeId, handshakeResult.ClientNodeId, "Client node ID should match the provided ID");
         }
 
         [Test]
@@ -312,6 +308,56 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
                 // Expected exception due to wrong URL
                 Assert.Pass("HandShake threw the expected exception: " + ex.Message);
             }
+        }
+
+        [Test]
+        public async Task DeltasMarkedAsSentAfterPush()
+        {
+            // Arrange: Set up the test client and create a database with a memory delta store
+            var httpclient = this.GetTestClientFactory().CreateClient("TestClient");
+            httpclient.BaseAddress = new Uri("http://localhost/sync/");
+
+            string dbName = "DeltasMarkTest";
+            string nodeId = TestStartup.STR_MemoryDeltaStore1;
+
+            // Create a delta store that we can access directly for verification
+            MemoryDeltaStore deltaStore = new MemoryDeltaStore();
+            ISyncFrameworkClient syncFrameworkClient = new SyncFrameworkHttpClient(httpclient, nodeId);
+
+            // Create the database with our trackable delta store
+            SimpleDatabase database = new SimpleDatabase(deltaStore, dbName, syncFrameworkClient);
+
+            // Add some records to generate deltas
+            SimpleDatabaseRecord record1 = new SimpleDatabaseRecord() { Key = Guid.NewGuid(), Text = "Test1" };
+            SimpleDatabaseRecord record2 = new SimpleDatabaseRecord() { Key = Guid.NewGuid(), Text = "Test2" };
+
+            await database.Add(record1);
+            await database.Add(record2);
+
+            // Get deltas before push to verify they exist
+            var deltasBeforePush = await deltaStore.GetDeltasByIdentityAsync(string.Empty, dbName, default);
+            Assert.IsTrue(deltasBeforePush.Any(), "Should have deltas to push");
+
+            // Get the last pushed delta before push (should be empty)
+            var lastPushedBefore = await deltaStore.GetLastPushedDeltaAsync(dbName, default);
+            Assert.IsTrue(string.IsNullOrEmpty(lastPushedBefore), "LastPushedDelta should be empty before push");
+
+            // Act: Push the deltas
+            var pushResult = await database.PushAsync();
+
+            // Assert: Verify the push was successful
+            Assert.IsTrue(pushResult.Success, "Push operation should succeed");
+
+            // Get the max delta index that should have been pushed
+            var maxDeltaIndex = deltasBeforePush.Max(d => d.Index);
+
+            // Verify the last pushed delta was updated correctly
+            var lastPushedAfter = await deltaStore.GetLastPushedDeltaAsync(dbName, default);
+            Assert.AreEqual(maxDeltaIndex, lastPushedAfter, "LastPushedDelta should be updated after successful push");
+
+            // Try to push again, should have nothing to send since deltas were marked as sent
+            var secondPushResult = await database.PushAsync();
+            Assert.AreEqual("Nothing to send", secondPushResult.Message, "Second push should have nothing to send");
         }
     }
 }
