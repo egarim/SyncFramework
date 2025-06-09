@@ -56,6 +56,12 @@
                                     </MudListItem>
                                 </MudList>
                                 <div class="mt-auto d-flex flex-column gap-2">
+                                    <!-- Add Client Node with Generate Random Data Checkbox -->
+                                    <div class="d-flex flex-row align-center gap-2 mb-2">
+                                        <MudCheckBox T="bool" Label="Generate Random Data" 
+                                                     Color="Color.Primary" @bind-Value="@GenerateRandomData" 
+                                                     Class="mr-2" />
+                                    </div>
                                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
                                                Color="Color.Primary" OnClick="@AddClientNode" FullWidth
                                                Disabled="@(!IsConnected)">
@@ -75,14 +81,6 @@
                     <MudItem xs="12" md="8">
                         <MudCard Elevation="2" Class="h-100 d-flex flex-column">
                             <MudCardContent Class="flex-grow-1 d-flex flex-column">
-                                <!-- Random Data Option -->
-                                <MudGrid>
-                                    <MudItem xs="12" md="4" Class="d-flex align-items-end">
-                                        <MudCheckBox T="bool" Label="Generate Random Data"
-                                                     Color="Color.Primary" @bind-Value="@GenerateRandomData" />
-                                    </MudItem>
-                                </MudGrid>
-                                
                                 <!-- Connection Options Card -->
                                 <MudCard Elevation="1" Class="mb-0 mt-4">
                                     <MudCardHeader>
