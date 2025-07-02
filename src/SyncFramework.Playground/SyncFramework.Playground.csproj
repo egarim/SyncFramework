@@ -5,12 +5,12 @@
 		<TargetFramework>net9.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+		<!--<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>-->
 		<Platforms>AnyCPU;x64</Platforms>
 
 
-	
-		
+
+
 	</PropertyGroup>
 	<PropertyGroup>
 		<GenerateMvcApplicationPartsAssemblyAttributes>false</GenerateMvcApplicationPartsAssemblyAttributes>
@@ -37,18 +37,18 @@
 		<!--<NativeFileReference Include="Data\e_sqlite3.o" />-->
 	</ItemGroup>
 	<ItemGroup>
-	  <!--<PackageReference Include="Microsoft.Data.Sqlite" Version="(EfCoreSqliteVersion)" />-->
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.5" />
-	  <PackageReference Include="MudBlazor" Version="8.6.0" />
-	  <ProjectReference Include="..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
-	  <ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Pomelo.MySql\BIT.Data.Sync.EfCore.Pomelo.MySql.csproj" />
-	  <ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Sqlite\BIT.Data.Sync.EfCore.Sqlite.csproj" />
-	  <ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore.SqlServer\BIT.Data.Sync.EfCore.SqlServer.csproj" />
-	  <ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
-	  <ProjectReference Include="..\EntityFrameworkCore\NBIT.Data.Sync.EfCore.Npgsql\BIT.Data.Sync.EfCore.Npgsql.csproj" />
+		<!--<PackageReference Include="Microsoft.Data.Sqlite" Version="(EfCoreSqliteVersion)" />-->
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.5" />
+		<PackageReference Include="MudBlazor" Version="8.6.0" />
+		<ProjectReference Include="..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
+		<ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Pomelo.MySql\BIT.Data.Sync.EfCore.Pomelo.MySql.csproj" />
+		<ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Sqlite\BIT.Data.Sync.EfCore.Sqlite.csproj" />
+		<ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore.SqlServer\BIT.Data.Sync.EfCore.SqlServer.csproj" />
+		<ProjectReference Include="..\EntityFrameworkCore\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
+		<ProjectReference Include="..\EntityFrameworkCore\NBIT.Data.Sync.EfCore.Npgsql\BIT.Data.Sync.EfCore.Npgsql.csproj" />
 	</ItemGroup>
-	<!--<ItemGroup>
+	<ItemGroup>
 		<ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
-	</ItemGroup>-->
+	</ItemGroup>
 
 </Project>

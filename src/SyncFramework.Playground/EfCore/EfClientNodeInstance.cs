@@ -55,7 +55,7 @@ namespace SyncFramework.Playground.EfCore
             {
                 return;
             }
-            //await Task.Delay(TimeSpan.FromMilliseconds(100));
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
             this.DbContext=await InitDbContext();
             //Delete the database if it exists
             await DbContext.Database.EnsureDeletedAsync();
