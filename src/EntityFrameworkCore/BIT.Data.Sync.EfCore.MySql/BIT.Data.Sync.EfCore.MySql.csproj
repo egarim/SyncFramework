@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>$(EfCoreTargetFramework)</TargetFramework>
+		<Configurations>Debug;Release</Configurations>
+		<PackageTags>Entity Framework Core entity-framework-core EF Data O/RM EntityFramework EntityFrameworkCore EFCore Data-Synchronization MySql Oracle</PackageTags>
+		<Description>SyncFramework delta generator and delta processor for Official MySQL (Oracle)</Description>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<DebugType>Full</DebugType>
+		<DebugSymbols>True</DebugSymbols>
+		<Platforms>AnyCPU;x64</Platforms>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\..\..\README.md" Link="README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+	<!--Nuget Generation Section Start-->
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<AssemblyName>BIT.Data.Sync.EfCore.MySql.v$(EfCoreNugetVersion)</AssemblyName>
+		<Version>$(EfCoreNugetVersion)</Version>
+		<PackageId>BIT.Data.Sync.EfCore.MySql</PackageId>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <AssemblyName>BIT.Data.Sync.EfCore.MySql.v$(EfCoreNugetVersion)</AssemblyName>
+	  <Version>$(EfCoreNugetVersion)</Version>
+	  <PackageId>BIT.Data.Sync.EfCore.MySql</PackageId>
+	</PropertyGroup>
+	<!--Nuget Generation Section End-->
+	<!--Nuget Reference Section Start-->
+	<ItemGroup>
+		<PackageReference Include="MySql.EntityFrameworkCore" Version="$(EfCoreMySqlVersion)" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="LICENSE.txt">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+	<!--NugetProject ReferencesSection End-->
+	<Target Name="CopyPackage" AfterTargets="Pack">
+		<Copy SourceFiles="bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" />
+	</Target>
+</Project>

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <IsPackable>false</IsPackable>
     <Configurations>Debug;Release;EasyTest</Configurations>
