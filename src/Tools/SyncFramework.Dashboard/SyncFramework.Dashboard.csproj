@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BIT.Data.Sync.AspNetCore\BIT.Data.Sync.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Sqlite\BIT.Data.Sync.EfCore.Sqlite.csproj" />
+    <ProjectReference Include="..\..\EntityFrameworkCore\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />
+    <ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
+  </ItemGroup>
+</Project>

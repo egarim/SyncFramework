@@ -1,0 +1,176 @@
+@page "/nodes/{NodeId}/replay"
+@rendermode InteractiveServer
+@using BIT.Data.Sync.Server
+@using BIT.Data.Sync
+@using Microsoft.EntityFrameworkCore
+@inject ISyncFrameworkServer SyncServer
+
+<h1 class="mb-1"><i class="bi bi-play-circle me-2"></i>Replay Deltas</h1>
+<p class="text-secondary mb-4">Apply all deltas from a node into a SQLite database.</p>
+
+@if (node == null)
+{
+    <div class="alert alert-warning">Node <strong>@NodeId</strong> not found.</div>
+    <a href="/" class="btn btn-outline-secondary">← Back</a>
+}
+else
+{
+    <div class="card shadow-sm mb-4" style="max-width: 600px;">
+        <div class="card-body">
+            <div class="mb-2">
+                <span class="text-secondary">Node:</span>
+                <strong class="ms-2">@NodeId</strong>
+            </div>
+            <div class="mb-3">
+                <span class="text-secondary">Available deltas:</span>
+                <span class="badge bg-primary ms-2">@deltaCount</span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Output SQLite Path</label>
+                <input class="form-control" @bind="outputPath" />
+                <div class="form-text">A fresh database will be created at this path.</div>
+            </div>
+
+            <button class="btn btn-success" @onclick="StartReplay" disabled="@(busy || deltaCount == 0)">
+                @if (busy)
+                {
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                    <span>Replaying...</span>
+                }
+                else
+                {
+                    <i class="bi bi-play-fill me-1"></i>
+                    <span>Start Replay</span>
+                }
+            </button>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(statusMessage))
+    {
+        <div class="alert @(isError ? "alert-danger" : "alert-success")">
+            <i class="bi @(isError ? "bi-x-circle" : "bi-check-circle") me-2"></i>
+            @statusMessage
+        </div>
+    }
+
+    @if (replayedDeltas.Any())
+    {
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold">Replayed Deltas (@replayedDeltas.Count)</div>
+            <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
+                <table class="table table-sm table-striped mb-0">
+                    <thead class="table-light sticky-top">
+                        <tr>
+                            <th>#</th>
+                            <th>Index</th>
+                            <th>Identity</th>
+                            <th>Data (preview)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var (delta, i) in replayedDeltas.Select((d, i) => (d, i + 1)))
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td><code class="small">@delta.Index</code></td>
+                                <td>@delta.Identity</td>
+                                <td class="text-truncate" style="max-width:200px;">
+                                    <small>@(delta.Operation != null ? $"{delta.Operation.Length} bytes" : "—")</small>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    <div class="mt-3">
+        <a href="/" class="btn btn-outline-secondary">← Back to Nodes</a>
+    </div>
+}
+
+@code {
+    [Parameter] public string NodeId { get; set; } = "";
+
+    private IServerSyncEndpoint? node;
+    private string outputPath = "";
+    private int deltaCount = 0;
+    private bool busy = false;
+    private string statusMessage = "";
+    private bool isError = false;
+    private List<IDelta> replayedDeltas = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        node = SyncServer.Nodes.FirstOrDefault(n => n.NodeId == NodeId);
+        if (node != null)
+        {
+            outputPath = $"/tmp/{NodeId}-replay.db";
+            try
+            {
+                deltaCount = await node.DeltaStore.GetDeltaCountAsync(string.Empty, string.Empty, default);
+            }
+            catch { deltaCount = 0; }
+        }
+    }
+
+    private async Task StartReplay()
+    {
+        statusMessage = "";
+        isError = false;
+        replayedDeltas.Clear();
+        busy = true;
+
+        try
+        {
+            // Delete existing file for a clean replay
+            if (File.Exists(outputPath))
+                File.Delete(outputPath);
+
+            // Fetch all deltas from the node
+            var deltas = (await node!.DeltaStore.GetDeltasAsync(string.Empty, default)).ToList();
+
+            if (!deltas.Any())
+            {
+                statusMessage = "No deltas to replay.";
+                return;
+            }
+
+            // Write deltas to a simple SQLite DB using EF Core
+            var options = new DbContextOptionsBuilder<ReplayDbContext>()
+                .UseSqlite($"Data Source={outputPath}")
+                .Options;
+
+            await using var ctx = new ReplayDbContext(options);
+            await ctx.Database.EnsureCreatedAsync();
+
+            foreach (var delta in deltas)
+            {
+                ctx.ReplayedDeltas.Add(new ReplayedDeltaRecord
+                {
+                    DeltaId = delta.DeltaId,
+                    Index = delta.Index,
+                    Identity = delta.Identity,
+                    OperationSize = delta.Operation?.Length ?? 0,
+                    OperationBase64 = delta.Operation != null ? Convert.ToBase64String(delta.Operation) : null
+                });
+            }
+
+            await ctx.SaveChangesAsync();
+            replayedDeltas = deltas;
+            statusMessage = $"Done — {deltas.Count} delta(s) replayed into {outputPath}";
+        }
+        catch (Exception ex)
+        {
+            isError = true;
+            statusMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+}

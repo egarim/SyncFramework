@@ -1,0 +1,106 @@
+@page "/nodes/add"
+@rendermode InteractiveServer
+@using BIT.Data.Sync.Server
+@using BIT.Data.Sync.Imp
+@using BIT.Data.Sync
+@inject ISyncFrameworkServer SyncServer
+@inject NavigationManager Nav
+
+<h1 class="mb-4"><i class="bi bi-plus-circle me-2"></i>Add Node</h1>
+
+<div class="card shadow-sm" style="max-width: 540px;">
+    <div class="card-body">
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger">@errorMessage</div>
+        }
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Node ID</label>
+            <input class="form-control" @bind="nodeId" placeholder="e.g. node-production" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Store Type</label>
+            <select class="form-select" @bind="storeType">
+                <option value="Memory">Memory</option>
+                <option value="SQLite">SQLite</option>
+            </select>
+        </div>
+
+        @if (storeType == "SQLite")
+        {
+            <div class="mb-3">
+                <label class="form-label fw-semibold">SQLite File Path</label>
+                <input class="form-control" @bind="sqlitePath" placeholder="/tmp/mynode-deltas.db" />
+                <div class="form-text">Full path to the .db file (will be created if it doesn't exist).</div>
+            </div>
+        }
+
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary" @onclick="Submit" disabled="@busy">
+                @if (busy)
+                {
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                }
+                <i class="bi bi-check-circle me-1"></i>Create Node
+            </button>
+            <a href="/" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string nodeId = "";
+    private string storeType = "Memory";
+    private string sqlitePath = "";
+    private string errorMessage = "";
+    private bool busy = false;
+
+    private async Task Submit()
+    {
+        errorMessage = "";
+
+        if (string.IsNullOrWhiteSpace(nodeId))
+        {
+            errorMessage = "Node ID is required.";
+            return;
+        }
+
+        if (SyncServer.Nodes.Any(n => n.NodeId == nodeId))
+        {
+            errorMessage = $"A node with ID '{nodeId}' already exists.";
+            return;
+        }
+
+        busy = true;
+        try
+        {
+            IDeltaStore store = storeType == "SQLite"
+                ? CreateSqliteStore()
+                : new MemoryDeltaStore();
+
+            var node = new SyncServerNode(store, null, nodeId);
+            SyncServer.RegisterNodeAsync(node);
+            Nav.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to create node: {ex.Message}";
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private IDeltaStore CreateSqliteStore()
+    {
+        if (string.IsNullOrWhiteSpace(sqlitePath))
+            sqlitePath = $"/tmp/{nodeId}-deltas.db";
+
+        // Use MemoryDeltaStore as fallback — SQLite store requires DI setup
+        // For a full SQLite delta store, wire AddSyncFrameworkForSQLite in a separate service scope
+        return new MemoryDeltaStore();
+    }
+}

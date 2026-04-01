@@ -1,0 +1,34 @@
+@inherits LayoutComponentBase
+
+<div class="d-flex flex-column min-vh-100">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+        <a class="navbar-brand fw-bold" href="/">
+            <i class="bi bi-arrow-repeat me-2"></i>SyncFramework
+        </a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+                        <i class="bi bi-server me-1"></i>Nodes
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/nodes/add">
+                        <i class="bi bi-plus-circle me-1"></i>Add Node
+                    </NavLink>
+                </li>
+            </ul>
+            <span class="navbar-text text-secondary small">Dashboard v10.0</span>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="flex-grow-1 p-4">
+        @Body
+    </main>
+
+    <footer class="text-center text-secondary small py-2 border-top">
+        SyncFramework Dashboard — running on .NET 10
+    </footer>
+</div>
