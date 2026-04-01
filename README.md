@@ -130,7 +130,7 @@ public class SyncController : SyncControllerBase
 
 ```bash
 cd src/Tools/SyncFramework.Dashboard
-dotnet run
+ASPNETCORE_ENVIRONMENT=Development dotnet run
 # Open http://localhost:5000
 ```
 
@@ -139,6 +139,17 @@ dotnet run
 | Nodes | `/` | View all active nodes and delta counts |
 | Add Node | `/nodes/add` | Spin up a new node (Memory or SQLite) |
 | Replay | `/nodes/{id}/replay` | Replay a node's deltas into a SQLite file |
+
+### Screenshots
+
+**Nodes — overview of all active sync nodes**
+![Nodes page](docs/screenshots/dashboard-nodes.png)
+
+**Add Node — spin up a new node with store type selection**
+![Add Node page](docs/screenshots/dashboard-add-node-filled.png)
+
+**Replay — apply a node's deltas into a local SQLite file**
+![Replay page](docs/screenshots/dashboard-replay.png)
 
 ---
 
