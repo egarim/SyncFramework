@@ -30,6 +30,7 @@
 	<!--Nuget Reference Section Start-->
 	<ItemGroup>
 		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="$(EfCorePomeloMysqlVersion)" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfCoreVersion)" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\BIT.Data.Sync.EfCore\BIT.Data.Sync.EfCore.csproj" />

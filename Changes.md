@@ -1,4 +1,25 @@
-﻿## Version 2.0.1-beta
+﻿## Version 10.0.0
+
+### MySQL Provider: Migrated from Pomelo to Official Oracle MySQL Driver
+- **Replaced** `Pomelo.EntityFrameworkCore.MySql` (9.0.0, incompatible with EF Core 10) with `MySql.EntityFrameworkCore` (10.0.1, official Oracle driver) across the entire solution
+- **Added** `MySqlDeltaGenerator` in `BIT.Data.Sync.EfCore.MySql` — uses reflection to instantiate internal Oracle MySQL EF Core types (`MySQLUpdateSqlGenerator`, `MySQLSqlGenerationHelper`, `MySQLTypeMappingSource`)
+- **Added** `MySqlOfficial` alias in `SyncFrameworkDbContextExtensions` for the Oracle MySQL update SQL generator type
+- **Added** `AddEntityFrameworkMySQL()` registration in `AddSyncFrameworkForMySql` extension (required for `IUpdateSqlGenerator` to resolve correctly in the sync DI container)
+- **Updated** `EfCoreMySqlVersion` to `10.0.1` in `Directory.Build.props`
+- **Fixed** `BIT.Data.Sync.EfCore.Pomelo.MySql` build error (NU1107 version conflict) by adding direct `Microsoft.EntityFrameworkCore.Relational` reference — Pomelo package is retained in solution but no longer used in tests
+
+### Test Fixes
+- **Fixed** test isolation bug in `EfDeltaStoreTests` — `SetAndGetLastProcessedDelta_Test` and `GetDeltasAsync_Test` were sharing the same in-memory database name (`nameof(SaveDeltasAsync_Test)`), causing count failures when tests ran in certain orders. Each test now uses its own database name.
+- **Fixed** `LoadConnectionStrings` in `AllDatabaseTests` — changed `EnvironmentVariableTarget.User` to default (process-level) so connection strings load correctly on Linux
+- **Updated** `AllDatabaseTests` to use `UseMySQL()`, `MySqlDeltaGenerator`, and `AddSyncFrameworkForMySql` (official provider API)
+
+### Test Results (all 6 passing on .NET 10 against real databases)
+- SQL Server 2022 (master node)
+- SQLite (node A)
+- PostgreSQL 16 (node B)
+- MySQL 8.0 (node C / official Oracle driver)
+
+## Version 2.0.1-beta
 
 -IDeltaStore added Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken)
 -ISyncServer added Task<IDelta> GetDeltaAsync(string nodeId, string deltaId, CancellationToken cancellationToken)

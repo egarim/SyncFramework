@@ -1,7 +1,7 @@
 using BIT.Data.Sync;
 using BIT.Data.Sync.Client;
 using BIT.Data.Sync.EfCore.Npgsql;
-using BIT.Data.Sync.EfCore.Pomelo.MySql;
+using BIT.Data.Sync.EfCore.MySql;
 using BIT.Data.Sync.EfCore.SQLite;
 using BIT.Data.Sync.EfCore.SqlServer;
 using BIT.Data.Sync.EfCore.Tests.Contexts.SyncFramework;
@@ -13,7 +13,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MySqlConnector;
+using MySql.Data.MySqlClient;
 using Npgsql;
 using NUnit.Framework;
 using System;
@@ -43,7 +43,7 @@ namespace BIT.Data.Sync.EfCore.Tests
         private DbContextOptionsBuilder node_AContextOptionBuilder = new DbContextOptionsBuilder();
         private DbContextOptionsBuilder node_BContextOptionBuilder = new DbContextOptionsBuilder();
         private DbContextOptionsBuilder node_CContextOptionBuilder = new DbContextOptionsBuilder();
-        private MySqlServerVersion serverVersion;
+
         private TestClientFactory HttpClientFactory;
         #endregion
 
@@ -54,9 +54,6 @@ namespace BIT.Data.Sync.EfCore.Tests
             // Load connection strings from environment variables
             LoadConnectionStrings();
 
-            // Set MySQL server version
-            serverVersion = new MySqlServerVersion(new Version(8, 0, 31));
-
             base.Setup();
             HttpClientFactory = this.GetTestClientFactory();
 
@@ -64,19 +61,19 @@ namespace BIT.Data.Sync.EfCore.Tests
             masterContextOptionBuilder.UseSqlServer(SqlServerSyncFrameworkTestCnx);
             node_AContextOptionBuilder.UseSqlite(SQLiteSyncFrameworkTestCnx);
             node_BContextOptionBuilder.UseNpgsql(PostgresSyncFrameworkTestCnx);
-            node_CContextOptionBuilder.UseMySql(MySQLSyncFrameworkTestCnx, serverVersion);
+            node_CContextOptionBuilder.UseMySQL(MySQLSyncFrameworkTestCnx);
         }
 
         private void LoadConnectionStrings()
         {
-            SqlServerSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSyncFrameworkTestCnx), EnvironmentVariableTarget.User);
-            SqlServerSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
-            PostgresSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(PostgresSyncFrameworkTestCnx), EnvironmentVariableTarget.User);
-            PostgresSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(PostgresSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
-            SQLiteSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SQLiteSyncFrameworkTestCnx), EnvironmentVariableTarget.User);
-            SQLiteSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(SQLiteSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
-            MySQLSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestCnx), EnvironmentVariableTarget.User);
-            MySQLSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestDeltaCnx), EnvironmentVariableTarget.User);
+            SqlServerSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSyncFrameworkTestCnx));
+            SqlServerSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(SqlServerSyncFrameworkTestDeltaCnx));
+            PostgresSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(PostgresSyncFrameworkTestCnx));
+            PostgresSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(PostgresSyncFrameworkTestDeltaCnx));
+            SQLiteSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(SQLiteSyncFrameworkTestCnx));
+            SQLiteSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(SQLiteSyncFrameworkTestDeltaCnx));
+            MySQLSyncFrameworkTestCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestCnx));
+            MySQLSyncFrameworkTestDeltaCnx = Environment.GetEnvironmentVariable(nameof(MySQLSyncFrameworkTestDeltaCnx));
         }
 
         private void CleanupDatabases()
@@ -177,7 +174,7 @@ namespace BIT.Data.Sync.EfCore.Tests
         #endregion
 
         #region Service Configuration
-        private ServiceProvider ConfigureServices(string nodeType, HttpClient client, string connectionString, MySqlServerVersion mysqlVersion = null)
+        private ServiceProvider ConfigureServices(string nodeType, HttpClient client, string connectionString)
         {
             ServiceCollection services = new ServiceCollection();
             DeltaGeneratorBase[] deltaGenerators = GetDeltaGenerators();
@@ -194,7 +191,7 @@ namespace BIT.Data.Sync.EfCore.Tests
                     services.AddSyncFrameworkForNpgsql(connectionString, client, "MemoryDeltaStore1", nodeType, deltaGenerators);
                     break;
                 case "Node C":
-                    services.AddSyncFrameworkForMysql(connectionString, mysqlVersion, client, "MemoryDeltaStore1", nodeType, deltaGenerators);
+                    services.AddSyncFrameworkForMySql(connectionString, client, "MemoryDeltaStore1", nodeType, deltaGenerators);
                     break;
                 default:
                     throw new ArgumentException("Unknown node type", nameof(nodeType));
@@ -212,7 +209,7 @@ namespace BIT.Data.Sync.EfCore.Tests
             List<DeltaGeneratorBase> deltaGenerators = new List<DeltaGeneratorBase>
             {
                 new NpgsqlDeltaGenerator(),
-                new PomeloMySqlDeltaGenerator(serverVersion),
+                new MySqlDeltaGenerator(),
                 new SqliteDeltaGenerator(),
                 new SqlServerDeltaGenerator()
             };
@@ -243,7 +240,7 @@ namespace BIT.Data.Sync.EfCore.Tests
             var masterServiceProvider = ConfigureServices("Master", masterHttpClient, SqlServerSyncFrameworkTestDeltaCnx);
             var nodeAServiceProvider = ConfigureServices("Node A", nodeAHttpClient, SQLiteSyncFrameworkTestDeltaCnx);
             var nodeBServiceProvider = ConfigureServices("Node B", nodeBHttpClient, PostgresSyncFrameworkTestDeltaCnx);
-            var nodeCServiceProvider = ConfigureServices("Node C", nodeCHttpClient, MySQLSyncFrameworkTestDeltaCnx, serverVersion);
+            var nodeCServiceProvider = ConfigureServices("Node C", nodeCHttpClient, MySQLSyncFrameworkTestDeltaCnx);
 
             // Create contexts
             var masterContext = new TestSyncFrameworkDbContext(masterContextOptionBuilder.Options, masterServiceProvider);

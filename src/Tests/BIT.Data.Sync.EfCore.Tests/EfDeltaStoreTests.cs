@@ -57,7 +57,7 @@ namespace BIT.Data.Sync.EfCore.Tests
 
 
             var options = new DbContextOptionsBuilder<DeltaDbContext>()
-                        .UseInMemoryDatabase(databaseName: nameof(SaveDeltasAsync_Test))
+                        .UseInMemoryDatabase(databaseName: nameof(SetAndGetLastProcessedDelta_Test))
                         .Options;
 
             DeltaDbContext deltaDbContext = new(options);
@@ -82,7 +82,7 @@ namespace BIT.Data.Sync.EfCore.Tests
         public async Task GetDeltasAsync_Test()
         {
             var options = new DbContextOptionsBuilder<DeltaDbContext>()
-                                   .UseInMemoryDatabase(databaseName: nameof(SaveDeltasAsync_Test))
+                                   .UseInMemoryDatabase(databaseName: nameof(GetDeltasAsync_Test))
                                    .Options;
 
             DeltaDbContext deltaDbContext = new(options);

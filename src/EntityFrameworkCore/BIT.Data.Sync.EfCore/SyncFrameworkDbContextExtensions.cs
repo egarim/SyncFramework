@@ -47,6 +47,7 @@ namespace Microsoft.Extensions.DependencyInjection
             KnownUpdaters.Add("Microsoft.EntityFrameworkCore.SqlServer.Update.Internal.SqlServerUpdateSqlGenerator", "SqlServer");
             KnownUpdaters.Add("Npgsql.EntityFrameworkCore.PostgreSQL.Update.Internal.NpgsqlUpdateSqlGenerator", "Postgres");
             KnownUpdaters.Add("Pomelo.EntityFrameworkCore.MySql.Update.Internal.MySqlUpdateSqlGenerator", "MySqlPomelo");
+            KnownUpdaters.Add("MySql.EntityFrameworkCore.MySQLUpdateSqlGenerator", "MySqlOfficial");
             serviceCollection.AddSingleton<IUpdaterAliasService>(new UpdaterAliasService(KnownUpdaters));
             return serviceCollection;
 

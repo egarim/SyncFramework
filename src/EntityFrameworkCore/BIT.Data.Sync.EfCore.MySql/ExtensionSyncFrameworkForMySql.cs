@@ -1,6 +1,7 @@
 using BIT.EfCore.Sync;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using MySql.EntityFrameworkCore.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace Microsoft.Extensions.DependencyInjection
             ServerNodeId, 
             Identity,
             AdditionalDeltaGenerators);
+            serviceCollection.AddEntityFrameworkMySQL();
             return serviceCollection;
         }
     }

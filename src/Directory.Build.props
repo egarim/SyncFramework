@@ -22,7 +22,7 @@
 	<PropertyGroup Label="BIT.Data.Sync.EfCore.ProvidersVersion">
 		<EfCorePostgresVersion>10.0.0</EfCorePostgresVersion>
 		<EfCorePomeloMysqlVersion>9.0.0</EfCorePomeloMysqlVersion>
-		<EfCoreMySqlVersion>9.0.0</EfCoreMySqlVersion>
+		<EfCoreMySqlVersion>10.0.1</EfCoreMySqlVersion>
 		<EfCoreSqliteVersion>10.0.0</EfCoreSqliteVersion>
 		<EfCoreSqlServerVersion>10.0.0</EfCoreSqlServerVersion>
 	</PropertyGroup>
