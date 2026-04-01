@@ -21,7 +21,10 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
 }
 
-app.UseStaticFiles();
+if (app.Environment.IsDevelopment())
+    app.MapStaticAssets();
+else
+    app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapControllers();
