@@ -74,7 +74,8 @@ dotnet add package BIT.Data.Sync.EfCore.MySql        # MySQL (Oracle)
 
 ```csharp
 var services = new ServiceCollection();
-var httpClient = new HttpClient { BaseAddress = new Uri("https://your-sync-server/") };
+// The base address ends at the controller's route (here SyncController → /sync/); the client appends Push, Fetch and HandShake.
+var httpClient = new HttpClient { BaseAddress = new Uri("https://your-sync-server/sync/") };
 
 services.AddSyncFrameworkForSQLite(
     connectionString: "Data Source=deltas.db;",

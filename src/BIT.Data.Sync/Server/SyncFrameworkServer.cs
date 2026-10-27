@@ -49,7 +49,6 @@ namespace BIT.Data.Sync.Server
         public Func<RegisterNodeRequest, IServerSyncEndpoint> RegisterNodeFunction { get; set; }
 
   
-        Func<RegisterNodeRequest, IServerSyncEndpoint> ISyncFrameworkServer.RegisterNodeFunction { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public event EventHandler<ServerSavingDeltaEventArgs> ServerSavingDelta;
         public event EventHandler<ServerSavedDeltaEventArgs> ServerSavedDelta;

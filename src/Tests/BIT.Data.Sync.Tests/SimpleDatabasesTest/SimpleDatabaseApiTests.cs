@@ -67,9 +67,10 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
                 await B_Database.Add(Mir);
 
                 //7 - Push deltas to the server
-                await Master.PushAsync();
-                await A_Database.PushAsync();
-                await B_Database.PushAsync();
+                foreach (var pushed in new[] { await Master.PushAsync(), await A_Database.PushAsync(), await B_Database.PushAsync() })
+                {
+                    Assert.IsTrue(pushed.Success, pushed.Message);
+                }
 
                 //8 - Pull deltas from server
               var mr=   await Master.PullAsync();
