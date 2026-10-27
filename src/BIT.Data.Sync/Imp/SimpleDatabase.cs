@@ -40,7 +40,7 @@ namespace BIT.Data.Sync.Imp
         {
 
         }
-        public async void Update(SimpleDatabaseRecord Instance)
+        public async Task Update(SimpleDatabaseRecord Instance)
         {
             var ObjectToUpdate = Data.FirstOrDefault(x => x.Key == Instance.Key);
             if (ObjectToUpdate != null)
@@ -67,7 +67,7 @@ namespace BIT.Data.Sync.Imp
             }
         }
 
-        public async void Delete(SimpleDatabaseRecord Instance)
+        public async Task Delete(SimpleDatabaseRecord Instance)
         {
             var ObjectToDelete=  Data.FirstOrDefault(x=>x.Key==Instance.Key);
             if(ObjectToDelete!=null)

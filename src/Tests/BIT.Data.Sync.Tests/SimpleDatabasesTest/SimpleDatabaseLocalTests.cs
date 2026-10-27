@@ -107,9 +107,9 @@ namespace BIT.Data.Sync.Tests.SimpleDatabasesTest
 
 
             //16 - Delete and update records in the master database
-            Master.Delete(Hola);
+            await Master.Delete(Hola);
             Mundo.Text = "HOLA MUNDO";
-            Master.Update(Mundo);
+            await Master.Update(Mundo);
 
             //17 - Get deltas from the master and process them on the other nodes 
             await A_DeltaProcessor.ProcessDeltasAsync(await Master.DeltaStore.GetDeltasAsync(A_LastIndexProcessed, default), default);

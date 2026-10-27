@@ -123,6 +123,22 @@ public class SyncController : SyncControllerBase
 }
 ```
 
+
+### In-process server (tests, simulations)
+
+The server needs no HTTP. `SyncFrameworkInMemoryClient` talks to an `ISyncFrameworkServer` in the same process and behaves like the HTTP client:
+
+```csharp
+var server = new SyncFrameworkServer(new SyncServerNode(new MemoryDeltaStore(), null, "node1"));
+
+var a = new SimpleDatabase("A", new SyncFrameworkInMemoryClient(server, "node1"));
+var b = new SimpleDatabase("B", new SyncFrameworkInMemoryClient(server, "node1"));
+
+await a.Add(new SimpleDatabaseRecord { Key = Guid.NewGuid(), Text = "Hello" });
+await a.PushAsync();
+await b.PullAsync();   // b now has "Hello"
+```
+
 ---
 
 ## Dashboard
