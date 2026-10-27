@@ -22,7 +22,7 @@
 	<!--Nuget Generation Section End-->
 	<!--Nuget Reference Section Start-->
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\BIT.Data.Sync\BIT.Data.Sync.csproj" />

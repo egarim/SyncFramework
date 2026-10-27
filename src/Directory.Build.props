@@ -16,14 +16,14 @@
 	<PropertyGroup Label="BIT.Data.Sync.EfCore">
 		<EfCoreTargetFramework>net10.0</EfCoreTargetFramework>
 		<EfCoreNugetVersion>10.0.0</EfCoreNugetVersion>
-		<EfCoreVersion>10.0.0</EfCoreVersion>
+		<EfCoreVersion>10.0.14</EfCoreVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Label="BIT.Data.Sync.EfCore.ProvidersVersion">
-		<EfCorePostgresVersion>10.0.0</EfCorePostgresVersion>
+		<EfCorePostgresVersion>10.0.3</EfCorePostgresVersion>
 		<EfCorePomeloMysqlVersion>9.0.0</EfCorePomeloMysqlVersion>
-		<EfCoreMySqlVersion>10.0.1</EfCoreMySqlVersion>
-		<EfCoreSqliteVersion>10.0.0</EfCoreSqliteVersion>
-		<EfCoreSqlServerVersion>10.0.0</EfCoreSqlServerVersion>
+		<EfCoreMySqlVersion>10.0.12</EfCoreMySqlVersion>
+		<EfCoreSqliteVersion>10.0.14</EfCoreSqliteVersion>
+		<EfCoreSqlServerVersion>10.0.14</EfCoreSqlServerVersion>
 	</PropertyGroup>
 </Project>

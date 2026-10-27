@@ -53,6 +53,18 @@ namespace BIT.Data.Sync.EfCore.Tests
         {
             // Load connection strings from environment variables
             LoadConnectionStrings();
+            var missing = new[]
+            {
+                (nameof(SqlServerSyncFrameworkTestCnx), SqlServerSyncFrameworkTestCnx),
+                (nameof(SQLiteSyncFrameworkTestCnx), SQLiteSyncFrameworkTestCnx),
+                (nameof(PostgresSyncFrameworkTestCnx), PostgresSyncFrameworkTestCnx),
+                (nameof(MySQLSyncFrameworkTestCnx), MySQLSyncFrameworkTestCnx),
+            }.Where(c => string.IsNullOrWhiteSpace(c.Item2)).Select(c => c.Item1).ToList();
+            if (missing.Count > 0)
+            {
+                // These tests need live SQL Server, PostgreSQL and MySQL databases; without their connection strings they are skipped, not failed.
+                Assert.Ignore($"Set {string.Join(", ", missing)} to run the cross-database tests.");
+            }
 
             base.Setup();
             HttpClientFactory = this.GetTestClientFactory();

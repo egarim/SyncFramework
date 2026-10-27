@@ -46,6 +46,7 @@ namespace Microsoft.Extensions.DependencyInjection
             KnownUpdaters.Add("Microsoft.EntityFrameworkCore.Sqlite.Update.Internal.SqliteUpdateSqlGenerator", "Sqlite");
             KnownUpdaters.Add("Microsoft.EntityFrameworkCore.SqlServer.Update.Internal.SqlServerUpdateSqlGenerator", "SqlServer");
             KnownUpdaters.Add("Npgsql.EntityFrameworkCore.PostgreSQL.Update.Internal.NpgsqlUpdateSqlGenerator", "Postgres");
+            // Pomelo's adapter was removed (no EF Core 10 release); its alias stays so deltas stored by Pomelo clients remain readable.
             KnownUpdaters.Add("Pomelo.EntityFrameworkCore.MySql.Update.Internal.MySqlUpdateSqlGenerator", "MySqlPomelo");
             KnownUpdaters.Add("MySql.EntityFrameworkCore.MySQLUpdateSqlGenerator", "MySqlOfficial");
             serviceCollection.AddSingleton<IUpdaterAliasService>(new UpdaterAliasService(KnownUpdaters));

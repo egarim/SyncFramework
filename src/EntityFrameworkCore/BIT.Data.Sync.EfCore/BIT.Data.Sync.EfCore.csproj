@@ -32,7 +32,7 @@
 	<!--Nuget Generation Section End-->
 	<!--Nuget Reference Section Start-->
 	<ItemGroup>
-		<PackageReference Include="JetBrains.Annotations" Version="2021.2.0" />
+		<PackageReference Include="JetBrains.Annotations" Version="2026.2.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="$(EfCoreVersion)" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfCoreVersion)" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EfCoreVersion)" />
