@@ -21,6 +21,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **`BIT.Data.Sync.EfCore.Pomelo.MySql`**, finishing the move to the official MySQL driver that 10.0.0 started: Pomelo has no EF Core 10 release. The playground and the Studio now use `MySqlDeltaGenerator` from `BIT.Data.Sync.EfCore.MySql`, which is also now in `All.sln`. The `MySqlPomelo` updater alias stays so deltas stored by Pomelo clients remain readable.
 
 ### Fixed
+- `MemoryDeltaStore`: a client that pulled before its first push had its push cursor set to the server's index, which counts ahead of the client's own, so its deltas were never pushed. A pull now sets only the pull cursor, and an identity with no push yet reads as nothing pushed. Found while syncing Creatura's work ledger; covered by `ADatabaseThatPullsBeforeItsFirstPushStillPushesAllItsDeltas`.
 - `SyncFrameworkServer`: the explicit `ISyncFrameworkServer.RegisterNodeFunction` threw `NotImplementedException`, so the server failed when used through its interface.
 - `SyncFrameworkHttpClient.PushAsync` returned `null` on a non-success HTTP status; it now returns a failed response with the status and body.
 - `MemoryDeltaStore`: a push moved the pull cursor to the client's own push index, so after pushing a client skipped other clients' deltas with lower server indexes; and the pull cursor came back `null` for a status created by a push.
