@@ -56,6 +56,15 @@ namespace BIT.Data.Sync.Client
                     //pushOperationResponse= JsonSerializer.Deserialize<PushOperationResponse>(content);
 
                 }
+                else
+                {
+                    string body = await httpResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    pushOperationResponse = new PushOperationResponse
+                    {
+                        Success = false,
+                        Message = $"The server answered {(int)httpResponseMessage.StatusCode} {httpResponseMessage.ReasonPhrase} to the push. {body}".Trim()
+                    };
+                }
                 return pushOperationResponse;
             }
             catch (Exception ex)

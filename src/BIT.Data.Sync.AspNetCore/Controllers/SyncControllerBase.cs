@@ -78,14 +78,20 @@ namespace BIT.Data.Sync.AspNetCore.Controllers
             catch (ArgumentNullException argEx)
             {
                 _logger.LogError(argEx, "An argument null exception occurred.");
+                pushOperationResponse.Success = false;
+                pushOperationResponse.Message = argEx.Message;
             }
             catch (InvalidOperationException invOpEx)
             {
                 _logger.LogError(invOpEx, "An invalid operation exception occurred.");
+                pushOperationResponse.Success = false;
+                pushOperationResponse.Message = invOpEx.Message;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unknown exception occurred.");
+                pushOperationResponse.Success = false;
+                pushOperationResponse.Message = ex.Message;
             }
             DataContractJsonSerializer js = new DataContractJsonSerializer(typeof(PushOperationResponse));
             MemoryStream msObj = new MemoryStream();

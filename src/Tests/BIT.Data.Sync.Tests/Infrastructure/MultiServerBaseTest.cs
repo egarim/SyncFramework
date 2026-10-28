@@ -44,6 +44,8 @@ namespace BIT.Data.Sync.Tests.Infrastructure
 
             });
             var testClient = _testServer.CreateClient();
+            // The sync controller is routed at /sync (SyncController); the client's relative URIs (Push, Fetch, HandShake) resolve under it.
+            testClient.BaseAddress = new System.Uri("http://localhost/sync/");
             var testServerHttpClientFactory = new TestClientFactory(testClient);
             return testServerHttpClientFactory;
         }

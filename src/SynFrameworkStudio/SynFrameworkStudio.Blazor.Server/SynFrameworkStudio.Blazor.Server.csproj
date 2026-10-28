@@ -29,7 +29,7 @@
     <PackageReference Include="DevExpress.ExpressApp.Security.Xpo" Version="25.1.1-alpha" />
     <PackageReference Include="DevExpress.ExpressApp.Validation" Version="25.1.1-alpha" />
     <PackageReference Include="DevExpress.ExpressApp.Validation.Blazor" Version="25.1.1-alpha" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.14" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.9.0" />
   </ItemGroup>

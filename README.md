@@ -74,7 +74,8 @@ dotnet add package BIT.Data.Sync.EfCore.MySql        # MySQL (Oracle)
 
 ```csharp
 var services = new ServiceCollection();
-var httpClient = new HttpClient { BaseAddress = new Uri("https://your-sync-server/") };
+// The base address ends at the controller's route (here SyncController → /sync/); the client appends Push, Fetch and HandShake.
+var httpClient = new HttpClient { BaseAddress = new Uri("https://your-sync-server/sync/") };
 
 services.AddSyncFrameworkForSQLite(
     connectionString: "Data Source=deltas.db;",
@@ -120,6 +121,22 @@ public class SyncController : SyncControllerBase
     public SyncController(ILogger<SyncControllerBase> logger, ISyncFrameworkServer server)
         : base(logger, server) { }
 }
+```
+
+
+### In-process server (tests, simulations)
+
+The server needs no HTTP. `SyncFrameworkInMemoryClient` talks to an `ISyncFrameworkServer` in the same process and behaves like the HTTP client:
+
+```csharp
+var server = new SyncFrameworkServer(new SyncServerNode(new MemoryDeltaStore(), null, "node1"));
+
+var a = new SimpleDatabase("A", new SyncFrameworkInMemoryClient(server, "node1"));
+var b = new SimpleDatabase("B", new SyncFrameworkInMemoryClient(server, "node1"));
+
+await a.Add(new SimpleDatabaseRecord { Key = Guid.NewGuid(), Text = "Hello" });
+await a.PushAsync();
+await b.PullAsync();   // b now has "Hello"
 ```
 
 ---

@@ -2,7 +2,6 @@ using BIT.Data.Sync.Imp;
 using BIT.EfCore.Sync;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;

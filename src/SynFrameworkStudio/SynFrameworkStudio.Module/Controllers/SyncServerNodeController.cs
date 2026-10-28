@@ -1,6 +1,6 @@
 ﻿using BIT.Data.Sync;
 using BIT.Data.Sync.EfCore.Npgsql;
-using BIT.Data.Sync.EfCore.Pomelo.MySql;
+using BIT.Data.Sync.EfCore.MySql;
 using BIT.Data.Sync.EfCore.SQLite;
 using BIT.Data.Sync.EfCore.SqlServer;
 using BIT.Data.Sync.Imp;
@@ -102,11 +102,10 @@ namespace SynFrameworkStudio.Module.Controllers
 
             //ContextBuilder.UseSqlite("Data Source=EfSqlite_Data.db");
 
-            var serverVersion = new MySqlServerVersion(new Version(8, 0, 31));
 
             List<DeltaGeneratorBase> DeltaGenerators = new List<DeltaGeneratorBase>();
             DeltaGenerators.Add(new NpgsqlDeltaGenerator());
-            DeltaGenerators.Add(new PomeloMySqlDeltaGenerator(serverVersion));
+            DeltaGenerators.Add(new MySqlDeltaGenerator());
             DeltaGenerators.Add(new SqliteDeltaGenerator());
             DeltaGenerators.Add(new SqlServerDeltaGenerator());
             DeltaGeneratorBase[] additionalDeltaGenerators = DeltaGenerators.ToArray();

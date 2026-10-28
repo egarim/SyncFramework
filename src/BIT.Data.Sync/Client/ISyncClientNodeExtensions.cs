@@ -46,7 +46,8 @@ namespace Microsoft.Extensions.DependencyInjection
             if (Deltas.Any())
             {
                 var Max = Deltas.Max(d => d.Index);
-                Response = await instance.SyncFrameworkClient.PushAsync(Deltas, cancellationToken).ConfigureAwait(false);
+                Response = await instance.SyncFrameworkClient.PushAsync(Deltas, cancellationToken).ConfigureAwait(false)
+                    ?? new PushOperationResponse { Success = false, Message = "The sync client returned no response to the push." };
                 if(Response.Success)
                     await instance.DeltaStore.SetLastPushedDeltaAsync(Max, instance.Identity, cancellationToken).ConfigureAwait(false);
             }

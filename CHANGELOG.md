@@ -5,6 +5,34 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [Unreleased]
+
+### Added
+- **`SyncFrameworkInMemoryClient`** (`BIT.Data.Sync.Client`): an `ISyncFrameworkClient` that talks to an `ISyncFrameworkServer` in the same process, with no HTTP. It answers Push, Fetch and HandShake as `SyncControllerBase` does and copies deltas at the boundary, as serialization would. For tests, simulations and apps that host their own server.
+- `InMemorySyncServerTests`: three databases converge through an in-memory server; updates and deletes propagate; pushing never renumbers a client's own deltas; an unknown node fails with a message.
+
+### Changed
+- Packages updated to the latest stable .NET 10 releases: EF Core 10.0.14, Npgsql EF 10.0.3, MySql.EntityFrameworkCore 10.0.12, ASP.NET Core 10.0.14, test SDK 18.11.0, NUnit 3.14.0 (NUnit 4+ would need the classic asserts rewritten), MudBlazor 8.15.0.
+- `BIT.Data.Sync.AspNetCore` uses the shared framework (`Microsoft.AspNetCore.App`) instead of `Microsoft.AspNetCore.Mvc.Core` 2.2.5.
+- **Breaking (binary):** `SimpleDatabase.Update` and `Delete` return `Task` instead of `async void`, so callers can await them and see their exceptions. Source-compatible; already-compiled callers of these two methods must be rebuilt.
+- The cross-database EF Core tests are skipped, with the missing connection strings named, instead of failing when SQL Server, PostgreSQL and MySQL are not available.
+
+### Removed
+- **`BIT.Data.Sync.EfCore.Pomelo.MySql`**, finishing the move to the official MySQL driver that 10.0.0 started: Pomelo has no EF Core 10 release. The playground and the Studio now use `MySqlDeltaGenerator` from `BIT.Data.Sync.EfCore.MySql`, which is also now in `All.sln`. The `MySqlPomelo` updater alias stays so deltas stored by Pomelo clients remain readable.
+
+### Fixed
+- `SyncFrameworkServer`: the explicit `ISyncFrameworkServer.RegisterNodeFunction` threw `NotImplementedException`, so the server failed when used through its interface.
+- `SyncFrameworkHttpClient.PushAsync` returned `null` on a non-success HTTP status; it now returns a failed response with the status and body.
+- `MemoryDeltaStore`: a push moved the pull cursor to the client's own push index, so after pushing a client skipped other clients' deltas with lower server indexes; and the pull cursor came back `null` for a status created by a push.
+- `SyncControllerBase.Push` returned `Success = false` with no message for three kinds of exception.
+- The solution did not build: `SynFrameworkStudio.Module` failed its restore with NU1605 (SqlClient, Azure.Identity, IdentityModel.Tokens.Jwt downgrades).
+- Release builds failed on macOS, Linux and CI: each package's `CopyPackage` step copied to `$(USERPROFILE)\Documents\MyNugets`, which is `/Documents` where `USERPROFILE` is unset. The step now runs only when `USERPROFILE` is set, so the Windows local feed works as before.
+
+### Security
+- No known vulnerable package remains, transitive included. Removed or overridden: Newtonsoft.Json 9.0.1, SQLitePCLRaw.lib.e_sqlite3 2.1.11, System.Security.Cryptography.Pkcs 8.0.1 and 9.0.x, System.Security.Cryptography.Xml 8.0.2, MessagePack 3.1.4.
+
+---
+
 ## [10.0.0] — 2026-04-01
 
 ### Added

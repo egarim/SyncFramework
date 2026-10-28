@@ -78,10 +78,10 @@ namespace BIT.Data.Sync.Imp
         public override async Task<string> GetLastProcessedDeltaAsync(string identity, CancellationToken cancellationToken = default)
         {
 
-            if(_syncStatus.ContainsKey(identity))
+            if(_syncStatus.ContainsKey(identity) && _syncStatus[identity].LastProcessedDelta != null)
             {
-                var test= _syncStatus[identity].LastProcessedDelta;
-                return test;
+                // A status created by a push has no pull cursor yet: start from the beginning, as for an identity never seen.
+                return _syncStatus[identity].LastProcessedDelta;
             }
 
             return "-1";
@@ -95,7 +95,7 @@ namespace BIT.Data.Sync.Imp
             }
                
             _syncStatus[identity].LastPushedDelta = Index;
-            _syncStatus[identity].LastProcessedDelta = Index;
+            // The pull cursor (LastProcessedDelta) counts in the server's index space; a push index counts in this store's own, so a push must not move it.
 
 
         }
