@@ -14,7 +14,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - Packages updated to the latest stable .NET 10 releases: EF Core 10.0.14, Npgsql EF 10.0.3, MySql.EntityFrameworkCore 10.0.12, ASP.NET Core 10.0.14, test SDK 18.11.0, NUnit 3.14.0 (NUnit 4+ would need the classic asserts rewritten), MudBlazor 8.15.0.
 - `BIT.Data.Sync.AspNetCore` uses the shared framework (`Microsoft.AspNetCore.App`) instead of `Microsoft.AspNetCore.Mvc.Core` 2.2.5.
-- `SimpleDatabase.Update` and `Delete` return `Task` instead of `async void`, so callers can await them and see their exceptions.
+- **Breaking (binary):** `SimpleDatabase.Update` and `Delete` return `Task` instead of `async void`, so callers can await them and see their exceptions. Source-compatible; already-compiled callers of these two methods must be rebuilt.
 - The cross-database EF Core tests are skipped, with the missing connection strings named, instead of failing when SQL Server, PostgreSQL and MySQL are not available.
 
 ### Removed
@@ -26,6 +26,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `MemoryDeltaStore`: a push moved the pull cursor to the client's own push index, so after pushing a client skipped other clients' deltas with lower server indexes; and the pull cursor came back `null` for a status created by a push.
 - `SyncControllerBase.Push` returned `Success = false` with no message for three kinds of exception.
 - The solution did not build: `SynFrameworkStudio.Module` failed its restore with NU1605 (SqlClient, Azure.Identity, IdentityModel.Tokens.Jwt downgrades).
+- Release builds failed on macOS, Linux and CI: each package's `CopyPackage` step copied to `$(USERPROFILE)\Documents\MyNugets`, which is `/Documents` where `USERPROFILE` is unset. The step now runs only when `USERPROFILE` is set, so the Windows local feed works as before.
 
 ### Security
 - No known vulnerable package remains, transitive included. Removed or overridden: Newtonsoft.Json 9.0.1, SQLitePCLRaw.lib.e_sqlite3 2.1.11, System.Security.Cryptography.Pkcs 8.0.1 and 9.0.x, System.Security.Cryptography.Xml 8.0.2, MessagePack 3.1.4.

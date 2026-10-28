@@ -60,8 +60,11 @@ namespace BIT.Data.Sync.Tests.InMemoryServerTests
             await master.Update(hello);
             await master.Delete(hola);
             Assert.IsTrue((await master.PushAsync()).Success);
-            await a.PullAsync();
-            await b.PullAsync();
+            foreach (var db in new[] { a, b })
+            {
+                var pulled = await db.PullAsync();
+                Assert.IsTrue(pulled.Success, pulled.Message);
+            }
 
             foreach (var db in new[] { a, b })
             {

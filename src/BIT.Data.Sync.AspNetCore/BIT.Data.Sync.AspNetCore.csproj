@@ -28,7 +28,8 @@
 		<ProjectReference Include="..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
 	</ItemGroup>
 	<!--NugetProject ReferencesSection End-->
-	<Target Name="CopyPackage" AfterTargets="Pack">
+	<!-- Copies the package to a local feed on Windows; skipped where USERPROFILE is not set (macOS, Linux, CI), where the path would be /Documents. -->
+	<Target Name="CopyPackage" AfterTargets="Pack" Condition="'$(USERPROFILE)' != ''">
 		<Copy SourceFiles="bin\$(ConfigurationName)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(USERPROFILE)\Documents\MyNugets\" />
 	</Target>
 	<ItemGroup>
