@@ -108,7 +108,9 @@ namespace BIT.Data.Sync.Imp
             }
             else
             {
-                _syncStatus.Add(identity, new SyncStatus() { LastProcessedDelta = Index, LastPushedDelta = Index });
+                // Only the pull cursor: it counts in the server's index space, the push cursor in this store's own, so a
+                // pull that comes before the first push must not move the push cursor past this store's own deltas.
+                _syncStatus.Add(identity, new SyncStatus() { LastProcessedDelta = Index });
             }
 
         }
@@ -118,7 +120,8 @@ namespace BIT.Data.Sync.Imp
             if (!_syncStatus.ContainsKey(identity))
                 return string.Empty;
 
-            return _syncStatus[identity].LastPushedDelta;
+            // A status made by a pull has no push cursor yet: nothing pushed, as for an identity never seen.
+            return _syncStatus[identity].LastPushedDelta ?? string.Empty;
         }
 
 

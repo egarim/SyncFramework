@@ -101,6 +101,31 @@ namespace BIT.Data.Sync.Tests.InMemoryServerTests
         }
 
         [Test]
+        public async Task ADatabaseThatPullsBeforeItsFirstPushStillPushesAllItsDeltas()
+        {
+            // The pull cursor counts in the server's index space and the push cursor in the database's own. A pull
+            // that comes first must not set the push cursor: the server's index is ahead of the database's, and the
+            // database's own deltas would never be pushed.
+            var (_, newDatabase) = Setup();
+            var first = newDatabase("First");
+            var late = newDatabase("Late");
+            for (var i = 0; i < 3; i++)
+            {
+                await first.Add(new SimpleDatabaseRecord { Key = Guid.NewGuid(), Text = $"first {i}" });
+            }
+            Assert.IsTrue((await first.PushAsync()).Success);
+
+            await late.Add(new SimpleDatabaseRecord { Key = Guid.NewGuid(), Text = "late 1" });
+            await late.Add(new SimpleDatabaseRecord { Key = Guid.NewGuid(), Text = "late 2" });
+            Assert.IsTrue((await late.PullAsync()).Success);
+            Assert.IsTrue((await late.PushAsync()).Success);
+
+            Assert.IsTrue((await first.PullAsync()).Success);
+            Assert.AreEqual(5, first.Data.Count);
+            Assert.AreEqual(5, late.Data.Count);
+        }
+
+        [Test]
         public async Task AnUnknownNodeFailsWithAMessageInsteadOfDroppingTheDeltas()
         {
             var (server, _) = Setup();
