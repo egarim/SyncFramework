@@ -5,7 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased]
+## [BIT.Data.Sync 3.0.0 · EF Core packages 10.0.0] — 2026-10-28
+
+The first release built for .NET 10, and the first published since BIT.Data.Sync 2.34.0 and the EF Core packages
+9.2.33 (both net9.0). It also ships the changes listed under 10.0.0 below, which were never published. The core goes
+to 3.0.0 because it drops net9.0 and `SimpleDatabase.Update`/`Delete` change their return type. The EF Core packages
+follow EF Core's major version. `BIT.Data.Sync.EfCore.MySql` is new and replaces `BIT.Data.Sync.EfCore.Pomelo.MySql`,
+which gets no further releases.
 
 ### Added
 - **`SyncFrameworkInMemoryClient`** (`BIT.Data.Sync.Client`): an `ISyncFrameworkClient` that talks to an `ISyncFrameworkServer` in the same process, with no HTTP. It answers Push, Fetch and HandShake as `SyncControllerBase` does and copies deltas at the boundary, as serialization would. For tests, simulations and apps that host their own server.
@@ -34,7 +40,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [10.0.0] — 2026-04-01
+## [10.0.0] — 2026-04-01 (never published; shipped in the release above)
 
 ### Added
 - **SyncFramework.Dashboard** — new Blazor Server admin UI (`src/Tools/SyncFramework.Dashboard`)
