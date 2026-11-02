@@ -61,7 +61,7 @@ namespace BIT.Data.Sync.Server
             IServerSyncEndpoint Node = GetNode(NodeId);
             if (Node != null)
             {
-                return await Node.GetDeltasFromOtherNodes(startIndex,null, cancellationToken).ConfigureAwait(false);
+                return await Node.GetDeltasAsync(startIndex, cancellationToken).ConfigureAwait(false);
             }
 
             IEnumerable<IDelta> result = new List<IDelta>();

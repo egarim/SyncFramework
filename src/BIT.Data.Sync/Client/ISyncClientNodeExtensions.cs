@@ -37,6 +37,29 @@ namespace Microsoft.Extensions.DependencyInjection
             return Response;
 
         }
+        /// <summary>
+        /// Pulls every delta on the server from the beginning, including the ones this node pushed itself.
+        /// Use it to restore a new or crashed node that shares the identity of an existing one.
+        /// </summary>
+        public static async Task<FetchOperationResponse> RestoreAsync(this IClientSyncDatabase instance, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var Response = await instance.SyncFrameworkClient.FetchAsync("", null, cancellationToken).ConfigureAwait(false);
+
+            if (Response.Success && Response.Deltas.Any())
+            {
+                await instance.DeltaProcessor.ProcessDeltasAsync(Response.Deltas, cancellationToken).ConfigureAwait(false);
+                string index = Response.Deltas.Max(d => d.Index);
+                await instance.DeltaStore.SetLastProcessedDeltaAsync(index, instance.Identity, cancellationToken).ConfigureAwait(false);
+                Response.Message = $"Restored {Response.Deltas.Count()} deltas";
+            }
+            if (Response.Success && !Response.Deltas.Any())
+            {
+                Response.Message = "Nothing to restore";
+            }
+
+            return Response;
+        }
         public static async Task<PushOperationResponse> PushAsync(this IClientSyncDatabase instance, CancellationToken cancellationToken = default)
         {
             PushOperationResponse Response = null;
