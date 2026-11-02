@@ -39,8 +39,9 @@ namespace BIT.Data.Sync.EfCore
 
           
             int AffectedRows = base.Execute(commandBatches, connection);
+            // Run on the thread pool so blocking here can't deadlock a caller with a SynchronizationContext (UI threads).
             if (IsDeltaTrackingEnabled)
-                SaveDeltasAsync(commandBatches, AffectedRows).ConfigureAwait(false).GetAwaiter().GetResult();
+                Task.Run(() => SaveDeltasAsync(commandBatches, AffectedRows)).GetAwaiter().GetResult();
 
             return AffectedRows;
         }
