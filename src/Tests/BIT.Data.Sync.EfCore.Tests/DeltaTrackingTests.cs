@@ -105,5 +105,35 @@ namespace BIT.Data.Sync.EfCore.Tests
             context.SaveChanges();
             Assert.AreEqual(1, await CountDeltas(context));
         }
+
+        /// <summary>
+        /// Like a busy UI thread: work posted back to it never runs while it is blocked.
+        /// </summary>
+        private class BlockedThreadContext : SynchronizationContext
+        {
+            public override void Post(SendOrPostCallback d, object state) { }
+        }
+
+        [Test]
+        public async Task SyncSaveChangesDoesNotDeadlockOnAThreadWithASynchronizationContext()
+        {
+            using var context = NewContext(new SlowDeltaStore());
+            Exception error = null;
+            var thread = new Thread(() =>
+            {
+                SynchronizationContext.SetSynchronizationContext(new BlockedThreadContext());
+                try
+                {
+                    context.Add(new Blog { Name = "ui thread" });
+                    context.SaveChanges();
+                }
+                catch (Exception ex) { error = ex; }
+            }) { IsBackground = true };
+            thread.Start();
+
+            Assert.IsTrue(thread.Join(TimeSpan.FromSeconds(10)), "SaveChanges deadlocked");
+            Assert.IsNull(error, error?.ToString());
+            Assert.AreEqual(1, await CountDeltas(context));
+        }
     }
 }
