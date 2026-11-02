@@ -24,6 +24,7 @@ namespace BIT.Data.Sync.Client
         public ISyncFrameworkClient SyncFrameworkClient { get; }
         /// <summary>
         /// Table names, optionally schema-qualified ("Employees" or "hr.Employees"), compared ignoring case.
+        /// A dot always means schema.table, so tables whose own name contains a dot can't be routed by their bare name.
         /// </summary>
         public ISet<string> Tables { get; }
 
