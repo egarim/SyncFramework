@@ -54,5 +54,32 @@ namespace Microsoft.Extensions.DependencyInjection
 
         }
 
+        /// <summary>
+        /// Send the changes made to <paramref name="Tables"/> to their own server node, through a delta store of their own.
+        /// Call it after AddEfSynchronization (or AddSyncFrameworkFor...); changes to other tables keep using the default node.
+        /// </summary>
+        /// <param name="serviceCollection">The current service collection</param>
+        /// <param name="Name">The route name used with PushAsync(name) / PullAsync(name)</param>
+        /// <param name="DeltaStoreDbContextOptions">The options for this route's delta store DbContext; use a different database than the default delta store</param>
+        /// <param name="httpClient">The HTTP client for this route's server</param>
+        /// <param name="ServerNodeId">The id of the node on this route's server</param>
+        /// <param name="Tables">Table names, optionally schema-qualified ("hr.Employees")</param>
+        public static IServiceCollection AddDeltaRoute(this IServiceCollection serviceCollection, string Name, Action<DbContextOptionsBuilder> DeltaStoreDbContextOptions, HttpClient httpClient, string ServerNodeId, params string[] Tables)
+        {
+            return serviceCollection.AddDeltaRoute(Name, DeltaStoreDbContextOptions, new SyncFrameworkHttpClient(httpClient, ServerNodeId), Tables);
+        }
+        public static IServiceCollection AddDeltaRoute(this IServiceCollection serviceCollection, string Name, Action<DbContextOptionsBuilder> DeltaStoreDbContextOptions, ISyncFrameworkClient SyncFrameworkClient, params string[] Tables)
+        {
+            serviceCollection.AddSingleton(serviceProvider =>
+            {
+                var optionsBuilder = new DbContextOptionsBuilder<DeltaDbContext>();
+                DeltaStoreDbContextOptions(optionsBuilder);
+                var deltaDbContext = new DeltaDbContext(optionsBuilder.Options);
+                var sequenceService = new EfSequenceService(serviceProvider.GetRequiredService<ISequencePrefixStrategy>(), deltaDbContext);
+                return new DeltaRoute(Name, new EfDeltaStore(deltaDbContext, sequenceService), SyncFrameworkClient, Tables);
+            });
+            return serviceCollection;
+        }
+
     }
 }
