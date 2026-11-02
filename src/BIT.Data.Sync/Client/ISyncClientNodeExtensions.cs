@@ -53,7 +53,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 await instance.DeltaStore.SetLastProcessedDeltaAsync(index, instance.Identity, cancellationToken).ConfigureAwait(false);
                 Response.Message = $"Restored {Response.Deltas.Count()} deltas";
             }
-            if (!Response.Deltas.Any())
+            if (Response.Success && !Response.Deltas.Any())
             {
                 Response.Message = "Nothing to restore";
             }

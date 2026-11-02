@@ -176,5 +176,16 @@ namespace BIT.Data.Sync.Tests.InMemoryServerTests
             Assert.IsTrue(again.Success, again.Message);
             Assert.AreEqual("Nothing to receive", again.Message);
         }
+
+        [Test]
+        public async Task ARestoreFromAnUnknownNodeKeepsTheErrorMessage()
+        {
+            var (server, _) = Setup();
+            var client = new SimpleDatabase("Lost", new SyncFrameworkInMemoryClient(server, "NoSuchNode"));
+
+            var response = await client.RestoreAsync();
+            Assert.IsFalse(response.Success);
+            StringAssert.Contains("NoSuchNode", response.Message);
+        }
     }
 }
