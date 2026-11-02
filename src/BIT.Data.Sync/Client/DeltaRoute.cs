@@ -1,0 +1,63 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace BIT.Data.Sync.Client
+{
+    /// <summary>
+    /// Sends the changes made to some tables to their own server node, through their own delta store.
+    /// Changes to tables that no route claims stay on the database's default delta store and client.
+    /// </summary>
+    public class DeltaRoute
+    {
+        public DeltaRoute(string name, IDeltaStore deltaStore, ISyncFrameworkClient syncFrameworkClient, IEnumerable<string> tables)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
+            Name = name;
+            DeltaStore = deltaStore ?? throw new ArgumentNullException(nameof(deltaStore));
+            SyncFrameworkClient = syncFrameworkClient ?? throw new ArgumentNullException(nameof(syncFrameworkClient));
+            Tables = new HashSet<string>(tables ?? throw new ArgumentNullException(nameof(tables)), StringComparer.OrdinalIgnoreCase);
+        }
+
+        public string Name { get; }
+        public IDeltaStore DeltaStore { get; }
+        public ISyncFrameworkClient SyncFrameworkClient { get; }
+        /// <summary>
+        /// Table names, optionally schema-qualified ("Employees" or "hr.Employees"), compared ignoring case.
+        /// </summary>
+        public ISet<string> Tables { get; }
+
+        public bool Handles(string table, string schema)
+        {
+            return Tables.Contains(table) || (!string.IsNullOrEmpty(schema) && Tables.Contains($"{schema}.{table}"));
+        }
+    }
+
+    /// <summary>
+    /// A client database that splits its changes across several server nodes.
+    /// </summary>
+    public interface IRoutedClientSyncDatabase : IClientSyncDatabase
+    {
+        IReadOnlyList<DeltaRoute> Routes { get; }
+    }
+
+    /// <summary>
+    /// The database seen through one route: same data and identity, the route's delta store and client.
+    /// </summary>
+    internal class RouteClientSyncDatabase : IClientSyncDatabase
+    {
+        private readonly IClientSyncDatabase database;
+        private readonly DeltaRoute route;
+
+        public RouteClientSyncDatabase(IClientSyncDatabase database, DeltaRoute route)
+        {
+            this.database = database;
+            this.route = route;
+        }
+
+        public IDeltaProcessor DeltaProcessor => database.DeltaProcessor;
+        public IDeltaStore DeltaStore => route.DeltaStore;
+        public ISyncFrameworkClient SyncFrameworkClient => route.SyncFrameworkClient;
+        public string Identity => database.Identity;
+    }
+}

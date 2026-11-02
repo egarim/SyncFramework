@@ -4,12 +4,19 @@ using BIT.Data.Sync.EfCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace BIT.EfCore.Sync
 {
-    public abstract class SyncFrameworkDbContext : DbContext, IClientSyncDatabase, IEnableDeltaTracking
+    public abstract class SyncFrameworkDbContext : DbContext, IRoutedClientSyncDatabase, IEnableDeltaTracking
     {
+        private IReadOnlyList<DeltaRoute> routes;
+        /// <summary>
+        /// The <see cref="DeltaRoute"/>s registered with AddDeltaRoute; empty when every change goes to the default server node.
+        /// </summary>
+        public IReadOnlyList<DeltaRoute> Routes => routes ??= serviceProvider?.GetServices<DeltaRoute>().ToList() ?? new List<DeltaRoute>();
+
         /// <summary>
         /// True (the default) to record a delta for every SaveChanges; false to save changes without creating deltas.
         /// </summary>

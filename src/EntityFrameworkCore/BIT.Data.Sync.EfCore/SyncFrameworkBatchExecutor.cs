@@ -7,7 +7,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Update;
 using Microsoft.EntityFrameworkCore.Update.Internal;
+using BIT.Data.Sync.Client;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -72,6 +74,8 @@ namespace BIT.Data.Sync.EfCore
 
 
             List<ModificationCommandData> modifications = new List<ModificationCommandData>();
+            IReadOnlyList<DeltaRoute> routes = (this.CurrentContext.Context as IRoutedClientSyncDatabase)?.Routes ?? new List<DeltaRoute>();
+            Dictionary<DeltaRoute, List<ModificationCommandData>> routedModifications = new Dictionary<DeltaRoute, List<ModificationCommandData>>();
             foreach (ModificationCommandBatch modificationCommandBatch in commandBatches)
             {
 
@@ -99,13 +103,31 @@ namespace BIT.Data.Sync.EfCore
                     List<Parameters> parameters = GetParameters(modificationCommand);
 
                     ModificationCommandData modificationCommandData = new ModificationCommandData(parameters, commands, AffectedRows, alias);
-                    modifications.Add(modificationCommandData);
+                    DeltaRoute route = routes.FirstOrDefault(r => r.Handles(modificationCommand.TableName, modificationCommand.Schema));
+                    if (route == null)
+                    {
+                        modifications.Add(modificationCommandData);
+                    }
+                    else
+                    {
+                        if (!routedModifications.TryGetValue(route, out var routeModifications))
+                            routedModifications[route] = routeModifications = new List<ModificationCommandData>();
+                        routeModifications.Add(modificationCommandData);
+                    }
                 }
             }
 
-            var Delta= DeltaStore.CreateDelta(syncIdentityService.Identity, modifications);
-
-            await this.DeltaStore.SaveDeltasAsync(new List<IDelta>() { Delta }, cancellationToken).ConfigureAwait(false);
+            // Without routes this is the original behaviour: one delta per SaveChanges on the default store.
+            if (modifications.Count > 0 || routes.Count == 0)
+            {
+                var Delta = DeltaStore.CreateDelta(syncIdentityService.Identity, modifications);
+                await this.DeltaStore.SaveDeltasAsync(new List<IDelta>() { Delta }, cancellationToken).ConfigureAwait(false);
+            }
+            foreach (var routed in routedModifications)
+            {
+                var Delta = routed.Key.DeltaStore.CreateDelta(syncIdentityService.Identity, routed.Value);
+                await routed.Key.DeltaStore.SaveDeltasAsync(new List<IDelta>() { Delta }, cancellationToken).ConfigureAwait(false);
+            }
 
 
             return modifications;
