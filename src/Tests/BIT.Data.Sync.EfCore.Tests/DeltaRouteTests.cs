@@ -105,6 +105,18 @@ namespace BIT.Data.Sync.EfCore.Tests
             Assert.AreEqual(1, (await postsServerStore.GetDeltasAsync("")).Count());
 
             Assert.Throws<ArgumentException>(() => writer.ForRoute("nope"));
+            Assert.ThrowsAsync<InvalidOperationException>(() => writer.ForRoute("posts").PushAllRoutesAsync());
+        }
+
+        [Test]
+        public void TwoRoutesCannotClaimTheSameTable()
+        {
+            var store = new MemoryDeltaStore();
+            var client = new SyncFrameworkInMemoryClient(postsServer, PostsNode);
+            var routes = new[] { new DeltaRoute("a", store, client, new[] { "Post" }), new DeltaRoute("b", store, client, new[] { "post" }) };
+
+            var error = Assert.Throws<InvalidOperationException>(() => DeltaRoute.Validate(routes));
+            StringAssert.Contains("'a' and 'b'", error.Message);
         }
 
         [Test]

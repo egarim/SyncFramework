@@ -59,6 +59,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static IEnumerable<DeltaRoute> RoutesOf(IClientSyncDatabase instance)
         {
+            if (instance is RouteClientSyncDatabase)
+                throw new InvalidOperationException("Call PushAllRoutesAsync / PullAllRoutesAsync on the database itself, not on a ForRoute view.");
             return (instance as IRoutedClientSyncDatabase)?.Routes ?? Enumerable.Empty<DeltaRoute>();
         }
     }

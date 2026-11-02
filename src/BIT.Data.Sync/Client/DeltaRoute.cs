@@ -31,6 +31,27 @@ namespace BIT.Data.Sync.Client
         {
             return Tables.Contains(table) || (!string.IsNullOrEmpty(schema) && Tables.Contains($"{schema}.{table}"));
         }
+
+        /// <summary>
+        /// Throws when two routes share a name or claim the same table, since the second route would never get its changes.
+        /// </summary>
+        public static IReadOnlyList<DeltaRoute> Validate(IReadOnlyList<DeltaRoute> routes)
+        {
+            var names = new HashSet<string>();
+            var tables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var route in routes)
+            {
+                if (!names.Add(route.Name))
+                    throw new InvalidOperationException($"Two delta routes are called '{route.Name}'.");
+                foreach (var table in route.Tables)
+                {
+                    if (tables.TryGetValue(table, out var other))
+                        throw new InvalidOperationException($"Table '{table}' is claimed by delta routes '{other}' and '{route.Name}'.");
+                    tables[table] = route.Name;
+                }
+            }
+            return routes;
+        }
     }
 
     /// <summary>
