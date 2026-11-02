@@ -45,6 +45,11 @@ namespace BIT.Data.Sync.Server
            return this.deltaStore?.GetDeltaAsync(deltaId, cancellationToken);
         }
 
+        public virtual Task<IEnumerable<IDelta>> GetDeltasAsync(string startIndex, CancellationToken cancellationToken)
+        {
+            return this.deltaStore?.GetDeltasAsync(startIndex ?? "", cancellationToken);
+        }
+
         public virtual Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string startIndex, string identity, CancellationToken cancellationToken)
         {
             if(string.IsNullOrEmpty(identity))

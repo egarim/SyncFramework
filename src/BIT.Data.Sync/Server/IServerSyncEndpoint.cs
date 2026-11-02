@@ -19,7 +19,16 @@ namespace BIT.Data.Sync.Server
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<IEnumerable<IDelta>> GetDeltasFromOtherNodes(string startIndex, string identity, CancellationToken cancellationToken);
-        
+        /// <summary>
+        /// The function will fetch all the Deltas that are greater than <paramref name="startIndex"/>, from every node including the caller.
+        /// Used to restore a new or crashed client node.
+        /// </summary>
+        /// <param name="startIndex"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<IEnumerable<IDelta>> GetDeltasAsync(string startIndex, CancellationToken cancellationToken)
+            => DeltaStore.GetDeltasAsync(startIndex ?? "", cancellationToken);
+
         Task ProcessDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken);
         /// <summary>
         /// The function will fetch all the deltas that are greater than current <paramref name="deltaId"/>

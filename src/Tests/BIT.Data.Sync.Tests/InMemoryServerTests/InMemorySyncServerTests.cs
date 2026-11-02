@@ -148,5 +148,33 @@ namespace BIT.Data.Sync.Tests.InMemoryServerTests
             Assert.IsTrue(response.Success);
             Assert.AreEqual(NodeId, response.ServerNodeId);
         }
+
+        [Test]
+        public async Task ARestoredNodeGetsBackItsOwnDeltas()
+        {
+            var (_, newDatabase) = Setup();
+            var master = newDatabase("Master");
+            var other = newDatabase("Other");
+            await master.Add(new SimpleDatabaseRecord { Key = Guid.NewGuid(), Text = "Hello" });
+            await master.Add(new SimpleDatabaseRecord { Key = Guid.NewGuid(), Text = "World" });
+            await other.Add(new SimpleDatabaseRecord { Key = Guid.NewGuid(), Text = "Hola" });
+            Assert.IsTrue((await master.PushAsync()).Success);
+            Assert.IsTrue((await other.PushAsync()).Success);
+
+            // A normal pull skips the node's own deltas, so a fresh copy of "Master" only gets the other node's data.
+            var pulledCopy = newDatabase("Master");
+            Assert.IsTrue((await pulledCopy.PullAsync()).Success);
+            Assert.AreEqual(1, pulledCopy.Data.Count);
+
+            // A restore brings back everything, including what "Master" pushed itself.
+            var restored = newDatabase("Master");
+            var response = await restored.RestoreAsync();
+            Assert.IsTrue(response.Success, response.Message);
+            Assert.AreEqual(3, restored.Data.Count);
+
+            var again = await restored.PullAsync();
+            Assert.IsTrue(again.Success, again.Message);
+            Assert.AreEqual("Nothing to receive", again.Message);
+        }
     }
 }
