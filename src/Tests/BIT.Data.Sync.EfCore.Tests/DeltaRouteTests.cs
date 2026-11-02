@@ -105,18 +105,35 @@ namespace BIT.Data.Sync.EfCore.Tests
             Assert.AreEqual(1, (await postsServerStore.GetDeltasAsync("")).Count());
 
             Assert.Throws<ArgumentException>(() => writer.ForRoute("nope"));
+
+            // All-routes calls belong on the database itself; on a route view they fail before sending anything.
+            writer.Add(new Blog { Name = "Not sent", Posts = { new Post { Title = "Not sent" } } });
+            await writer.SaveChangesAsync();
             Assert.ThrowsAsync<InvalidOperationException>(() => writer.ForRoute("posts").PushAllRoutesAsync());
+            Assert.AreEqual(1, (await postsServerStore.GetDeltasAsync("")).Count(), "nothing was pushed before the error");
         }
 
-        [Test]
-        public void TwoRoutesCannotClaimTheSameTable()
+        [TestCase("Post", "post")]
+        [TestCase("Post", "dbo.Post")]
+        [TestCase("dbo.Post", "Post")]
+        public void TwoRoutesCannotClaimTheSameTable(string first, string second)
         {
             var store = new MemoryDeltaStore();
             var client = new SyncFrameworkInMemoryClient(postsServer, PostsNode);
-            var routes = new[] { new DeltaRoute("a", store, client, new[] { "Post" }), new DeltaRoute("b", store, client, new[] { "post" }) };
+            var routes = new[] { new DeltaRoute("a", store, client, new[] { first }), new DeltaRoute("b", store, client, new[] { second }) };
 
             var error = Assert.Throws<InvalidOperationException>(() => DeltaRoute.Validate(routes));
             StringAssert.Contains("'a' and 'b'", error.Message);
+        }
+
+        [Test]
+        public void TheSameTableNameInDifferentSchemasCanGoToDifferentRoutes()
+        {
+            var store = new MemoryDeltaStore();
+            var client = new SyncFrameworkInMemoryClient(postsServer, PostsNode);
+            var routes = new[] { new DeltaRoute("hr", store, client, new[] { "hr.Post" }), new DeltaRoute("pos", store, client, new[] { "pos.Post" }) };
+
+            Assert.DoesNotThrow(() => DeltaRoute.Validate(routes));
         }
 
         [Test]

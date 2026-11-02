@@ -39,8 +39,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static async Task<IReadOnlyList<PushOperationResponse>> PushAllRoutesAsync(this IClientSyncDatabase instance, CancellationToken cancellationToken = default)
         {
+            var routes = RoutesOf(instance).ToList();
             var responses = new List<PushOperationResponse> { await instance.PushAsync(cancellationToken).ConfigureAwait(false) };
-            foreach (var route in RoutesOf(instance))
+            foreach (var route in routes)
                 responses.Add(await new RouteClientSyncDatabase(instance, route).PushAsync(cancellationToken).ConfigureAwait(false));
             return responses;
         }
@@ -51,8 +52,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static async Task<IReadOnlyList<FetchOperationResponse>> PullAllRoutesAsync(this IClientSyncDatabase instance, CancellationToken cancellationToken = default)
         {
+            var routes = RoutesOf(instance).ToList();
             var responses = new List<FetchOperationResponse> { await instance.PullAsync(cancellationToken).ConfigureAwait(false) };
-            foreach (var route in RoutesOf(instance))
+            foreach (var route in routes)
                 responses.Add(await new RouteClientSyncDatabase(instance, route).PullAsync(cancellationToken).ConfigureAwait(false));
             return responses;
         }
