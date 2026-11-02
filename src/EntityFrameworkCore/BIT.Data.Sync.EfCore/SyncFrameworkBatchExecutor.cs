@@ -39,17 +39,25 @@ namespace BIT.Data.Sync.EfCore
 
           
             int AffectedRows = base.Execute(commandBatches, connection);
-            SaveDeltasAsync(commandBatches, AffectedRows).ConfigureAwait(false);
-           
+            // Run on the thread pool so blocking here can't deadlock a caller with a SynchronizationContext (UI threads).
+            if (IsDeltaTrackingEnabled)
+                Task.Run(() => SaveDeltasAsync(commandBatches, AffectedRows)).GetAwaiter().GetResult();
+
             return AffectedRows;
         }
+
+        /// <summary>
+        /// False when the current context implements <see cref="IEnableDeltaTracking"/> and has tracking turned off.
+        /// </summary>
+        protected virtual bool IsDeltaTrackingEnabled => (this.CurrentContext.Context as IEnableDeltaTracking)?.EnableDeltaTracking ?? true;
         public async override Task<int> ExecuteAsync(IEnumerable<ModificationCommandBatch> commandBatches, IRelationalConnection connection, CancellationToken cancellationToken = default)
         {
             
             cancellationToken.ThrowIfCancellationRequested();
           
             int AffectedRows = await base.ExecuteAsync(commandBatches, connection, cancellationToken).ConfigureAwait(false);
-            await SaveDeltasAsync(commandBatches, AffectedRows, cancellationToken).ConfigureAwait(false);
+            if (IsDeltaTrackingEnabled)
+                await SaveDeltasAsync(commandBatches, AffectedRows, cancellationToken).ConfigureAwait(false);
             return AffectedRows;
         }
 

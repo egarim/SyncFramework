@@ -8,8 +8,13 @@ using System.Linq;
 
 namespace BIT.EfCore.Sync
 {
-    public abstract class SyncFrameworkDbContext : DbContext, IClientSyncDatabase
+    public abstract class SyncFrameworkDbContext : DbContext, IClientSyncDatabase, IEnableDeltaTracking
     {
+        /// <summary>
+        /// True (the default) to record a delta for every SaveChanges; false to save changes without creating deltas.
+        /// </summary>
+        public bool EnableDeltaTracking { get; set; } = true;
+
         /// <summary>
         /// <para>
         /// Initializes a new instance of the <see cref="SyncFrameworkDbContext" /> class. The
