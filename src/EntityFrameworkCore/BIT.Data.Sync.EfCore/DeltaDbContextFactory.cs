@@ -21,7 +21,16 @@ namespace BIT.EfCore.Sync
                 throw new ArgumentNullException(nameof(template));
 
             var type = template.GetType();
-            var options = template.GetService<IDbContextOptions>() as DbContextOptions;
+            DbContextOptions options;
+            try
+            {
+                // Read once, now, while the template is alive; the factory never touches the template again.
+                options = template.GetService<IDbContextOptions>() as DbContextOptions;
+            }
+            catch (ObjectDisposedException ex)
+            {
+                throw new ArgumentException($"The {type.Name} passed in is already disposed; pass a live context or a Func<DeltaDbContext> factory.", nameof(template), ex);
+            }
             if (type == typeof(DeltaDbContext))
                 return () => new DeltaDbContext(options);
 
