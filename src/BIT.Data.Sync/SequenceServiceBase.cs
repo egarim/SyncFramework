@@ -41,7 +41,7 @@ namespace BIT.Data.Sync
         /// <returns>The next sequence.</returns>
         public virtual async Task<string> GenerateNextSequenceAsync()
         {
-            return await GenerateNextSequenceAsync(sequencePrefixStrategy.GetDefaultPrefix());
+            return await GenerateNextSequenceAsync(sequencePrefixStrategy.GetDefaultPrefix()).ConfigureAwait(false);
         }
 
         /// <summary>
