@@ -96,7 +96,7 @@ namespace BIT.Data.Sync.EfCore.Tests
             using (var setup = NewContext(data, shared))
                 setup.Database.EnsureCreated();
             var store = shared.GetRequiredService<IDeltaStore>();
-            int before = (await store.GetDeltasAsync(string.Empty)).Count();
+            int before = (await store.GetDeltasAsync(string.Empty, CancellationToken.None)).Count();
 
             // Shared: one provider, so one singleton store and sequence service, like an ASP.NET Core app.
             // Not shared: a store and sequence service per context, so only the database orders them.
@@ -111,7 +111,7 @@ namespace BIT.Data.Sync.EfCore.Tests
             start.Set();
             await Task.WhenAll(tasks);
 
-            var saved = (await store.GetDeltasAsync(string.Empty)).ToList();
+            var saved = (await store.GetDeltasAsync(string.Empty, CancellationToken.None)).ToList();
             Assert.AreEqual(0, before);
             AssertDistinct(saved, count);
             using var check = NewContext(data, shared);
@@ -133,20 +133,20 @@ namespace BIT.Data.Sync.EfCore.Tests
             var saves = Enumerable.Range(0, count).Select(i => Task.Run(async () =>
             {
                 start.Wait();
-                await store.SaveDeltasAsync(new List<IDelta> { store.CreateDelta("Client", "delta " + i) });
+                await store.SaveDeltasAsync(new List<IDelta> { store.CreateDelta("Client", "delta " + i) }, CancellationToken.None);
             }));
             var reads = Enumerable.Range(0, count).Select(i => Task.Run(async () =>
             {
                 start.Wait();
-                await store.GetDeltasAsync(string.Empty);
-                await store.GetDeltaCountAsync(string.Empty, "Client");
+                await store.GetDeltasAsync(string.Empty, CancellationToken.None);
+                await store.GetDeltaCountAsync(string.Empty, "Client", CancellationToken.None);
             }));
             var all = saves.Concat(reads).ToList();
             start.Set();
             // WhenAll rethrows the first failure, for example "A second operation was started on this context".
             await Task.WhenAll(all);
 
-            AssertDistinct(await store.GetDeltasAsync(string.Empty), count);
+            AssertDistinct(await store.GetDeltasAsync(string.Empty, CancellationToken.None), count);
         }
 
         [Test]
@@ -159,12 +159,12 @@ namespace BIT.Data.Sync.EfCore.Tests
 
             var calls = Enumerable.Range(0, count).SelectMany(i => new[]
             {
-                Task.Run(() => store.SaveDeltasAsync(new List<IDelta> { store.CreateDelta("Client", "delta " + i) })),
-                Task.Run(() => (Task)store.GetDeltasAsync(string.Empty)),
+                Task.Run(() => store.SaveDeltasAsync(new List<IDelta> { store.CreateDelta("Client", "delta " + i) }, CancellationToken.None)),
+                Task.Run(() => (Task)store.GetDeltasAsync(string.Empty, CancellationToken.None)),
             }).ToList();
             await Task.WhenAll(calls);
 
-            AssertDistinct(await store.GetDeltasAsync(string.Empty), count);
+            AssertDistinct(await store.GetDeltasAsync(string.Empty, CancellationToken.None), count);
         }
 
         [Test]
@@ -190,7 +190,7 @@ namespace BIT.Data.Sync.EfCore.Tests
             await store.SaveDeltasAsync(new List<IDelta> { store.CreateDelta("Client", "after dispose") });
             await Task.WhenAll(Enumerable.Range(0, 10).Select(i => Task.Run(() => store.SaveDeltasAsync(new List<IDelta> { store.CreateDelta("Client", i) }))));
 
-            AssertDistinct(await store.GetDeltasAsync(string.Empty), 11);
+            AssertDistinct(await store.GetDeltasAsync(string.Empty, CancellationToken.None), 11);
         }
 
         // Marks the calls whose context the factory disposes before handing it out.
@@ -217,7 +217,7 @@ namespace BIT.Data.Sync.EfCore.Tests
             await Task.WhenAll(Enumerable.Range(0, count).SelectMany(i => new[]
             {
                 Task.Run(() => store.SaveDeltasAsync(new List<IDelta> { store.CreateDelta("Client", i) })),
-                Task.Run(() => (Task)store.GetDeltasAsync(string.Empty)),
+                Task.Run(() => (Task)store.GetDeltasAsync(string.Empty, CancellationToken.None)),
             }));
             Assert.AreEqual(2 * count, created.Count);
             Assert.AreEqual(2 * count, created.Distinct().Count(), "no context is shared between calls");
@@ -234,7 +234,7 @@ namespace BIT.Data.Sync.EfCore.Tests
             Assert.ThrowsAsync<ObjectDisposedException>(() => broken);
             await Task.WhenAll(healthy);
 
-            AssertDistinct(await store.GetDeltasAsync(string.Empty), 2 * count);
+            AssertDistinct(await store.GetDeltasAsync(string.Empty, CancellationToken.None), 2 * count);
         }
 
         [TestCase(Database.SqliteFile)]
@@ -330,11 +330,9 @@ namespace BIT.Data.Sync.EfCore.Tests
             using var ui = new SingleThreadSynchronizationContext();
             var completed = new ManualResetEventSlim(false);
             async Task Naive() { await Task.Delay(10); }
-            var blocked = ui.Run(() => completed.Set(Naive().Wait(TimeSpan.FromSeconds(2))));
+            var blocked = ui.Run(() => { if (Naive().Wait(TimeSpan.FromSeconds(2))) completed.Set(); });
             await blocked;
             Assert.IsFalse(completed.IsSet, "naive sync-over-async should time out on this context");
-
-            void Set(ManualResetEventSlim e, bool value) { if (value) e.Set(); }
         }
 
         [TestCase(Database.SqliteFile)]
@@ -352,12 +350,13 @@ namespace BIT.Data.Sync.EfCore.Tests
                 Assert.IsInstanceOf<SingleThreadSynchronizationContext>(SynchronizationContext.Current);
                 context.Add(new Blog { Name = "ui thread" });
                 context.SaveChanges();
+                Assert.IsInstanceOf<SingleThreadSynchronizationContext>(SynchronizationContext.Current, "the caller's context is restored");
             });
 
             Assert.IsTrue(await CompletesWithin(save, TimeSpan.FromSeconds(10)), "SaveChanges deadlocked on the UI context");
             await save;
             var store = services.GetRequiredService<IDeltaStore>();
-            Assert.AreEqual(1, (await store.GetDeltasAsync(string.Empty)).Count(), "a delta is recorded");
+            Assert.AreEqual(1, (await store.GetDeltasAsync(string.Empty, CancellationToken.None)).Count(), "a delta is recorded");
             using var check = NewContext(data, services);
             Assert.AreEqual("ui thread", check.Blogs.Single().Name);
         }
