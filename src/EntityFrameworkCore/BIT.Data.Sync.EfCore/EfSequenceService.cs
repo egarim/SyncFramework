@@ -45,7 +45,8 @@ namespace BIT.EfCore.Sync
             bool relational = context.Database.IsRelational();
             // In-memory stores have no connection string; they live in this process, so one lock for all of them is enough.
             string database = relational ? context.Database.GetConnectionString() : "<non-relational>";
-            var gate = locks.GetOrAdd($"{context.GetType().FullName}|{database}|{prefix}", _ => new SemaphoreSlim(1, 1));
+            // Keyed by database, not context type, so different DeltaDbContext subclasses on one database share the gate.
+            var gate = locks.GetOrAdd($"{database}|{prefix}", _ => new SemaphoreSlim(1, 1));
 
             await gate.WaitAsync().ConfigureAwait(false);
             try
