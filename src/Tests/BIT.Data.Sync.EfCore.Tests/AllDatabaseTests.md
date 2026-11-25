@@ -25,13 +25,27 @@ On a machine with those servers, run everything. First set the connection string
 dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests
 ```
 
-To see which tests the category selects, run the category on its own. Without the connection string variables, `SetUp` skips each selected test before it opens any connection, so this also works on a machine without servers:
+On a machine with those servers you can also run only the server-dependent tests:
 
 ```bash
 dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests --filter "TestCategory=RequiresDatabaseServer" --logger "console;verbosity=normal"
 ```
 
-Do not use `--list-tests` for this. With the VSTest runner and NUnit3TestAdapter 5.2.0 this project uses, test discovery ignores `--filter` and the NUnit `Where` setting, so `--list-tests` always prints every test in the project.
+To see which tests a filter selects, run it with `--logger "console;verbosity=normal"`, which prints each test it runs. `--list-tests` does not help here: with the VSTest runner and NUnit3TestAdapter 5.2.0 this project uses, it ignores `--filter` and always prints every test in the project.
+
+### Result on a machine without database servers
+
+Run on 2026-11-25 on Linux with .NET 10, no SQL Server, PostgreSQL or MySQL server listening and no connection string variables set:
+
+```bash
+dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests --filter "TestCategory!=RequiresDatabaseServer" --logger "console;verbosity=normal"
+```
+
+- Exit code: 0
+- Total tests: 30, passed: 30, failed: 0, skipped: 0
+- No connection errors or timeouts in the output
+
+`dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests --list-tests` lists 32 tests on this branch and 32 on `main`: the 30 above plus the two `RequiresDatabaseServer` tests.
 
 ## System Architecture
 
