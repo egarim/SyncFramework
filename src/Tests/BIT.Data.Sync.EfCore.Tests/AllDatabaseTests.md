@@ -25,17 +25,13 @@ On a machine with those servers, run everything. First set the connection string
 dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests
 ```
 
-The command to list the tests in the category is:
-
-```bash
-dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests --list-tests --filter "TestCategory=RequiresDatabaseServer"
-```
-
-With the VSTest runner and NUnit3TestAdapter this project uses, `--list-tests` does not apply `--filter` and prints all tests. To see which tests the category selects, run the category on its own. Without the connection string variables, `SetUp` skips each selected test before it opens any connection:
+To see which tests the category selects, run the category on its own. Without the connection string variables, `SetUp` skips each selected test before it opens any connection, so this also works on a machine without servers:
 
 ```bash
 dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests --filter "TestCategory=RequiresDatabaseServer" --logger "console;verbosity=normal"
 ```
+
+Do not use `--list-tests` for this. With the VSTest runner and NUnit3TestAdapter 5.2.0 this project uses, test discovery ignores `--filter` and the NUnit `Where` setting, so `--list-tests` always prints every test in the project.
 
 ## System Architecture
 
