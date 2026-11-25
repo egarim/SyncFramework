@@ -2,6 +2,51 @@
 
 This document illustrates the data flow in the `AllDatabaseTests.cs` test that validates cross-database synchronization using a master-node architecture.
 
+## Running the tests with or without database servers
+
+Every test in this project that needs a SQL Server, PostgreSQL or MySQL server carries the NUnit category `RequiresDatabaseServer`. Today those are the two tests in `AllDatabaseTests`, each tagged at method level:
+
+- `SyncFramework_CrossDatabaseSync_SuccessfullyExchangesData` syncs a SQL Server master with SQLite, PostgreSQL and MySQL nodes.
+- `DeltasMarkedAsSentAfterPush` uses the SQL Server master context and delta store.
+
+The fixture's `SetUp` only reads connection strings and configures context options; it opens no connection, so the category sits on the tests rather than the fixture. Neither test is parameterized across providers. If a provider-parameterized test is added, tag only its SQL Server, PostgreSQL and MySQL cases, for example `[TestCase(..., Category = "RequiresDatabaseServer")]`, and leave the SQLite and in-memory cases untagged.
+
+The other tests in the project (`ConcurrencyTests`, `DeltaRouteTests`, `DeltaTrackingTests`, `EfDeltaStoreTests`) use only SQLite or the EF Core in-memory provider and run without any database server.
+
+On a machine with no SQL Server, PostgreSQL or MySQL server, leave the category out:
+
+```bash
+dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests --filter "TestCategory!=RequiresDatabaseServer"
+```
+
+On a machine with those servers, run everything. First set the connection string environment variables that `AllDatabaseTests` reads, such as `SqlServerSyncFrameworkTestCnx`, `PostgresSyncFrameworkTestCnx`, `MySQLSyncFrameworkTestCnx`, `SQLiteSyncFrameworkTestCnx` and their `...DeltaCnx` counterparts:
+
+```bash
+dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests
+```
+
+On a machine with those servers you can also run only the server-dependent tests:
+
+```bash
+dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests --filter "TestCategory=RequiresDatabaseServer" --logger "console;verbosity=normal"
+```
+
+To see which tests a filter selects, run it with `--logger "console;verbosity=normal"`, which prints each test it runs. `--list-tests` does not help here: with the VSTest runner and NUnit3TestAdapter 5.2.0 this project uses, it ignores `--filter` and always prints every test in the project.
+
+### Result on a machine without database servers
+
+Run on 2026-11-25 on Linux with .NET 10, no SQL Server, PostgreSQL or MySQL server listening and no connection string variables set:
+
+```bash
+dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests --filter "TestCategory!=RequiresDatabaseServer" --logger "console;verbosity=normal"
+```
+
+- Exit code: 0
+- Total tests: 30, passed: 30, failed: 0, skipped: 0
+- No connection errors or timeouts in the output
+
+`dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests --list-tests` lists 32 tests on this branch and 32 on `main`: the 30 above plus the two `RequiresDatabaseServer` tests.
+
 ## System Architecture
 
 ```mermaid
