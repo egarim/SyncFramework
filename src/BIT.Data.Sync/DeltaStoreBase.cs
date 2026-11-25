@@ -43,7 +43,7 @@ namespace BIT.Data.Sync
         }
         protected virtual async Task SetDeltaIndex(IDelta delta)
         {
-            delta.Index = await sequenceService.GenerateNextSequenceAsync();
+            delta.Index = await sequenceService.GenerateNextSequenceAsync().ConfigureAwait(false);
         }
         public abstract Task SaveDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken = default);
 
