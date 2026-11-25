@@ -25,6 +25,8 @@ using System.Threading.Tasks;
 
 namespace BIT.Data.Sync.EfCore.Tests
 {
+    // Every test here talks to live SQL Server, PostgreSQL and MySQL servers; see AllDatabaseTests.md for how to leave them out.
+    [Category("RequiresDatabaseServer")]
     public class AllDatabaseTests : MultiServerBaseTest
     {
         #region Connection Strings

@@ -2,6 +2,28 @@
 
 This document illustrates the data flow in the `AllDatabaseTests.cs` test that validates cross-database synchronization using a master-node architecture.
 
+## Running the tests with or without database servers
+
+Every test in this project that needs a SQL Server, PostgreSQL or MySQL server carries the NUnit category `RequiresDatabaseServer`. The whole `AllDatabaseTests` fixture has this category. The other tests in the project use only SQLite or in-memory databases.
+
+On a machine with no SQL Server, PostgreSQL or MySQL server, leave the category out:
+
+```bash
+dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests --filter "TestCategory!=RequiresDatabaseServer"
+```
+
+On a machine with those servers, run everything. First set the connection string environment variables that `AllDatabaseTests` reads, such as `SqlServerSyncFrameworkTestCnx`, `PostgresSyncFrameworkTestCnx`, `MySQLSyncFrameworkTestCnx`, `SQLiteSyncFrameworkTestCnx` and their `...DeltaCnx` counterparts:
+
+```bash
+dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests
+```
+
+To list only the tests that need a database server:
+
+```bash
+dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests --list-tests --filter "TestCategory=RequiresDatabaseServer"
+```
+
 ## System Architecture
 
 ```mermaid
