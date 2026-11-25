@@ -90,7 +90,7 @@ namespace BIT.Data.Sync
         {
             using (var document = Parse(data))
             {
-                return ReadRow(document.RootElement);
+                return Guarded(() => ReadRow(document.RootElement), RowContext);
             }
         }
 
@@ -105,7 +105,7 @@ namespace BIT.Data.Sync
                 var root = document.RootElement;
                 if (root.ValueKind != JsonValueKind.Array)
                     throw new RowChangeSerializationException($"A row change list payload must be a JSON array, not {root.ValueKind}.");
-                return root.EnumerateArray().Select(ReadRow).ToList();
+                return root.EnumerateArray().Select(item => Guarded(() => ReadRow(item), RowContext)).ToList();
             }
         }
 
@@ -272,13 +272,14 @@ namespace BIT.Data.Sync
             var members = new Dictionary<string, JsonElement>(StringComparer.Ordinal);
             foreach (var property in element.EnumerateObject())
             {
-                if (!allowed.Contains(property.Name))
+                var propertyName = GetName(property, context);
+                if (!allowed.Contains(propertyName))
                     throw new RowChangeSerializationException(
-                        $"{Describe(context)}: member '{property.Name}' is not part of the row change format and was rejected; type names and converters in payloads are never resolved.",
-                        context, property.Name);
-                if (members.ContainsKey(property.Name))
-                    throw new RowChangeSerializationException($"{Describe(context)}: member '{property.Name}' appears more than once.", context, property.Name);
-                members.Add(property.Name, property.Value);
+                        $"{Describe(context)}: member '{propertyName}' is not part of the row change format and was rejected; type names and converters in payloads are never resolved.",
+                        context, propertyName);
+                if (members.ContainsKey(propertyName))
+                    throw new RowChangeSerializationException($"{Describe(context)}: member '{propertyName}' appears more than once.", context, propertyName);
+                members.Add(propertyName, property.Value);
             }
             return members;
         }
@@ -289,7 +290,7 @@ namespace BIT.Data.Sync
                 throw new RowChangeSerializationException($"{Describe(context)}: required member '{member}' is missing.", context);
             if (value.ValueKind != JsonValueKind.String)
                 throw new RowChangeSerializationException($"{Describe(context)}: member '{member}' must be a string, not {value.ValueKind}.", context);
-            return value.GetString();
+            return GetText(value, member, context);
         }
 
         private static List<RowColumn> ReadColumns(Dictionary<string, JsonElement> members, string member, string table)
@@ -306,7 +307,7 @@ namespace BIT.Data.Sync
                 var position = $"{member}[{index++}]";
                 if (item.ValueKind != JsonValueKind.Object)
                     throw new RowChangeSerializationException($"Column '{position}' of table '{table}' must be a JSON object, not {item.ValueKind}.", position);
-                result.Add(ReadColumn(item, position));
+                result.Add(Guarded(() => ReadColumn(item, position), position));
             }
             return result;
         }
@@ -315,8 +316,12 @@ namespace BIT.Data.Sync
         {
             // Read the name first so later errors can name the column.
             string name = position;
-            if (element.TryGetProperty("name", out var nameElement) && nameElement.ValueKind == JsonValueKind.String && !string.IsNullOrEmpty(nameElement.GetString()))
-                name = nameElement.GetString();
+            if (element.TryGetProperty("name", out var nameElement) && nameElement.ValueKind == JsonValueKind.String)
+            {
+                var text = GetText(nameElement, "name", position);
+                if (!string.IsNullOrEmpty(text))
+                    name = text;
+            }
 
             var members = ReadMembers(element, columnMembers, name);
             if (name == position)
@@ -344,14 +349,14 @@ namespace BIT.Data.Sync
 
             if (!hasValue || valueElement.ValueKind != JsonValueKind.String)
                 throw new RowChangeSerializationException($"Column '{name}' of type '{tag}' must carry its value as a JSON string.", name, tag);
-            var text = valueElement.GetString();
+            var valueText = GetText(valueElement, "value", name);
 
-            if (!TryParseValue(type, text, out var value))
-                throw new RowChangeSerializationException($"Column '{name}': the value '{Truncate(text)}' does not parse as type '{tag}'.", name, tag);
+            if (!TryParseValue(type, valueText, out var value))
+                throw new RowChangeSerializationException($"Column '{name}': the value '{Truncate(valueText)}' does not parse as type '{tag}'.", name, tag);
 
             if (type == typeof(DateTime))
             {
-                if (!hasKind || kindElement.ValueKind != JsonValueKind.String || !TryParseKind(kindElement.GetString(), out var kind))
+                if (!hasKind || kindElement.ValueKind != JsonValueKind.String || !TryParseKind(GetText(kindElement, "kind", name), out var kind))
                     throw new RowChangeSerializationException($"Column '{name}' of type 'datetime' must carry a kind of Utc, Local or Unspecified.", name, tag);
                 value = DateTime.SpecifyKind((DateTime)value, kind);
             }
@@ -415,7 +420,53 @@ namespace BIT.Data.Sync
             }
         }
 
+        /// <summary>
+        /// Reads the text of a JSON string. The parser accepts escapes such as a lone "\uD800" that cannot be
+        /// turned into a .NET string; those are refused here instead of surfacing as InvalidOperationException.
+        /// </summary>
+        private static string GetText(JsonElement element, string member, string context)
+        {
+            try
+            {
+                return element.GetString();
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new RowChangeSerializationException($"{Describe(context)}: member '{member}' holds text that is not valid Unicode.", ColumnOf(context), innerException: ex);
+            }
+        }
+
+        private static string GetName(JsonProperty property, string context)
+        {
+            try
+            {
+                return property.Name;
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new RowChangeSerializationException($"{Describe(context)}: a member name is not valid Unicode.", ColumnOf(context), innerException: ex);
+            }
+        }
+
+        /// <summary>
+        /// Last line of defence: any reader failure that is not already a <see cref="RowChangeSerializationException"/>
+        /// is refused as one, naming the column (or position) being read.
+        /// </summary>
+        private static T Guarded<T>(Func<T> read, string context)
+        {
+            try
+            {
+                return read();
+            }
+            catch (Exception ex) when (ex is InvalidOperationException || ex is FormatException || ex is ArgumentException)
+            {
+                throw new RowChangeSerializationException($"{Describe(context)} could not be read: {ex.Message}", ColumnOf(context), innerException: ex);
+            }
+        }
+
         #endregion
+
+        private static string ColumnOf(string context) => context == RowContext ? null : context;
 
         private static string Describe(string context) => context == RowContext ? "Row change payload" : $"Column '{context}'";
 

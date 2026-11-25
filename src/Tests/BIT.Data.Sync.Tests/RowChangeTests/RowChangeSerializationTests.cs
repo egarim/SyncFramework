@@ -432,6 +432,34 @@ namespace BIT.Data.Sync.Tests.RowChangeTests
             Refused(json);
         }
 
+        // "\uD800" is a lone surrogate escape: JsonDocument.Parse accepts it, but it cannot become a .NET string.
+        private const string LoneSurrogate = "\\uD800";
+
+        [TestCase("{\"format\":\"bit.rowchange/1\",\"table\":\"" + LoneSurrogate + "\",\"operation\":\"Insert\",\"keys\":[],\"columns\":[]}", TestName = "LoneSurrogate_InTable")]
+        [TestCase("{\"format\":\"bit.rowchange/1\",\"table\":\"t\",\"operation\":\"" + LoneSurrogate + "\",\"keys\":[],\"columns\":[]}", TestName = "LoneSurrogate_InOperation")]
+        [TestCase("{\"format\":\"" + LoneSurrogate + "\",\"table\":\"t\",\"operation\":\"Insert\",\"keys\":[],\"columns\":[]}", TestName = "LoneSurrogate_InFormat")]
+        [TestCase("{\"format\":\"bit.rowchange/1\",\"tab" + LoneSurrogate + "le\":\"t\",\"operation\":\"Insert\",\"keys\":[],\"columns\":[]}", TestName = "LoneSurrogate_InRowMemberName")]
+        [TestCase("{\"format\":\"bit.rowchange/1\",\"table\":\"t\",\"operation\":\"Insert\",\"keys\":[{\"name\":\"Id" + LoneSurrogate + "\",\"type\":\"int\",\"value\":\"1\"}],\"columns\":[]}", TestName = "LoneSurrogate_InKeyName")]
+        [TestCase("{\"format\":\"bit.rowchange/1\",\"table\":\"t\",\"operation\":\"Insert\",\"keys\":[],\"columns\":[{\"name\":\"" + LoneSurrogate + "\",\"type\":\"string\",\"value\":\"x\"}]}", TestName = "LoneSurrogate_InColumnName")]
+        [TestCase("{\"format\":\"bit.rowchange/1\",\"table\":\"t\",\"operation\":\"Insert\",\"keys\":[],\"columns\":[{\"name\":\"Col\",\"type\":\"string\",\"value\":\"a" + LoneSurrogate + "b\"}]}", TestName = "LoneSurrogate_InValue")]
+        [TestCase("{\"format\":\"bit.rowchange/1\",\"table\":\"t\",\"operation\":\"Insert\",\"keys\":[],\"columns\":[{\"name\":\"Col\",\"type\":\"" + LoneSurrogate + "\",\"value\":\"x\"}]}", TestName = "LoneSurrogate_InTypeTag")]
+        [TestCase("{\"format\":\"bit.rowchange/1\",\"table\":\"t\",\"operation\":\"Insert\",\"keys\":[],\"columns\":[{\"name\":\"Col\",\"type\":\"datetime\",\"value\":\"2024-01-01T00:00:00.0000000\",\"kind\":\"" + LoneSurrogate + "\"}]}", TestName = "LoneSurrogate_InKind")]
+        [TestCase("{\"format\":\"bit.rowchange/1\",\"table\":\"t\",\"operation\":\"Insert\",\"keys\":[],\"columns\":[{\"name\":\"Col\",\"ty" + LoneSurrogate + "pe\":\"int\",\"value\":\"1\"}]}", TestName = "LoneSurrogate_InColumnMemberName")]
+        [TestCase("{\"format\":\"bit.rowchange/1\",\"table\":\"t\",\"operation\":\"Insert\",\"keys\":[],\"columns\":[{\"na" + LoneSurrogate + "me\":\"Col\",\"name\":\"Col\",\"type\":\"int\",\"value\":\"1\"}]}", TestName = "LoneSurrogate_InMemberNameBeforeName")]
+        public void Deserializing_LoneSurrogateEscape_IsRefused(string json)
+        {
+            Refused(json);
+            Assert.Throws<RowChangeSerializationException>(() => SerializationHelper.DeserializeCore<List<RowChange>>(Utf8("[" + json + "]")));
+        }
+
+        [Test]
+        public void Deserializing_LoneSurrogateInValue_NamesTheColumn()
+        {
+            var ex = Refused(Payload("{\"name\":\"Title\",\"type\":\"string\",\"value\":\"" + LoneSurrogate + "\"}"));
+            Assert.That(ex.ColumnName, Is.EqualTo("Title"));
+            Assert.That(ex.Message, Does.Contain("Title"));
+        }
+
         [Test]
         public void Deserializing_NullOrInvalidUtf8_IsRefused()
         {
