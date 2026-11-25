@@ -6,10 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace BIT.EfCore.Sync
 {
-    public abstract class SyncFrameworkDbContext : DbContext, IRoutedClientSyncDatabase, IEnableDeltaTracking
+    public abstract class SyncFrameworkDbContext : DbContext, IRoutedClientSyncDatabase, IEnableDeltaTracking, IEnableRowChangeCapture
     {
         private IReadOnlyList<DeltaRoute> routes;
         /// <summary>
@@ -21,6 +22,12 @@ namespace BIT.EfCore.Sync
         /// True (the default) to record a delta for every SaveChanges; false to save changes without creating deltas.
         /// </summary>
         public bool EnableDeltaTracking { get; set; } = true;
+
+        /// <summary>
+        /// False (the default) to record only the provider SQL commands of each change; true to also record a
+        /// provider-neutral <see cref="RowChange"/> per row, read back with <see cref="DeltaRowChanges.GetRowChanges"/>.
+        /// </summary>
+        public bool EnableRowChangeCapture { get; set; }
 
         /// <summary>
         /// <para>
@@ -63,6 +70,27 @@ namespace BIT.EfCore.Sync
             var IEFSyncFrameworkService = serviceProvider.GetService<IModificationCommandToCommandDataService>();
             IEFSyncFrameworkService.RegisterDeltaGenerators(serviceProvider);
             optionsBuilder.UseInternalServiceProvider(serviceProvider);
+        }
+
+        /// <summary>
+        /// Saves changes with no SynchronizationContext installed, so the async delta work behind it never
+        /// tries to resume on a blocked caller thread (UI threads) and cannot deadlock.
+        /// The work stays on the calling thread, so ambient transactions keep working.
+        /// </summary>
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            var callerContext = SynchronizationContext.Current;
+            if (callerContext == null)
+                return base.SaveChanges(acceptAllChangesOnSuccess);
+            SynchronizationContext.SetSynchronizationContext(null);
+            try
+            {
+                return base.SaveChanges(acceptAllChangesOnSuccess);
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(callerContext);
+            }
         }
 
     }

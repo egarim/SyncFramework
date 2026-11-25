@@ -12,59 +12,68 @@ using System.Threading.Tasks;
 
 namespace BIT.EfCore.Sync
 {
+    /// <summary>
+    /// A delta store backed by a <see cref="BIT.EfCore.Sync.DeltaDbContext"/>.
+    /// Every operation creates and disposes its own context, so one instance (for example a DI singleton) can serve concurrent calls.
+    /// </summary>
     public class EfDeltaStore : DeltaStoreBase
     {
 
 
         public static bool EnsureDeleted { get; set; }
+        /// <summary>
+        /// The context passed to the constructor, kept for existing callers. The store never uses it for queries or saves;
+        /// it only reads its type and options to create a new context per operation. Null when the store was built from a factory.
+        /// </summary>
         public DeltaDbContext DeltaDbContext { get; protected set; }
+
+        private readonly Func<DeltaDbContext> contextFactory;
+
         [Obsolete("use the constructor with DbContextOptionsBuilder or DeltaDbContext directly instead. This constructor is for testing purposes only and may be removed in future versions.",true)]
         public EfDeltaStore(DeltaDbContext DeltaDbContext):base(DeltaDbContext.GetService<ISequenceService>())
         {
             this.DeltaDbContext = DeltaDbContext;
-            //HACK TEST remove the comment below to ensure a clean delta database for testing
-            
-            if(EnsureDeleted)
-            {
-                this.DeltaDbContext.Database.EnsureDeleted();
-            }
-           
-            this.DeltaDbContext.Database.EnsureCreated();
-          
+            this.contextFactory = DeltaDbContextFactory.FromTemplate(DeltaDbContext);
+            EnsureDatabase();
         }
+        /// <summary>
+        /// Creates a store that uses the type and options of <paramref name="DeltaDbContext"/> to create a new context for each operation.
+        /// </summary>
         public EfDeltaStore(DeltaDbContext DeltaDbContext, ISequenceService sequenceService) : base(sequenceService)
         {
             this.DeltaDbContext = DeltaDbContext;
-            //HACK TEST remove the comment below to ensure a clean delta database for testing
+            this.contextFactory = DeltaDbContextFactory.FromTemplate(DeltaDbContext);
+            EnsureDatabase();
+        }
+        /// <summary>
+        /// Creates a store that calls <paramref name="contextFactory"/> for a new context in each operation and disposes it afterwards.
+        /// </summary>
+        public EfDeltaStore(Func<DeltaDbContext> contextFactory, ISequenceService sequenceService) : base(sequenceService)
+        {
+            this.contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
+            EnsureDatabase();
+        }
 
+        private void EnsureDatabase()
+        {
+            using var context = CreateContext();
+            //HACK TEST set EnsureDeleted to ensure a clean delta database for testing
             if (EnsureDeleted)
             {
-                this.DeltaDbContext.Database.EnsureDeleted();
+                context.Database.EnsureDeleted();
             }
 
-            this.DeltaDbContext.Database.EnsureCreated();
-
+            context.Database.EnsureCreated();
         }
-        //public EfDeltaStore(DbContextOptionsBuilder<DeltaDbContext> dbContextOptionsBuilder):this(new DeltaDbContext(dbContextOptionsBuilder.Options))
-        //{
-           
-            
-        //}
 
+        /// <summary>
+        /// A new context for one operation; the caller disposes it.
+        /// </summary>
+        protected virtual DeltaDbContext CreateContext() => contextFactory();
 
-        //TODO clean up later, constructor not needed
-
-        //protected EfDeltaStore()
-        //{
-        //    DbContextOptionsBuilder<DeltaDbContext> dbContextOptionsBuilder = new DbContextOptionsBuilder<DeltaDbContext>();
-        //    dbContextOptionsBuilder.UseInMemoryDatabase("MemoryDb");
-        //    this.DeltaDbContext = new DeltaDbContext(dbContextOptionsBuilder.Options);
-        //    this.DeltaDbContext.Database.EnsureCreated();
-        //}
-     
         public async override Task SaveDeltasAsync(IEnumerable<IDelta> deltas, CancellationToken cancellationToken = default)
         {
-       
+            await using var context = CreateContext();
             foreach (IDelta delta in deltas)
             {
 
@@ -78,11 +87,11 @@ namespace BIT.EfCore.Sync
                 if (!SavingEventArgs.CustomHandled)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-                    await SetDeltaIndex(delta);
+                    await SetDeltaIndex(delta).ConfigureAwait(false);
                     EfDelta entity = new EfDelta(delta);
 
-                    DeltaDbContext.Deltas.Add(entity);
-                    await DeltaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                    context.Deltas.Add(entity);
+                    await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
                    
                 }
                 SavedDeltaEventArgs args = new SavedDeltaEventArgs(delta, SavingEventArgs.CustomHandled);
@@ -95,11 +104,15 @@ namespace BIT.EfCore.Sync
         {
             
             cancellationToken.ThrowIfCancellationRequested();
-            var CurrentDeltaIndex = await DeltaDbContext.EFSyncStatus.FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
+            EfSyncStatus CurrentDeltaIndex;
+            await using (var context = CreateContext())
+            {
+                CurrentDeltaIndex = await context.EFSyncStatus.AsNoTracking().FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
+            }
             if (CurrentDeltaIndex == null)
-                return await this.SequenceService.GetFirstIndexValue();
+                return await this.SequenceService.GetFirstIndexValue().ConfigureAwait(false);
             if (CurrentDeltaIndex.LastProcessedDelta==default)
-                return await this.SequenceService.GetFirstIndexValue();
+                return await this.SequenceService.GetFirstIndexValue().ConfigureAwait(false);
             else
                 return CurrentDeltaIndex.LastProcessedDelta;
         }
@@ -107,43 +120,51 @@ namespace BIT.EfCore.Sync
         public override async Task SetLastProcessedDeltaAsync(string Index, string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var CurrentDeltaIndex = await DeltaDbContext.EFSyncStatus.FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
+            await using var context = CreateContext();
+            var CurrentDeltaIndex = await context.EFSyncStatus.FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
             if (CurrentDeltaIndex == null)
             {
                 CurrentDeltaIndex = new EfSyncStatus()
                 {
                     Identity = identity
                 };
-                DeltaDbContext.Add(CurrentDeltaIndex);
+                context.Add(CurrentDeltaIndex);
             }
 
             CurrentDeltaIndex.LastProcessedDelta = Index;
 
-            await DeltaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        public override Task<IEnumerable<IDelta>> GetDeltasAsync(string startIndex, CancellationToken cancellationToken = default)
+        public override async Task<IEnumerable<IDelta>> GetDeltasAsync(string startIndex, CancellationToken cancellationToken = default)
         {
             startIndex = GuardStartIndex(startIndex);
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(DeltaDbContext.Deltas.Where(d => d.Index.CompareTo(startIndex) > 0).ToList().Cast<IDelta>());
+            await using var context = CreateContext();
+            var deltas = await context.Deltas.AsNoTracking().Where(d => d.Index.CompareTo(startIndex) > 0).ToListAsync(cancellationToken).ConfigureAwait(false);
+            return deltas.Cast<IDelta>();
         }
   
-        public override Task<IEnumerable<IDelta>> GetDeltasByIdentityAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
+        public override async Task<IEnumerable<IDelta>> GetDeltasByIdentityAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
           
             cancellationToken.ThrowIfCancellationRequested();
             startIndex=GuardStartIndex(startIndex);
-            IEnumerable<IDelta> result = DeltaDbContext.Deltas.Where(d => string.Compare(d.Index, startIndex) > 0 && d.Identity == identity).ToList().Cast<IDelta>();
-             return Task.FromResult(result);
+            await using var context = CreateContext();
+            var deltas = await context.Deltas.AsNoTracking().Where(d => string.Compare(d.Index, startIndex) > 0 && d.Identity == identity).ToListAsync(cancellationToken).ConfigureAwait(false);
+            return deltas.Cast<IDelta>();
         }
 
         public async override Task<string> GetLastPushedDeltaAsync(string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var CurrentDeltaIndex = await DeltaDbContext.EFSyncStatus.FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
+            EfSyncStatus CurrentDeltaIndex;
+            await using (var context = CreateContext())
+            {
+                CurrentDeltaIndex = await context.EFSyncStatus.AsNoTracking().FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
+            }
             if (CurrentDeltaIndex == null)
-                return await this.SequenceService.GetFirstIndexValue();
+                return await this.SequenceService.GetFirstIndexValue().ConfigureAwait(false);
             else
                 return CurrentDeltaIndex.LastPushedDelta;
         }
@@ -151,68 +172,75 @@ namespace BIT.EfCore.Sync
         public async override Task SetLastPushedDeltaAsync(string Index, string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var CurrentDeltaIndex = await DeltaDbContext.EFSyncStatus.FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
+            await using var context = CreateContext();
+            var CurrentDeltaIndex = await context.EFSyncStatus.FirstOrDefaultAsync(f => f.Identity == identity, cancellationToken).ConfigureAwait(false);
             if (CurrentDeltaIndex == null)
             {
                 CurrentDeltaIndex = new EfSyncStatus()
                 {
                     Identity = identity
                 };
-                DeltaDbContext.Add(CurrentDeltaIndex);
+                context.Add(CurrentDeltaIndex);
             }
 
             CurrentDeltaIndex.LastPushedDelta = Index;
 
-            await DeltaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
 
         public async override Task<int> GetDeltaCountAsync(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return await DeltaDbContext.Deltas.CountAsync(d => d.Index.CompareTo(startIndex) > 0 && d.Identity == identity);
+            await using var context = CreateContext();
+            return await context.Deltas.CountAsync(d => d.Index.CompareTo(startIndex) > 0 && d.Identity == identity, cancellationToken).ConfigureAwait(false);
         }
 
         public async override Task PurgeDeltasAsync(string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var deltas = DeltaDbContext.Deltas.Where(d => d.Identity == identity);
-            DeltaDbContext.RemoveRange(deltas);
-            await DeltaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await using var context = CreateContext();
+            var deltas = context.Deltas.Where(d => d.Identity == identity);
+            context.RemoveRange(deltas);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         }
 
         public override async Task<IEnumerable<IDelta>> GetDeltasFromOtherClients(string startIndex, string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            await using var context = CreateContext();
             /* By default there is no Ef translation set for string.Compare in PostgreSql. luckily the PostgreSql is by default case sensitive */
             //IQueryable<EFDelta> result = DeltaDbContext.Deltas.Where(d => d.Index.CompareTo(startIndex) > 0 && string.Compare(d.Identity, identity, StringComparison.Ordinal) != 0);
-            IQueryable<EfDelta> result = DeltaDbContext.Deltas.Where(d => d.Index.CompareTo(startIndex) > 0 && d.Identity != identity);
-            List<EfDelta> eFDeltas = result.ToList();
-            return await Task.FromResult(eFDeltas.Cast<IDelta>()).ConfigureAwait(false);
+            IQueryable<EfDelta> result = context.Deltas.AsNoTracking().Where(d => d.Index.CompareTo(startIndex) > 0 && d.Identity != identity);
+            List<EfDelta> eFDeltas = await result.ToListAsync(cancellationToken).ConfigureAwait(false);
+            return eFDeltas.Cast<IDelta>();
         }
 
         public override async Task ResetDeltasStatusAsync(string identity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var status = await DeltaDbContext.EFSyncStatus.FirstOrDefaultAsync(d => d.Identity == identity).ConfigureAwait(false);
+            await using var context = CreateContext();
+            var status = await context.EFSyncStatus.FirstOrDefaultAsync(d => d.Identity == identity, cancellationToken).ConfigureAwait(false);
             if (status != null)
             {
-                DeltaDbContext.RemoveRange(status);
-                await DeltaDbContext.SaveChangesAsync(cancellationToken);
+                context.RemoveRange(status);
+                await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             }
         }
 
-        public override Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken)
+        public override async Task<IDelta> GetDeltaAsync(string deltaId, CancellationToken cancellationToken)
         {
-           return DeltaDbContext.Deltas.FirstOrDefaultAsync(d => d.Index == deltaId).ContinueWith(t => (IDelta)t.Result);
+            await using var context = CreateContext();
+            return await context.Deltas.AsNoTracking().FirstOrDefaultAsync(d => d.Index == deltaId, cancellationToken).ConfigureAwait(false);
         }
 
         public async override Task PurgeDeltaStoreAsync(CancellationToken cancellationToken)
         {
-             await DeltaDbContext.Deltas.ExecuteDeleteAsync(cancellationToken);
-            await DeltaDbContext.EFSyncStatus.ExecuteDeleteAsync(cancellationToken);
-            await DeltaDbContext.EfSequence.ExecuteDeleteAsync(cancellationToken);
-            await DeltaDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await using var context = CreateContext();
+            await context.Deltas.ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
+            await context.EFSyncStatus.ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
+            await context.EfSequence.ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
+            await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return; 
         }
     }
