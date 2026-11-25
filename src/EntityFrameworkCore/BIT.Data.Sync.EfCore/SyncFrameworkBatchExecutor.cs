@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Update;
 using Microsoft.EntityFrameworkCore.Update.Internal;
 using BIT.Data.Sync.Client;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,7 +40,8 @@ namespace BIT.Data.Sync.EfCore
         public override int Execute(IEnumerable<ModificationCommandBatch> commandBatches, IRelationalConnection connection)
         {
 
-          
+            if (IsDeltaTrackingEnabled && IsRowChangeCaptureEnabled)
+                EnsureRowChangesCanBeCaptured();
             int AffectedRows = base.Execute(commandBatches, connection);
             // Run on the thread pool so blocking here can't deadlock a caller with a SynchronizationContext (UI threads).
             if (IsDeltaTrackingEnabled)
@@ -52,11 +54,17 @@ namespace BIT.Data.Sync.EfCore
         /// False when the current context implements <see cref="IEnableDeltaTracking"/> and has tracking turned off.
         /// </summary>
         protected virtual bool IsDeltaTrackingEnabled => (this.CurrentContext.Context as IEnableDeltaTracking)?.EnableDeltaTracking ?? true;
+
+        /// <summary>
+        /// True when the current context implements <see cref="IEnableRowChangeCapture"/> and has row change capture turned on; off by default.
+        /// </summary>
+        protected virtual bool IsRowChangeCaptureEnabled => (this.CurrentContext.Context as IEnableRowChangeCapture)?.EnableRowChangeCapture ?? false;
         public async override Task<int> ExecuteAsync(IEnumerable<ModificationCommandBatch> commandBatches, IRelationalConnection connection, CancellationToken cancellationToken = default)
         {
             
             cancellationToken.ThrowIfCancellationRequested();
-          
+            if (IsDeltaTrackingEnabled && IsRowChangeCaptureEnabled)
+                EnsureRowChangesCanBeCaptured();
             int AffectedRows = await base.ExecuteAsync(commandBatches, connection, cancellationToken).ConfigureAwait(false);
             if (IsDeltaTrackingEnabled)
                 await SaveDeltasAsync(commandBatches, AffectedRows, cancellationToken).ConfigureAwait(false);
@@ -71,6 +79,7 @@ namespace BIT.Data.Sync.EfCore
             var IUpdaterAliasService = this.CurrentContext.Context.GetService<IUpdaterAliasService>();
 
             var alias=IUpdaterAliasService.GetAlias(CurrentUpdater.GetType().FullName);
+            bool captureRowChanges = IsRowChangeCaptureEnabled;
 
 
             List<ModificationCommandData> modifications = new List<ModificationCommandData>();
@@ -102,7 +111,9 @@ namespace BIT.Data.Sync.EfCore
                     }
                     List<Parameters> parameters = GetParameters(modificationCommand);
 
-                    ModificationCommandData modificationCommandData = new ModificationCommandData(parameters, commands, AffectedRows, alias);
+                    ModificationCommandData modificationCommandData = captureRowChanges
+                        ? new ModificationCommandDataWithRowChange(parameters, commands, AffectedRows, alias, GetRowChange(modificationCommand))
+                        : new ModificationCommandData(parameters, commands, AffectedRows, alias);
                     DeltaRoute route = routes.FirstOrDefault(r => r.Handles(modificationCommand.TableName, modificationCommand.Schema));
                     if (route == null)
                     {
@@ -120,17 +131,108 @@ namespace BIT.Data.Sync.EfCore
             // Without routes this is the original behaviour: one delta per SaveChanges on the default store.
             if (modifications.Count > 0 || routes.Count == 0)
             {
-                var Delta = DeltaStore.CreateDelta(syncIdentityService.Identity, modifications);
+                var Delta = DeltaStore.CreateDelta(syncIdentityService.Identity, ToPayload(modifications, captureRowChanges));
                 await this.DeltaStore.SaveDeltasAsync(new List<IDelta>() { Delta }, cancellationToken).ConfigureAwait(false);
             }
             foreach (var routed in routedModifications)
             {
-                var Delta = routed.Key.DeltaStore.CreateDelta(syncIdentityService.Identity, routed.Value);
+                var Delta = routed.Key.DeltaStore.CreateDelta(syncIdentityService.Identity, ToPayload(routed.Value, captureRowChanges));
                 await routed.Key.DeltaStore.SaveDeltasAsync(new List<IDelta>() { Delta }, cancellationToken).ConfigureAwait(false);
             }
 
 
             return modifications;
+        }
+
+        /// <summary>
+        /// The object serialized into a delta. Without row change capture it is the list itself, so the payload is unchanged;
+        /// with it, a list of <see cref="ModificationCommandDataWithRowChange"/>, so the serializer writes the extra member without type hints.
+        /// </summary>
+        private static object ToPayload(List<ModificationCommandData> modifications, bool captureRowChanges)
+            => captureRowChanges ? modifications.Cast<ModificationCommandDataWithRowChange>().ToList() : (object)modifications;
+
+        /// <summary>
+        /// Builds the provider-neutral row change of <paramref name="modificationCommand"/>, or null for a state that changes no row.
+        /// Insert: the keys and every written column. Update: the keys (original values) and the written columns.
+        /// Delete: the keys only. Values are the provider values, after any value converter.
+        /// </summary>
+        protected virtual RowChange GetRowChange(ModificationCommand modificationCommand)
+        {
+            RowChangeOperation operation;
+            switch (modificationCommand.EntityState)
+            {
+                case EntityState.Added: operation = RowChangeOperation.Insert; break;
+                case EntityState.Modified: operation = RowChangeOperation.Update; break;
+                case EntityState.Deleted: operation = RowChangeOperation.Delete; break;
+                default: return null;
+            }
+
+            var rowChange = new RowChange
+            {
+                Table = string.IsNullOrEmpty(modificationCommand.Schema) ? modificationCommand.TableName : modificationCommand.Schema + "." + modificationCommand.TableName,
+                Operation = operation
+            };
+            foreach (IColumnModification column in modificationCommand.ColumnModifications)
+            {
+                if (column.IsKey)
+                {
+                    object key = operation == RowChangeOperation.Insert || !column.UseOriginalValueParameter ? column.Value : column.OriginalValue;
+                    rowChange.Keys.Add(new RowColumn(column.ColumnName, ToProviderValue(column, key)));
+                }
+                else if (operation != RowChangeOperation.Delete && column.IsWrite)
+                {
+                    rowChange.Columns.Add(new RowColumn(column.ColumnName, ToProviderValue(column, column.Value)));
+                }
+            }
+            return rowChange;
+        }
+
+        private static object ToProviderValue(IColumnModification column, object value)
+        {
+            var converter = column.TypeMapping?.Converter;
+            if (value == null || converter == null)
+                return value;
+            var modelType = Nullable.GetUnderlyingType(converter.ModelClrType) ?? converter.ModelClrType;
+            return modelType.IsInstanceOfType(value) ? converter.ConvertToProvider(value) : value;
+        }
+
+        /// <summary>
+        /// Refuses, before anything is written, a save whose changed columns hold a type a row change cannot carry
+        /// (see <see cref="RowValueTypes.Allowed"/>), so a failed capture never leaves saved rows without a delta.
+        /// </summary>
+        protected virtual void EnsureRowChangesCanBeCaptured()
+        {
+            var changeTracker = this.CurrentContext.Context.ChangeTracker;
+            bool autoDetectChanges = changeTracker.AutoDetectChangesEnabled;
+            changeTracker.AutoDetectChangesEnabled = false;
+            try
+            {
+                foreach (var entry in changeTracker.Entries())
+                {
+                    if (entry.State != EntityState.Added && entry.State != EntityState.Modified && entry.State != EntityState.Deleted)
+                        continue;
+                    foreach (var property in entry.Properties)
+                    {
+                        // Updates carry the keys and the modified columns, deletes only the keys.
+                        bool carried = property.Metadata.IsPrimaryKey()
+                            || entry.State == EntityState.Added
+                            || (entry.State == EntityState.Modified && property.IsModified);
+                        if (!carried)
+                            continue;
+                        var mapping = property.Metadata.FindTypeMapping();
+                        var providerType = mapping?.Converter?.ProviderClrType ?? mapping?.ClrType ?? property.Metadata.ClrType;
+                        providerType = Nullable.GetUnderlyingType(providerType) ?? providerType;
+                        if (!RowValueTypes.Allowed.Contains(providerType))
+                            throw new InvalidOperationException(
+                                $"Row change capture is on, but '{entry.Metadata.DisplayName()}.{property.Metadata.Name}' is stored as '{providerType.FullName}', which a row change cannot carry. " +
+                                $"Map it to one of {string.Join(", ", RowValueTypes.Allowed.Select(t => t.Name))} with a value converter, or turn row change capture off. Nothing was saved.");
+                    }
+                }
+            }
+            finally
+            {
+                changeTracker.AutoDetectChangesEnabled = autoDetectChanges;
+            }
         }
 
         protected virtual List<Parameters> GetParameters(ModificationCommand modificationCommand)
