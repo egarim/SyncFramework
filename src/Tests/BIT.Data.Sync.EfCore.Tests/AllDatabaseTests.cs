@@ -303,7 +303,9 @@ namespace BIT.Data.Sync.EfCore.Tests
         #endregion
 
         #region Tests
+        // Syncs a SQL Server master with SQLite, PostgreSQL and MySQL nodes; see AllDatabaseTests.md for how to leave it out.
         [Test]
+        [Category("RequiresDatabaseServer")]
         public async Task SyncFramework_CrossDatabaseSync_SuccessfullyExchangesData()
         {
             var (masterContext, nodeAContext, nodeBContext, nodeCContext) = await SetupContexts();
@@ -444,7 +446,9 @@ namespace BIT.Data.Sync.EfCore.Tests
             Assert.AreEqual(10, masterContext.Blogs.Count());
         }
 
+        // Uses the SQL Server master context and delta store.
         [Test]
+        [Category("RequiresDatabaseServer")]
         public async Task DeltasMarkedAsSentAfterPush()
         {
             // Arrange: Setup a context that we can use for testing
