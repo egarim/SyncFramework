@@ -19,6 +19,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="RowChangeTests\Fixtures\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -35,6 +41,8 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\BIT.Data.Sync.AspNetCore\BIT.Data.Sync.AspNetCore.csproj" />
 		<ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
+		<!-- SQLite in-memory tests of row change capture and apply (T-8); no new package, the provider package comes with this project. -->
+		<ProjectReference Include="..\..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Sqlite\BIT.Data.Sync.EfCore.Sqlite.csproj" />
 	</ItemGroup>
 
 </Project>
