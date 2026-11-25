@@ -4,7 +4,14 @@ This document illustrates the data flow in the `AllDatabaseTests.cs` test that v
 
 ## Running the tests with or without database servers
 
-Every test in this project that needs a SQL Server, PostgreSQL or MySQL server carries the NUnit category `RequiresDatabaseServer`. The whole `AllDatabaseTests` fixture has this category. The other tests in the project use only SQLite or in-memory databases.
+Every test in this project that needs a SQL Server, PostgreSQL or MySQL server carries the NUnit category `RequiresDatabaseServer`. Today those are the two tests in `AllDatabaseTests`, each tagged at method level:
+
+- `SyncFramework_CrossDatabaseSync_SuccessfullyExchangesData` syncs a SQL Server master with SQLite, PostgreSQL and MySQL nodes.
+- `DeltasMarkedAsSentAfterPush` uses the SQL Server master context and delta store.
+
+The fixture's `SetUp` only reads connection strings and configures context options; it opens no connection, so the category sits on the tests rather than the fixture. Neither test is parameterized across providers. If a provider-parameterized test is added, tag only its SQL Server, PostgreSQL and MySQL cases, for example `[TestCase(..., Category = "RequiresDatabaseServer")]`, and leave the SQLite and in-memory cases untagged.
+
+The other tests in the project (`ConcurrencyTests`, `DeltaRouteTests`, `DeltaTrackingTests`, `EfDeltaStoreTests`) use only SQLite or the EF Core in-memory provider and run without any database server.
 
 On a machine with no SQL Server, PostgreSQL or MySQL server, leave the category out:
 
@@ -18,10 +25,16 @@ On a machine with those servers, run everything. First set the connection string
 dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests
 ```
 
-To list only the tests that need a database server:
+The command to list the tests in the category is:
 
 ```bash
 dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests --list-tests --filter "TestCategory=RequiresDatabaseServer"
+```
+
+With the VSTest runner and NUnit3TestAdapter this project uses, `--list-tests` does not apply `--filter` and prints all tests. To see which tests the category selects, run the category on its own. Without the connection string variables, `SetUp` skips each selected test before it opens any connection:
+
+```bash
+dotnet test src/Tests/BIT.Data.Sync.EfCore.Tests --filter "TestCategory=RequiresDatabaseServer" --logger "console;verbosity=normal"
 ```
 
 ## System Architecture
