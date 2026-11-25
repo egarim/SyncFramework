@@ -43,6 +43,10 @@
 		<ProjectReference Include="..\..\BIT.Data.Sync\BIT.Data.Sync.csproj" />
 		<!-- SQLite in-memory tests of row change capture and apply (T-8); no new package, the provider package comes with this project. -->
 		<ProjectReference Include="..\..\EntityFrameworkCore\BIT.Data.Sync.EfCore.Sqlite\BIT.Data.Sync.EfCore.Sqlite.csproj" />
+		<!-- Command text and parameter tests of the SQL Server, Npgsql and MySQL row change builders (T-9); no server is needed and no package is added. -->
+		<ProjectReference Include="..\..\EntityFrameworkCore\BIT.Data.Sync.EfCore.SqlServer\BIT.Data.Sync.EfCore.SqlServer.csproj" />
+		<ProjectReference Include="..\..\EntityFrameworkCore\NBIT.Data.Sync.EfCore.Npgsql\BIT.Data.Sync.EfCore.Npgsql.csproj" />
+		<ProjectReference Include="..\..\EntityFrameworkCore\BIT.Data.Sync.EfCore.MySql\BIT.Data.Sync.EfCore.MySql.csproj" />
 	</ItemGroup>
 
 </Project>
